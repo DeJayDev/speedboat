@@ -30,7 +30,7 @@
     "webpack": "^3.3.0"
   },
   "scripts": {
-    "build": "NODE_ENV=production webpack",
-    "serve": "webpack-dev-server --progress --hot --inline --host 0.0.0.0"
+    "build": "NODE_ENV=docker webpack",
+    "serve": "webpack-dev-server --progress --hot --inline --host 0.0.0.0 --port 80"
   }
 }

@@ -32,7 +32,7 @@ export default class Login extends Component {
               </div>
               <div className="panel-body">
                 <a href="/api/auth/discord">
-                  <img src="https://discordapp.com/assets/bb408e0343ddedc0967f246f7e89cebf.svg" height="256" width="256" style={{
+                  <img src="https://u.swvn9.net/2017/OENkw.svg" height="256" width="256" style={{
                     margin: 'auto',
                     display: 'block',
                   }} />

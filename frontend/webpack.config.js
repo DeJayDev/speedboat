@@ -82,4 +82,5 @@ module.exports = {
 	// 				'create-react-class': 'preact-compat/lib/create-react-class'
 	// 		}
 	// }
+ 
 };
