@@ -29,7 +29,7 @@ class Topbar extends Component {
 		return(
 			<nav className="navbar navbar-default navbar-static-top" role="navigation" style={{marginBottom: 0}}>
 				<div className="navbar-header">
-					<a className="navbar-brand">Rowboat</a>
+					<a className="navbar-brand">Speedboat</a>
 				</div>
 
 				<ul className="nav navbar-top-links navbar-right">

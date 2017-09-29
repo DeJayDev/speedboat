@@ -56,31 +56,25 @@ class GuildOverviewInfoTable extends Component {
 
     if (this.props.guild.premium.active) {
       parts.push(
-        <b key='active'>Active!</b>
+        <b key='active'>Active</b>
       );
-
-      parts.push(<br key='br1' />);
-
-      parts.push(
-        <i key='by'>Purchased by {this.props.guild.premium.info.user.id}</i>
-      );
-
-      if (globalState.user.id == this.props.guild.premium.info.user.id || globalState.user.admin) {
+      if (globalState.user.admin) {
         parts.push(<br key='br2' />);
         parts.push(
-          <a key='cancel' href='#' onClick={this.onCancel.bind(this)}>Cancel Premium</a>
+          <a key='cancel' href='#' class="give" onClick={this.onCancel.bind(this)}>Cancel Premium</a>
         );
       }
     } else {
       if (PREMIUM_ENABLED) {
         parts.push(
-          <a key='purchase' href='#' onClick={this.onPurchase.bind(this)}>Purchase Rowboat Premium</a>
+          //<a key='purchase' href='#' onClick={this.onPurchase.bind(this)}>Purchase Rowboat Premium</a>
+          <b key='active'>Inactive</b>
         );
 
         if (globalState.user.admin) {
           parts.push(<br key='br3' />);
           parts.push(
-            <a key='give' href='#' onClick={this.onGive.bind(this)}>Give Premium</a>
+            <a class="give" key='give' href='#' onClick={this.onGive.bind(this)}>Give Premium</a>
           );
         }
       } else {

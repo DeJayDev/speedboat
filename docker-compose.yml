@@ -4,6 +4,8 @@ services:
     build: ./docker/database/
     volumes:
       - ./.data:/var/lib/postgresql/data
+    environment:
+      - ENV=production
   redis:
     image: redis:3.2
     command: redis-server --appendonly yes
@@ -38,7 +40,7 @@ services:
     volumes:
       - ./frontend:/opt/frontend
     ports:
-      - "8080:8080"
+      - "80:80"
     depends_on:
       - web
   bot:
