@@ -94,6 +94,7 @@ export default class GuildConfigEdit extends Component {
                 mode="yaml"
                 theme="monokai"
                 width="100%"
+                height="75vh"
                 value={this.state.contents == null ? '' : this.state.contents}
                 onChange={(newValue) => this.onEditorChange(newValue)}
               />
