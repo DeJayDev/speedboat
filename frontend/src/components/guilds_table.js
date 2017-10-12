@@ -35,24 +35,13 @@ class GuildTableRowActions extends Component {
 
 class GuildTableRow extends Component {
   render() {
-	if (this.props.guild.premium.active)
-		return (
-		  <tr style={{backgroundColor: 'rgba(114, 136, 218, 0.36)', borderColor: 'rgba(114, 136, 218, 0.7)'}}>
-			<td>{this.props.guild.id}</td>
-			<td>Yes</td>
-			<td>{this.props.guild.name}</td>
-			<td><GuildTableRowActions guild={this.props.guild} /></td>
-		  </tr>
-		);
-	if (!this.props.guild.premium.active)
-		return (
-		  <tr>
-			<td>{this.props.guild.id}</td>
-			<td>No</td>
-			<td>{this.props.guild.name}</td>
-			<td><GuildTableRowActions guild={this.props.guild} /></td>
-		  </tr>
-		);
+    return (
+      <tr>
+        <td>{this.props.guild.id}</td>
+        <td>{this.props.guild.name}</td>
+        <td><GuildTableRowActions guild={this.props.guild} /></td>
+      </tr>
+    );
   }
 }
 
@@ -75,7 +64,6 @@ class GuildsTable extends Component {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Premium</th>
               <th>Name</th>
               <th>Actions</th>
             </tr>
