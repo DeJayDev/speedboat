@@ -532,29 +532,26 @@ class CorePlugin(Plugin):
             perms = guild.get_permissions(self.state.me)
 
             if not perms.ban_members and not perms.administrator:
-                contents.append(u':x: {} (`{}`) - No Permissions'.format(
-                    guild.name,
-                    gid
+                contents.append(u':x: {} - No Permissions'.format(
+                    guild.name
                 ))
                 continue
 
             try:
                 Infraction.ban(
-                    self,
+                    self.bot.plugins.get('AdminPlugin'),
                     event,
                     user,
                     reason,
                     guild=guild)
             except:
-                contents.append(u':x: {} (`{}`) - Unknown Error'.format(
-                    guild.name,
-                    gid
+                contents.append(u':x: {} - Unknown Error'.format(
+                    guild.name
                 ))
                 self.log.exception('Failed to force ban %s in %s', user, gid)
 
-            contents.append(u':white_check_mark: {} (`{}`) - :regional_indicator_f:'.format(
-                guild.name,
-                gid
+            contents.append(u':white_check_mark: {} - :regional_indicator_f:'.format(
+                guild.name
             ))
 
         event.msg.reply('Results:\n' + '\n'.join(contents))
