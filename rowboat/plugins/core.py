@@ -351,9 +351,8 @@ class CorePlugin(Plugin):
             return
 
         # Ensure we're updated
-        self.log.info('Syncing guild %s', event.guild.id)
+        self.log.info('Syncing Guild and Members in: %s (&s)', event.guild.name, event.guild.id)
         guild.sync(event.guild)
-	self.log.info('Syncing Users in Guild %s', event.guild.id)
 	event.guild.sync()
 
         self.guilds[event.id] = guild
