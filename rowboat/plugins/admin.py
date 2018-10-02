@@ -844,7 +844,16 @@ class AdminPlugin(Plugin):
         q = Message.select(Message.id).join(User).order_by(Message.id.desc()).limit(size)
 
         if mode in ('all', 'channel'):
-            q = q.where((Message.channel_id == (channel or event.channel).id))
+            cid = event.channel.id
+            if channel:
+                cid = channel if isinstance(channel, (int,log)) else channel.id
+            channel = event.guild.channels.get(cid)
+            if not channel:
+              raise CommandFail('Channel not Found')
+            perms = channel.get_permissions(event.author)
+            if not (perms.administrator or perms.read_messages):
+              raise CommandFail('Cannot access channel due to permissions')
+            q = q.where(Message.channel_id == cid)
         else:
             q = q.where(
                 (Message.author_id == (user if isinstance(user, (int, long)) else user.id)) &
@@ -943,6 +952,12 @@ class AdminPlugin(Plugin):
         self.cleans[event.channel.id].join()
         del self.cleans[event.channel.id]
 
+    @Plugin.command(
+	'bypass',
+        '<user:user> <role:str> [reason:str...]',
+	level=-1,
+	context={'mode': 'remove'},
+	group='role')
     @Plugin.command(
         'add',
         '<user:user> <role:str> [reason:str...]',

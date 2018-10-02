@@ -1,0 +1,28 @@
+diff --git a/rowboat/plugins/admin.py b/rowboat/plugins/admin.py
+index e8c14a9..5cfd13e 100644
+--- a/rowboat/plugins/admin.py
++++ b/rowboat/plugins/admin.py
+@@ -237,15 +240,27 @@ class AdminPlugin(Plugin):
+         q = Message.select(Message.id).join(User).order_by(Message.id.desc()).limit(size)
+
+         if mode in ('all', 'channel'):
+-            q = q.where((Message.channel_id == (channel or event.channel).id))
++            cid = event.channel.id
++            if channel:
++                cid = channel if isinstance(channel, (int, long)) else channel.id
++            channel = event.guild.channels.get(cid)
++            if not channel:
++                raise CommandFail('channel not found')
++            perms = channel.get_permissions(event.author)
++            if not (perms.administrator or perms.read_messages):
++                raise CommandFail('invalid permissions')
++            q = q.where(Message.channel_id == cid)
+         else:
++            user_id = user if isinstance(user, (int, long)) else user.id
++            if event.author.id != user_id:
++                self.can_act_on(event, user_id)
+             q = q.where(
+-                (Message.author_id == (user if isinstance(user, (int, long)) else user.id)) &
++                (Message.author_id == user_id) &
+                 (Message.guild_id == event.guild.id)
+             )
