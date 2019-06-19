@@ -568,8 +568,8 @@ class CorePlugin(Plugin):
 
     @Plugin.command('uptime', level=-1)
     def command_uptime(self, event):
-        event.msg.reply('Rowboat was started {}'.format(
-            humanize.naturaldelta(datetime.utcnow() - self.startup)
+        event.msg.reply('Speedboat was started {}'.format(
+            humanize.naturaltime(datetime.utcnow() - self.startup)
         ))
 
     @Plugin.command('source', '<command>', level=-1)
