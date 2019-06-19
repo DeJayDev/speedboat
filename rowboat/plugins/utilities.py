@@ -129,7 +129,7 @@ class UtilitiesPlugin(Plugin):
         if guild:
             fields.append('**Guild:** {} ({})'.format(S(guild.name), guild.id))
 
-        url = 'https://discordapp.com/api/emojis/{}.png'.format(eid)
+        url = 'https://cdn.discordapp.com/emojis/{}.png?v=1'.format(eid)
         r = requests.get(url)
         r.raise_for_status()
         return event.msg.reply('\n'.join(fields), attachments=[('emoji.png', r.content)])
@@ -141,7 +141,7 @@ class UtilitiesPlugin(Plugin):
         for emoji in emojis.split(' ')[:5]:
             if EMOJI_RE.match(emoji):
                 _, eid = EMOJI_RE.findall(emoji)[0]
-                urls.append('https://discordapp.com/api/emojis/{}.png'.format(eid))
+                urls.append('https://cdn.discordapp.com/emojis/{}.png?v=1'.format(eid))
             else:
                 urls.append(get_emoji_url(emoji))
 
