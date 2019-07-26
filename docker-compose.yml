@@ -3,7 +3,7 @@ services:
   db:
     build: ./docker/database/
     volumes:
-      - postgres-data-volume:/var/lib/postgresql/data
+      - ./.data:/var/lib/postgresql/data
     environment:
       - ENV=production
   redis:
@@ -56,6 +56,3 @@ services:
     depends_on:
       - web
 
-volumes:
-  postgres-data-volume:
-    external: true
