@@ -3,8 +3,9 @@ from disco.types.base import Unset
 from disco.api.http import APIException
 from disco.bot.command import CommandEvent
 from disco.gateway.events import GatewayEvent
+from disco.bot.plugin import register_plugin_base_class
 
-from rowboat import raven_client
+from rowboat import sentry
 from rowboat.util import MetaException
 from rowboat.types import Field
 from rowboat.types.guild import PluginsConfig
@@ -23,9 +24,9 @@ class SafePluginInterface(object):
         return wrapped
 
 
-class RavenPlugin(object):
+class SentryPlugin(object):
     """
-    The RavenPlugin base plugin class manages tracking exceptions on a plugin
+    The SentryPlugin base plugin class manages tracking exceptions on a plugin
     level, by hooking the `handle_exception` function from disco.
     """
     def handle_exception(self, greenlet, event):
@@ -66,22 +67,25 @@ class RavenPlugin(object):
             except:
                 pass
 
-        raven_client.captureException(exc_info=greenlet.exc_info, extra=extra)
+        with sentry.push_scope() as scope:
+            scope.set_extra('extra', extra)
+            sentry.capture_exception(greenlet.exc_info)
 
 
-class BasePlugin(RavenPlugin, Plugin):
+class BasePlugin(SentryPlugin, Plugin):
     """
     A BasePlugin is simply a normal Disco plugin, but aliased so we have more
     control. BasePlugins do not have hooked/altered events, unlike a RowboatPlugin.
+
+    But fr fuck this plugin lol
     """
-    _shallow = True
+    pass
 
 
-class RowboatPlugin(RavenPlugin, Plugin):
+class RowboatPlugin(SentryPlugin, Plugin):
     """
     A plugin which wraps events to load guild configuration.
     """
-    _shallow = True
     global_plugin = False
 
     def get_safe_plugin(self, name):
@@ -113,7 +117,9 @@ class RowboatPlugin(RavenPlugin, Plugin):
             raise Exception('Cannot resolve method %s for plugin %s' % (method_name, plugin_name))
 
         return method(*args, **kwargs)
-
+        
+register_plugin_base_class(BasePlugin)
+register_plugin_base_class(RowboatPlugin)
 
 class CommandResponse(Exception):
     EMOJI = None
@@ -123,10 +129,8 @@ class CommandResponse(Exception):
             response = u':{}: {}'.format(self.EMOJI, response)
         self.response = response
 
-
 class CommandFail(CommandResponse):
     EMOJI = 'no_entry_sign'
-
 
 class CommandSuccess(CommandResponse):
     EMOJI = 'ballot_box_with_check'

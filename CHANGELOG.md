@@ -1,5 +1,27 @@
 # Changelog
 
+## V1.5.0
+
+**The skip forward update**
+
+### Features 
+
+- Adds a force option to setup (Good Idea Dooley)
+- Uses Discos `register_plugin_base_class`
+- Uses Sentrys Unified SDK instead of Raven
+- Begins removal of holster, because b1nzy said so
+
+### Bugfixes
+- **Fixed !cat** !!!
+- Uses the new Discord CDN for emoji loading
+- Removes usage of the deprecated trace packet
+- Changes all public references of "Rowboat" back to "Speedboat"
+- Changes how yaml files are loaded (be safe kids)
+
+## V1.4.0
+
+No.
+
 ## V1.3.0
 
 ### Features

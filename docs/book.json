@@ -1,5 +1,5 @@
 {
-  "title": "Rowboat",
+  "title": "Speedboat",
   "plugins": ["prism", "-highlight", "hints"],
 	"pluginsConfig": {
 			"anchorjs": {
