@@ -1,6 +1,5 @@
 import os
 import json
-import gevent
 import pprint
 import signal
 import inspect
@@ -38,11 +37,10 @@ from rowboat.constants import (
 PY_CODE_BLOCK = u'```py\n{}\n```'
 
 BOT_INFO = '''
-Rowboat is a moderation and utilitarian bot built for large Discord servers.
+Speedboat is a modernized fork of rowboat, a moderation and utilitarian bot built for large Discord servers.
 '''
 
 GUILDS_WAITING_SETUP_KEY = 'gws'
-
 
 class CorePlugin(Plugin):
     def load(self, ctx):
@@ -51,7 +49,7 @@ class CorePlugin(Plugin):
         self.startup = ctx.get('startup', datetime.utcnow())
         self.guilds = ctx.get('guilds', {})
 
-        self.emitter = Emitter(gevent.spawn)
+        self.emitter = Emitter()
 
         super(CorePlugin, self).load(ctx)
 
@@ -147,7 +145,7 @@ class CorePlugin(Plugin):
         if not rb_guild:
             return
 
-        self.log.info('Updating rowboat guild access')
+        self.log.info('Updating speedboat guild access')
 
         guilds = Guild.select(
             Guild.guild_id,
@@ -278,7 +276,7 @@ class CorePlugin(Plugin):
     @contextlib.contextmanager
     def send_control_message(self):
         embed = MessageEmbed()
-        embed.set_footer(text='Rowboat {}'.format(
+        embed.set_footer(text='Speedboat {}'.format(
             'Production' if ENV == 'prod' else 'Testing'
         ))
         embed.timestamp = datetime.utcnow().isoformat()
@@ -297,15 +295,12 @@ class CorePlugin(Plugin):
     def on_resumed(self, event):
         Notification.dispatch(
             Notification.Types.RESUME,
-            trace=event.trace,
             env=ENV,
         )
 
         with self.send_control_message() as embed:
             embed.title = 'Resumed'
             embed.color = 0xffb347
-            embed.add_field(name='Gateway Server', value=event.trace[0], inline=False)
-            embed.add_field(name='Session Server', value=event.trace[1], inline=False)
             embed.add_field(name='Replayed Events', value=str(self.client.gw.replayed_events))
 
     @Plugin.listen('Ready', priority=Priority.BEFORE)
@@ -314,7 +309,6 @@ class CorePlugin(Plugin):
         self.log.info('Started session %s', event.session_id)
         Notification.dispatch(
             Notification.Types.CONNECT,
-            trace=event.trace,
             env=ENV,
         )
 
@@ -325,9 +319,6 @@ class CorePlugin(Plugin):
             else:
                 embed.title = 'Connected'
                 embed.color = 0x77dd77
-
-            embed.add_field(name='Gateway Server', value=event.trace[0], inline=False)
-            embed.add_field(name='Session Server', value=event.trace[1], inline=False)
 
     @Plugin.listen('GuildCreate', priority=Priority.BEFORE, conditional=lambda e: not e.created)
     def on_guild_create(self, event):
@@ -467,7 +458,7 @@ class CorePlugin(Plugin):
                     event.reply(e.response)
                 except:
                     tracked = Command.track(event, command, exception=True)
-                    self.log.exception('Command error:')
+                    self.log.exception('Command Error:')
 
                     with self.send_control_message() as embed:
                         embed.title = u'Command Error: {}'.format(command.name)
@@ -498,26 +489,26 @@ class CorePlugin(Plugin):
 
             return
 
-    @Plugin.command('setup')
-    def command_setup(self, event):
+    @Plugin.command('setup', '[force:str]')
+    def command_setup(self, event, force=False):
         if not event.guild:
-            return event.msg.reply(':warning: this command can only be used in servers')
+            return event.msg.reply(':warning: This command can only be used in servers')
 
         # Make sure we're not already setup
-        if event.guild.id in self.guilds:
-            return event.msg.reply(':warning: this server is already setup')
+        if not force or event.guild.id in self.guilds:
+            return event.msg.reply(':warning: This server is already setup')
 
         global_admin = rdb.sismember('global_admins', event.author.id)
 
         # Make sure this is the owner of the server
         if not global_admin:
             if not event.guild.owner_id == event.author.id:
-                return event.msg.reply(':warning: only the server owner can setup rowboat')
+                return event.msg.reply(':warning: Only the server owner can setup speedboat')
 
         # Make sure we have admin perms
         m = event.guild.members.select_one(id=self.state.me.id)
         if not m.permissions.administrator and not global_admin:
-            return event.msg.reply(':warning: bot must have the Administrator permission')
+            return event.msg.reply(':warning: Bot must have the Administrator permission')
 
         guild = Guild.setup(event.guild)
         rdb.srem(GUILDS_WAITING_SETUP_KEY, str(event.guild.id))
@@ -560,7 +551,7 @@ class CorePlugin(Plugin):
     @Plugin.command('about')
     def command_about(self, event):
         embed = MessageEmbed()
-        embed.set_author(name='Rowboat', icon_url=self.client.state.me.avatar_url, url='https://rowboat.party/')
+        embed.set_author(name='Speedboat', icon_url=self.client.state.me.avatar_url, url='https://row.swvn.io/')
         embed.description = BOT_INFO
         embed.add_field(name='Servers', value=str(Guild.select().count()), inline=True)
         embed.add_field(name='Uptime', value=humanize.naturaldelta(datetime.utcnow() - self.startup), inline=True)
@@ -584,7 +575,7 @@ class CorePlugin(Plugin):
         code = cmd.func.__code__
         lines, firstlineno = inspect.getsourcelines(code)
 
-        event.msg.reply('<https://github.com/b1naryth1ef/rowboat/blob/master/{}#L{}-{}>'.format(
+        event.msg.reply('<https://github.com/SethBots/speedboat/blob/master/{}#L{}-{}>'.format(
             code.co_filename,
             firstlineno,
             firstlineno + len(lines)
@@ -638,7 +629,7 @@ class CorePlugin(Plugin):
             Guild.enabled == 1
         ))
 
-        msg = event.msg.reply(':timer: pls wait while I sync...')
+        msg = event.msg.reply(':timer: Pls hold...')
 
         for guild in guilds:
             guild.sync_bans(self.client.state.guilds.get(guild.guild_id))
