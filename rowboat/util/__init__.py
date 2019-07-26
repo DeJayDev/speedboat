@@ -14,7 +14,7 @@ ZERO_WIDTH_SPACE = u'\u200B'
 MODIFIER_GRAVE_ACCENT = u'\u02CB'
 
 
-def ordered_load(stream, Loader=yaml.Loader, object_pairs_hook=OrderedDict):
+def ordered_load(stream, Loader=yaml.SafeLoader, object_pairs_hook=OrderedDict):
     class OrderedLoader(Loader):
         pass
 
@@ -24,7 +24,7 @@ def ordered_load(stream, Loader=yaml.Loader, object_pairs_hook=OrderedDict):
     OrderedLoader.add_constructor(
         yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
         construct_mapping)
-    return yaml.load(stream, OrderedLoader)
+    return yaml.safe_load(stream)
 
 
 INVITE_DOMAIN_RE = re.compile(r'(discord.gg|discordapp.com/invite)')

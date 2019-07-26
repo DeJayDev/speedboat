@@ -99,7 +99,7 @@ class UtilitiesPlugin(Plugin):
         # Sometimes random.cat gives us gifs (smh)
         for _ in range(3):
             try:
-                r = requests.get('http://random.cat/meow')
+                r = requests.get('http://aws.random.cat/meow')
                 r.raise_for_status()
             except:
                 continue
@@ -108,7 +108,7 @@ class UtilitiesPlugin(Plugin):
             if not url.endswith('.gif'):
                 break
         else:
-            return event.msg.reply('404 cat not found :(')
+            return event.msg.reply('404 Cat not found :(')
 
         r = requests.get(url)
         r.raise_for_status()
