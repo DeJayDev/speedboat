@@ -343,7 +343,7 @@ class CorePlugin(Plugin):
 
         # Ensure we're updated
         self.log.info('Requesting Guild: %s (%s)', event.guild.name, event.guild.id)
-        guild.request_guild_members(event.guild)
+        guild.sync(event.guild)
         
 	event.guild.request_guild_members()
 
