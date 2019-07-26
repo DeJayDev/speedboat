@@ -73,7 +73,7 @@ class Guild(BaseModel):
     def update_config(self, actor_id, raw):
         from rowboat.types.guild import GuildConfig
 
-        parsed = yaml.load(raw)
+        parsed = yaml.safe_load(raw)
         GuildConfig(parsed).validate()
 
         GuildConfigChange.create(
@@ -226,13 +226,13 @@ class GuildConfigChange(BaseModel):
     def rollback_to(self):
         Guild.update(
             config_raw=self.after_raw,
-            config=yaml.load(self.after_raw)
+            config=yaml.safe_load(self.after_raw)
         ).where(Guild.guild_id == self.guild_id).execute()
 
     def revert(self):
         Guild.update(
             config_raw=self.before_raw,
-            config=yaml.load(self.before_raw)
+            config=yaml.safe_load(self.before_raw)
         ).where(Guild.guild_id == self.guild_id).execute()
 
 

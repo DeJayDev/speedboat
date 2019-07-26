@@ -72,7 +72,7 @@ def guild_z_config_update(guild):
 
     # Calculate users diff
     try:
-        data = yaml.load(request.json['config'])
+        data = yaml.safe_load(request.json['config'])
     except:
         return 'Invalid YAML', 400
 

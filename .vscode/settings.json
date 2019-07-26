@@ -1,0 +1,5 @@
+{
+    "python.pythonPath": "C:\\Users\\DeJay\\.windows-build-tools\\python27\\python.exe",
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true
+}

@@ -1,25 +1,20 @@
 import os
 import logging
 import subprocess
+import sentry_sdk as sentry
 
 from disco.util.logging import LOG_FORMAT
-from raven import Client
-from raven.transport.gevent import GeventedHTTPTransport
 
 ENV = os.getenv('ENV', 'local')
 DSN = os.getenv('DSN')
 REV = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip()
 
-VERSION = '1.3.0'
+VERSION = '1.5.0'
 
-raven_client = Client(
+sentry.init(
     DSN,
-    ignore_exceptions=[
-        'KeyboardInterrupt',
-    ],
     release=REV,
     environment=ENV,
-    transport=GeventedHTTPTransport,
 )
 
 # Log things to file
