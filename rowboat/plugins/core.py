@@ -490,14 +490,10 @@ class CorePlugin(Plugin):
 
             return
 
-    @Plugin.command('setup', '[force:str]')
-    def command_setup(self, event, force=False):
+    @Plugin.command('setup')
+    def command_setup(self, event):
         if not event.guild:
             return event.msg.reply(':warning: This command can only be used in servers')
-
-        # Make sure we're not already setup
-        if not force or event.guild.id in self.guilds:
-            return event.msg.reply(':warning: This server is already setup')
 
         global_admin = rdb.sismember('global_admins', event.author.id)
 
@@ -652,7 +648,7 @@ class CorePlugin(Plugin):
             guild.name,
         ))
 
-        general_channel = guild.channels[guild.id]
+        general_channel = list(guild.channels)[0]
 
         try:
             invite = general_channel.create_invite(
