@@ -29,7 +29,7 @@ oauth2client==3.0.0
 oauthlib==2.0.1
 olefile==0.44
 packaging==16.8
-Pillow==4.0.0
+Pillow==6.2.0
 ply==3.8
 protobuf==3.2.0
 psycogreen==1.0
