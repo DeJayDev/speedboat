@@ -12,12 +12,11 @@ from rowboat.models.message import Message
 
 guilds = Blueprint('guilds', __name__, url_prefix='/api/guilds')
 
-
 def serialize_user(u):
     return {
         'user_id': str(u.user_id),
         'username': u.username,
-        'discriminator': u.discriminator,
+        'discriminator': str(u.discriminator),
     }
 
 
