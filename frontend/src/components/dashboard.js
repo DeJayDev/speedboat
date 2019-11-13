@@ -4,7 +4,6 @@ import PageHeader from './page_header';
 import GuildsTable from './guilds_table';
 import {globalState} from '../state';
 
-
 class DashboardGuildsList extends Component {
   constructor() {
     super();
