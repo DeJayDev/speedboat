@@ -5,6 +5,6 @@ import {PREMIUM_ENABLED} from 'config';
 
 export default class GuildStats extends Component {
   render() {
-    return (<h1>TEST</h1>);
+    return (<h1>Coming Soon 😉</h1>);
   }
 }
