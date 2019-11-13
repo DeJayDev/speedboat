@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import sortBy from 'lodash/sortBy';
 
 class GuildTableRowActions extends Component {
-  render(props, state) {
+  render(props) {
     return (
       <div>
         <Link to={`/guilds/${this.props.guild.id}`} style={{paddingLeft: '4px'}}>
