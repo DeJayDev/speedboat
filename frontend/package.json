@@ -19,7 +19,7 @@
     "react-table": "^6.5.3",
     "recharts": "^1.0.0-apha.5",
     "style-loader": "^0.18.2",
-    "webpack-dev-server": "^2.5.1"
+    "webpack-dev-server": "^3.1.11"
   },
   "devDependencies": {
     "babel-core": "^6.25.0",
