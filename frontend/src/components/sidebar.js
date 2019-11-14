@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom'
 import {globalState} from '../state';
-import {STATS_ENABLED} from 'config';
 
 class SidebarLink extends Component {
   render () {
