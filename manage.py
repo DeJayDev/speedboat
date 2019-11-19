@@ -7,7 +7,7 @@ from rowboat import ENV
 from rowboat.web import rowboat
 from rowboat.sql import init_db
 from disco.util.logging import LOG_FORMAT
-from yaml import load
+from yaml import safe_load
 
 import os
 import copy
@@ -75,7 +75,7 @@ def serve(reloader):
 @click.option('--env', '-e', default='local')
 def bot(env):
     with open('config.yaml', 'r') as f:
-        config = load(f)
+        config = safe_load(f)
 
     supervisor = BotSupervisor(env={
         'ENV': env,

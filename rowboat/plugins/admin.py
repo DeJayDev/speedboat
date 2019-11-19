@@ -378,7 +378,7 @@ class AdminPlugin(Plugin):
         embed.set_thumbnail(url=infraction.user.get_avatar_url())
         embed.add_field(name='User', value=unicode(infraction.user), inline=True)
         embed.add_field(name='Moderator', value=unicode(infraction.actor), inline=True)
-        embed.add_field(name='Active', value='yes' if infraction.active else 'no', inline=True)
+        embed.add_field(name='Active', value='yes' if infraction.active else 'no', inline=False)
         if infraction.active and infraction.expires_at:
             embed.add_field(name='Expires', value=humanize.naturaldelta(infraction.expires_at - datetime.utcnow()))
         embed.add_field(name='Reason', value=infraction.reason or '_No Reason Given', inline=False)

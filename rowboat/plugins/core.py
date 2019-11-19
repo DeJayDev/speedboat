@@ -521,7 +521,7 @@ class CorePlugin(Plugin):
             perms = guild.get_permissions(self.state.me)
 
             if not perms.ban_members and not perms.administrator:
-                contents.append(u':x: {} - No Permissions'.format(
+                contents.append(u':x: {} - Could not Ban'.format(
                     guild.name
                 ))
                 continue
@@ -534,7 +534,7 @@ class CorePlugin(Plugin):
                     reason,
                     guild=guild)
             except:
-                contents.append(u':x: {} - Unknown Error'.format(
+                contents.append(u':x: {} - Error'.format(
                     guild.name
                 ))
                 self.log.exception('Failed to force ban %s in %s', user, gid)
@@ -543,7 +543,44 @@ class CorePlugin(Plugin):
                 guild.name
             ))
 
-        event.msg.reply('Results:\n' + '\n'.join(contents))
+        event.msg.reply('The Damage:\n' + '\n'.join(contents))
+
+    @Plugin.command('unnuke', '<user:snowflake> <reason:str...>', level=-1)
+    def unnuke(self, event, user, reason):
+        contents = []
+
+        for gid, guild in self.guilds.items():
+            guild = self.state.guilds[gid]
+            perms = guild.get_permissions(self.state.me)
+
+            if not perms.ban_members and not perms.administrator:
+                contents.append(u':x: {} - Could not Unban'.format(
+                    guild.name
+                ))
+                continue
+
+            try:
+                Infraction.create(
+                    guild_id=guild.id,
+                    user_id=user,
+                    actor_id=self.client.api.users_me_get().id,
+                    type_=Infraction.Types.UNBAN,
+                    reason=reason
+                )
+
+                GuildBan.get(user_id=user, guild_id=guild.id)
+                guild.delete_ban(user)
+            except:
+                contents.append(u':x: {} - Error'.format(
+                    guild.name
+                ))
+                self.log.exception('Failed to remove ban for %s in %s', user, gid)
+
+            contents.append(u':white_check_mark: {} - Fixed :heart:'.format(
+                guild.name
+            ))
+
+        event.msg.reply('Result:\n' + '\n'.join(contents))
 
     @Plugin.command('about')
     def command_about(self, event):
