@@ -12,7 +12,7 @@ services:
     volumes:
       - ./.data:/data
   statsd:
-    image: python:2.7.13
+    image: python:2.7.17
     volumes:
       - .:/opt/rowboat
     command: python /opt/rowboat/docker/nulld.py

@@ -17,7 +17,6 @@ STATUS_EMOJI = {
 }
 SNOOZE_EMOJI = u'\U0001f4a4'
 
-
 # Regexes
 INVITE_LINK_RE = re.compile(r'(discordapp.com/invite|discord.me|discord.gg)(?:/#)?(?:/invite)?/([a-z0-9\-]+)', re.I)
 URL_RE = re.compile(r'(https?://[^\s]+)')
@@ -42,5 +41,5 @@ with open('data/badwords.txt', 'r') as f:
 
 # Merge in any overrides in the config
 with open('config.yaml', 'r') as f:
-    loaded = yaml.load(f.read())
+    loaded = yaml.safe_load(f.read())
     locals().update(loaded.get('constants', {}))
