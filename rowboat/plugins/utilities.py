@@ -108,11 +108,26 @@ class UtilitiesPlugin(Plugin):
             if not url.endswith('.gif'):
                 break
         else:
-            return event.msg.reply('404 Cat not found :(')
+            return event.msg.reply(r.status_code + ' Cat not found :(')
 
         r = requests.get(url)
         r.raise_for_status()
         event.msg.reply('', attachments=[('cat.jpg', r.content)])
+
+    @Plugin.command('dog', global_=True) #global_=True! what will he do?
+    def dog(self, event):
+        try:
+            r = requests.get('https://random.dog/woof',
+            params={'filter': 'mp4,webm,gif'}) #
+            r.raise_for_status()
+        except:
+            return event.msg.reply(r.status_code + ' Dog not found :(')
+
+        url = r.json()['file']
+
+        r = requests.get('https://random.dog/' + url)
+        r.raise_for_status()
+        event.msg.reply('', attachments=[(url, r.content)])
 
     @Plugin.command('emoji', '<emoji:str>', global_=True)
     def emoji(self, event, emoji):

@@ -328,10 +328,10 @@ class CorePlugin(Plugin):
             # If the guild is not awaiting setup, leave it now
             if not rdb.sismember(GUILDS_WAITING_SETUP_KEY, str(event.id)) and event.id != ROWBOAT_GUILD_ID:
                 self.log.warning(
-                    'Leaving guild %s (%s), not within setup list',
+                    'I am in guild %s (%s), and it\'s not within the  setup list',
                     event.id, event.name
                 )
-                event.guild.leave()
+                #event.guild.leave()
             return
 
         if not guild.enabled:
@@ -711,6 +711,12 @@ class CorePlugin(Plugin):
     def guild_unwhitelist(self, event, guild):
         rdb.srem(GUILDS_WAITING_SETUP_KEY, str(guild))
         event.msg.reply('Ok, I\'ve made sure guild %s is no longer in the whitelist' % guild)
+
+    @Plugin.command('leave', '<guild:snowflake>', group='guilds', level=-1)
+    def guild_leave(self, event, guild):
+        guild = self.state.guilds.get(guild)
+        guild.leave()
+        event.msg.reply('Ok, I\'ve left that guild.')
 
     @Plugin.command('disable', '<plugin:str>', group='plugins', level=-1)
     def plugin_disable(self, event, plugin):
