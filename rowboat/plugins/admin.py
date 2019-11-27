@@ -302,8 +302,16 @@ class AdminPlugin(Plugin):
         try:
             GuildBan.get(user_id=user, guild_id=event.guild.id)
             event.guild.delete_ban(user)
-        except GuildBan.DoesNotExist:
-            raise CommandFail('user with id `{}` is not banned'.format(user))
+
+            GuildBan.delete().where(
+                (GuildBan.user_id == event.user.id) &
+                (GuildBan.guild_id == event.guild_id)
+            )
+        except (GuildBan.DoesNotExist, APIException) as e:
+            if hasattr(e, 'code') and e.code != 10026: # Unknown Ban
+                raise APIException(e.response)
+
+            raise CommandFail('User with id `{}` is not banned'.format(user))
 
         Infraction.create(
             guild_id=event.guild.id,
@@ -312,7 +320,7 @@ class AdminPlugin(Plugin):
             type_=Infraction.Types.UNBAN,
             reason=reason
         )
-        raise CommandSuccess('unbanned user with id `{}`'.format(user))
+        raise CommandSuccess('Unbanned user with id `{}`'.format(user))
 
     @Plugin.command('archive', group='infractions', level=CommandLevels.ADMIN)
     def infractions_archive(self, event):
@@ -539,7 +547,7 @@ class AdminPlugin(Plugin):
         if deleted:
             event.msg.reply(':ok_hand: I\'ve cleared the member backup for that user')
         else:
-            raise CommandFail('I couldn\t find any member backups for that user')
+            raise CommandFail('I couldn\'t find any member backups for that user')
 
     def can_act_on(self, event, victim_id, throw=True):
         if event.author.id == victim_id:
@@ -557,7 +565,7 @@ class AdminPlugin(Plugin):
         return True
 
     @Plugin.command('mute', '<user:user|snowflake> [reason:str...]', level=CommandLevels.MOD)
-    @Plugin.command('tempmute', '<user:user|snowflake> <duration:str> [reason:str...]', level=CommandLevels.MOD)
+    @Plugin.command('tempmute', '<user:user|snowflake> <duration:str> [reason:str...]', level=CommandLevels.MOD, aliases=['timeout'])
     def tempmute(self, event, user, duration=None, reason=None):
         if not duration and reason:
             duration = parse_duration(reason.split(' ')[0], safe=True)
@@ -649,7 +657,7 @@ class AdminPlugin(Plugin):
 
     @Plugin.command('unmute', '<user:user|snowflake>', level=CommandLevels.MOD)
     def unmute(self, event, user, reason=None):
-        # TOOD: eventually we should pull the role from the GuildMemberBackup if they arent in server
+        # TODO: eventually we should pull the role from the GuildMemberBackup if they arent in server
         member = event.guild.get_member(user)
 
         if member:
@@ -838,7 +846,7 @@ class AdminPlugin(Plugin):
         context={'mode': 'channel'},
         group='archive')
     def archive(self, event, size=50, mode=None, user=None, channel=None):
-        if 0 > size >= 15000:
+        if size < 1 or size > 15000:
             raise CommandFail('too many messages must be between 1-15000')
 
         q = Message.select(Message.id).join(User).order_by(Message.id.desc()).limit(size)
@@ -898,8 +906,8 @@ class AdminPlugin(Plugin):
         """
         Removes messages
         """
-        if 0 > size >= 10000:
-            raise CommandFail('too many messages must be between 1-10000')
+        if size > 1 or size > 10000:
+            raise CommandFail('too many messages. Must be between 1-10000')
 
         if event.channel.id in self.cleans:
             raise CommandFail('a clean is already running on this channel')
@@ -955,10 +963,10 @@ class AdminPlugin(Plugin):
         raise CommandSuccess('deleted {} messages'.format(size))
 
     @Plugin.command(
-	    'bypass',
+	    'addbypass',
         '<user:user> <role:str> [reason:str...]',
 	    level=-1,
-	    context={'mode': 'remove'},
+	    context={'mode': 'add'},
 	    group='role')
     @Plugin.command(
         'add',
@@ -966,6 +974,12 @@ class AdminPlugin(Plugin):
         level=CommandLevels.MOD,
         context={'mode': 'add'},
         group='role')
+    @Plugin.command(
+	    'rmbypass',
+        '<user:user> <role:str> [reason:str...]',
+	    level=-1,
+	    context={'mode': 'remove'},
+	    group='role')
     @Plugin.command(
         'rmv',
         '<user:user> <role:str> [reason:str...]',
@@ -1284,8 +1298,11 @@ class AdminPlugin(Plugin):
         finally:
             lock.release()
 
-    @Plugin.command('log', '<user:user|snowflake>', group='voice', level=CommandLevels.MOD)
-    def voice_log(self, event, user):
+    @Plugin.command('log', '[user:user|snowflake]', group='voice', level=CommandLevels.MOD)
+    def voice_log(self, event, user=None):
+        if user is None:
+            user = event.author.id
+
         if isinstance(user, DiscoUser):
             user = user.id
 

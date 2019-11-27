@@ -64,10 +64,10 @@ class Notification(BaseModel):
         elif self.type_ == self.Types.CONNECT:
             data['title'] = u'{} connected'.format(
                 'Production' if self.metadata['env'] == 'prod' else 'Testing')
-            data['content'] = ', '.join(self.metadata['trace'])
+            data['content'] = ', '.join(self.metadata.get('trace'))
         elif self.type_ == self.Types.RESUME:
             data['title'] = u'{} resumed'.format(
                 'Production' if self.metadata['env'] == 'prod' else 'Testing')
-            data['content'] = ', '.join(self.metadata['trace'])
+            data['content'] = ', '.join(self.metadata.get('trace'))
 
         return data

@@ -117,17 +117,12 @@ class UtilitiesPlugin(Plugin):
     @Plugin.command('dog', global_=True) #global_=True! what will he do?
     def dog(self, event):
         try:
-            r = requests.get('https://random.dog/woof',
-            params={'filter': 'mp4,webm,gif'}) #
+            r = requests.get('https://api.thedogapi.com/v1/images/search?format=src')
             r.raise_for_status()
+            ext = r.headers['content-type'].split('/')[-1].split(';')[0]
+            event.msg.reply('', attachments=[('dog.{}'.format(ext), r.content)])
         except:
             return event.msg.reply(r.status_code + ' Dog not found :(')
-
-        url = r.json()['file']
-
-        r = requests.get('https://random.dog/' + url)
-        r.raise_for_status()
-        event.msg.reply('', attachments=[(url, r.content)])
 
     @Plugin.command('emoji', '<emoji:str>', global_=True)
     def emoji(self, event, emoji):
@@ -278,12 +273,15 @@ class UtilitiesPlugin(Plugin):
             try: 
                 embed.color = get_dominant_colors_guild(guild)
             except:
-                embed.color = 'FFFFFF'
+                embed.color = 0x7289DA
         embed.description = '\n'.join(content)
         event.msg.reply('', embed=embed)
 
-    @Plugin.command('info', '<user:user>')
-    def info(self, event, user):
+    @Plugin.command('info', '[user:user]')
+    def info(self, event, user=None):
+        if user is None:
+            user = event.author
+        
         content = []
         content.append(u'**\u276F User Information**')
         content.append(u'ID: {}'.format(user.id))
@@ -471,8 +469,8 @@ class UtilitiesPlugin(Plugin):
     @Plugin.command('add', '<duration:str> <content:str...>', group='r', global_=True)
     @Plugin.command('remind', '<duration:str> <content:str...>', global_=True)
     def cmd_remind(self, event, duration, content):
-        if Reminder.count_for_user(event.author.id) > 30:
-            return event.msg.reply(':warning: you an only have 15 reminders going at once!')
+        if Reminder.count_for_user(event.author.id) > 15:
+            return event.msg.reply(':warning: you can only have 15 reminders going at once!')
 
         remind_at = parse_duration(duration)
         if remind_at > (datetime.utcnow() + timedelta(seconds=5 * YEAR_IN_SEC)):
