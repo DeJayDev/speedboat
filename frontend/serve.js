@@ -10,7 +10,7 @@ const app = express();
 
 let proxyURL = 'http://localhost:8686';
 
-if (process.env.NODE_ENV == 'production') {
+if (process.env.NODE_ENV == 'docker') {
 	proxyURL = 'http://web:8686';
 }
 

@@ -19,9 +19,7 @@ from rowboat.types import SlottedModel, DictField, Field
 from rowboat.models.user import Infraction
 from rowboat.models.message import Message, EMOJI_RE
 
-
 UPPER_RE = re.compile('[A-Z]')
-
 
 PunishmentType = Enum(
     'NONE',
@@ -31,7 +29,6 @@ PunishmentType = Enum(
     'BAN',
     'TEMPMUTE'
 )
-
 
 class CheckConfig(SlottedModel):
     count = Field(int)
@@ -72,7 +69,7 @@ class SubConfig(SlottedModel):
             raise Exception('Invalid value for `clean_duration` must be between 0 and 86400')
 
         if self.clean_count < 0 or self.clean_count > 1000:
-            raise Exception('Invaliud value for `clean_count` must be between 0 and 1000')
+            raise Exception('Invalid value for `clean_count` must be between 0 and 1000')
 
     def get_bucket(self, attr, guild_id):
         obj = getattr(self, attr)
@@ -134,7 +131,7 @@ class SpamPlugin(Plugin):
         if not last_violated > time.time() - 10:
             self.call(
                 'ModLogPlugin.log_action_ext',
-                Actions.SPAM_DEBUG,
+                Actions.SPAM,
                 violation.event.guild.id,
                 v=violation
             )
@@ -147,7 +144,7 @@ class SpamPlugin(Plugin):
                     self,
                     violation.event,
                     violation.member,
-                    'Spam Detected')
+                    'Spam Detected',)
             elif punishment == PunishmentType.TEMPMUTE:
                 Infraction.tempmute(
                     self,

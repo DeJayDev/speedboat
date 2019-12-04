@@ -952,12 +952,14 @@ class AdminPlugin(Plugin):
         self.cleans[event.channel.id].join()
         del self.cleans[event.channel.id]
 
+        raise CommandSuccess('deleted {} messages'.format(size))
+
     @Plugin.command(
-	'bypass',
+	    'bypass',
         '<user:user> <role:str> [reason:str...]',
-	level=-1,
-	context={'mode': 'remove'},
-	group='role')
+	    level=-1,
+	    context={'mode': 'remove'},
+	    group='role')
     @Plugin.command(
         'add',
         '<user:user> <role:str> [reason:str...]',

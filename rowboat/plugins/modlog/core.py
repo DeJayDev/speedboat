@@ -306,7 +306,7 @@ class ModLogPlugin(Plugin):
             return event.msg.reply(':warning: modlog is already hushed')
 
         self.hushed[event.guild.id] = True
-        event.msg.reply(':white_check_mark: modlog has been hushed, do your dirty work in peace')
+        event.msg.reply(':white_check_mark: modlog hushed, do your dirty work in peace')
 
     @Plugin.command('unhush', group='modlog', level=CommandLevels.ADMIN)
     def command_unhush(self, event):

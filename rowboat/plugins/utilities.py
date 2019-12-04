@@ -219,7 +219,7 @@ class UtilitiesPlugin(Plugin):
                     (User.username == username) &
                     (User.discriminator == int(discrim))))
 
-        users = User.select().where(reduce(operator.or_, queries))
+        users = User.select().where(reduce(operator.or_, queries).limit(10))
         if len(users) == 0:
             return event.msg.reply(u'No users found for query `{}`'.format(S(query, escape_codeblocks=True)))
 
@@ -241,12 +241,14 @@ class UtilitiesPlugin(Plugin):
         content.append(u'**\u276F Server Information**')
 
         created_at = to_datetime(guild.id)
-        content.append(u'Created: {} ago ({})'.format(
-            humanize.naturaldelta(datetime.utcnow() - created_at),
+        content.append(u'Created: {} ({})'.format(
+            humanize.naturaltime(datetime.utcnow() - created_at),
             created_at.isoformat(),
         ))
-        content.append(u'Members: {}'.format(len(guild.members)))
-        content.append(u'Features: {}'.format(', '.join(guild.features) or 'none'))
+        
+        content.append(u'Members: {:,}'.format(len(guild.members)))
+        if guild.features:
+            content.append(u'Features: {}'.format(', '.join(guild.features)))
 
         content.append(u'\n**\u276F Counts**')
         text_count = sum(1 for c in guild.channels.values() if not c.is_voice)
