@@ -90,6 +90,10 @@ COMMAND_USED:
   emoji: wrench
   format: "{e.author!s} (`{e.author.id}`) used command in **{e.channel}** `{e.content!s}`"
 
+SPAM:
+  emoji: helmet_with_cross
+  format: "{v.member!s} (`{v.member.id}`) violated {v.label} ({v.event.channel.mention}): {v.msg}"
+
 SPAM_DEBUG:
   emoji: helmet_with_cross
   format: "{v.member!s} (`{v.member.id}`) violated {v.label} ({v.event.channel.mention}): {v.msg}"
