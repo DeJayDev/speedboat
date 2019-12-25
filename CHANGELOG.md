@@ -12,9 +12,9 @@ This update attempts to catch Speedboat up to the rest of the rowboat clones by 
 - Removes the force option from setup (Bad Idea Dooley)
 - Moves project to Parcel 📦 (Hopefully this reduces some server side load)
 - Update rowboat and workers to Python 2.7.17
-- Also updates all requirements to their newest versions (@dependabot was being annoying)
+- Also updates all requirements to their newest versions (@depend-a-bot was being annoying)
 - Disable leave on guild unwhitelist (Speedboat left every guild it was apart of, not good)
-- Adds requested !dog command (Thanks Tiemen.)
+- Adds requested !dog command (Thanks @ThaTiemsz.)
 - Alias tempmute to timeout
 - Defaults to the message author if no user is defined for info and log
 - Brings the max reminders down to 15
