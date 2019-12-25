@@ -65,9 +65,9 @@ class Notification(BaseModel):
             data['title'] = u'{} connected'.format(
                 'Production' if self.metadata['env'] == 'prod' else 'Testing')
             data['content'] = self.metadata.get('content', '').format(m=self.metadata)
-        elif self.type_ == self.Types.RESUME
+        elif self.type_ == self.Types.RESUME:
             data['title'] = u'{} resumed'.format(
                 'Production' if self.metadata['env'] == 'prod' else 'Testing')
-            data['content'] = self.metadata.get('content', '').format(m=self.metadata)
+            data['content'] = self.metadata.get('content', '').format(m=self.metadata))
 
         return data
