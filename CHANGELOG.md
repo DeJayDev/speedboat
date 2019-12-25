@@ -1,5 +1,39 @@
 # Changelog
 
+
+## V1.6.0
+
+**Merry Speedboat 1.6mas!**
+
+This update attempts to catch Speedboat up to the rest of the rowboat clones by adding some fixes and community requested features.
+
+### Features
+
+- Removes the force option from setup (Bad Idea Dooley)
+- Moves project to Parcel 📦 (Hopefully this reduces some server side load)
+- Update rowboat and workers to Python 2.7.17
+- Also updates all requirements to their newest versions (@dependabot was being annoying)
+- Disable leave on guild unwhitelist (Speedboat left every guild it was apart of, not good)
+- Adds requested !dog command (Thanks Tiemen.)
+- Alias tempmute to timeout
+- Defaults to the message author if no user is defined for info and log
+- Brings the max reminders down to 15
+- Switches back to b1nzy's disco repo
+- Adds success message for purge
+- Limits users returned by !search to 10.
+- *Messages users when they are punished*
+
+### Bug Fixes
+
+- Properly load guilds in the core plugin
+- Rewrote the frontend Dockerfile to fix some npm install issues
+- Attempt to fix embed colors for guilds with transparent icons
+- Update how the main guild channel is grabbed
+- Fixes some upper bounds stuff with commands such as clean and archive
+- Fixed a typo in the !clean command ("invaliud")
+- Uses naturaltime instead of naturaldelta for that sweet sweet formatting.
+- Fixes formatting of !info when a user is "Streaming"
+
 ## V1.5.0
 
 **The skip forward update**
