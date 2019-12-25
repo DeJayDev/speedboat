@@ -296,7 +296,7 @@ class UtilitiesPlugin(Plugin):
                 else:
                     if user.presence.game.url:
                         content.append(u'Streaming: [{}]({})'.format(user.presence.game.name, user.presence.game.url))
-                    elif:
+                    else:
                         content.append(u'Streaming: {}'.format(user.presence.game.name))
 
 
