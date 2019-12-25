@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "/usr/local/opt/python/bin/python3.7",
+    "python.pythonPath": "C:\\Users\\DeJay\\.windows-build-tools\\python27\\python.exe",
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true
 }

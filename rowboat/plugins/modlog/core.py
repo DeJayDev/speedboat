@@ -314,7 +314,7 @@ class ModLogPlugin(Plugin):
             return event.msg.reply(':warning: modlog is not hushed')
 
         del self.hushed[event.guild.id]
-        event.msg.reply(':white_check_mark: modlog has been unhushed, shhhhh... nobody saw anything')
+        event.msg.reply(':white_check_mark: modlog unhushed, shhhhh... nobody saw anything')
 
     @Plugin.schedule(120)
     def cleanup_debounce(self):

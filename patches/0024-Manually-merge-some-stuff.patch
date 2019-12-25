@@ -1,0 +1,190 @@
+From 088f89967ba47cf759e646fc3a5d04e50d473517 Mon Sep 17 00:00:00 2001
+From: DeJay <contact@dejaydev.com>
+Date: Tue, 24 Dec 2019 19:30:51 -0600
+Subject: [PATCH 24/24] Manually merge some stuff
+
+---
+ .vscode/settings.json        |  5 -----
+ frontend/serve.js            |  4 ----
+ requirements.txt             |  4 ----
+ rowboat/plugins/admin.py     | 15 ---------------
+ rowboat/plugins/spam.py      | 23 -----------------------
+ rowboat/plugins/utilities.py |  2 +-
+ 6 files changed, 1 insertion(+), 52 deletions(-)
+ delete mode 100644 .vscode/settings.json
+
+diff --git a/.vscode/settings.json b/.vscode/settings.json
+deleted file mode 100644
+index e959d1f..0000000
+--- a/.vscode/settings.json
++++ /dev/null
+@@ -1,5 +0,0 @@
+-{
+-    "python.pythonPath": "C:\\Users\\DeJay\\.windows-build-tools\\python27\\python.exe",
+-    "python.linting.pylintEnabled": true,
+-    "python.linting.enabled": true
+-}
+\ No newline at end of file
+diff --git a/frontend/serve.js b/frontend/serve.js
+index 029457d..f312139 100644
+--- a/frontend/serve.js
++++ b/frontend/serve.js
+@@ -10,11 +10,7 @@ const app = express();
+ 
+ let proxyURL = 'http://localhost:8686';
+ 
+-<<<<<<< HEAD
+-if (process.env.NODE_ENV == 'production') {
+-=======
+ if (process.env.NODE_ENV == 'docker') {
+->>>>>>> 6c46a05f1dc5c07eebfa1668e91cfed10aa6a623
+ 	proxyURL = 'http://web:8686';
+ }
+ 
+diff --git a/requirements.txt b/requirements.txt
+index 2f68424..56eafd8 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -6,11 +6,7 @@ click==7.0
+ contextlib2==0.6.0.post1
+ cssselect==1.1.0
+ dill==0.3.1.1
+-<<<<<<< HEAD
+--e git+https://github.com/elderlabs/disco.git@8c19162f2f3498fd4d82af0c89d0869751edffa0#egg=disco-py
+-=======
+ -e git+https://github.com/b1naryth1ef/disco.git#egg=disco-py
+->>>>>>> 6c46a05f1dc5c07eebfa1668e91cfed10aa6a623
+ # disco-py==0.0.11-rc.8
+ Distance==0.1.3
+ emoji==0.5.4
+diff --git a/rowboat/plugins/admin.py b/rowboat/plugins/admin.py
+index caff420..5c1a836 100644
+--- a/rowboat/plugins/admin.py
++++ b/rowboat/plugins/admin.py
+@@ -721,15 +721,9 @@ class AdminPlugin(Plugin):
+ 
+             if not self.can_act_on(event, member.id, throw=False):
+                 raise CommandFail('failed to kick {}, invalid permissions'.format(user_id))
+-<<<<<<< HEAD
+ 
+             members.append(member)
+ 
+-=======
+-
+-            members.append(member)
+-
+->>>>>>> 6c46a05f1dc5c07eebfa1668e91cfed10aa6a623
+         msg = event.msg.reply('Ok, kick {} users for `{}`?'.format(len(members), args.reason or 'no reason'))
+         msg.chain(False).\
+             add_reaction(GREEN_TICK_EMOJI).\
+@@ -992,15 +986,9 @@ class AdminPlugin(Plugin):
+ 
+             if mra_event.emoji.id != GREEN_TICK_EMOJI_ID:
+                 return
+-<<<<<<< HEAD
+-
+-            event.msg.reply(':wastebasket: Ok please hold on while I delete those messages...').after(5).delete()
+-
+-=======
+ 
+             event.msg.reply(':wastebasket: Ok please hold on while I delete those messages...').after(5).delete()
+ 
+->>>>>>> 6c46a05f1dc5c07eebfa1668e91cfed10aa6a623
+         def run_clean():
+             for chunk in chunks(messages, 100):
+                 self.client.api.channels_messages_delete_bulk(event.channel.id, chunk)
+@@ -1009,11 +997,8 @@ class AdminPlugin(Plugin):
+         self.cleans[event.channel.id].join()
+         del self.cleans[event.channel.id]
+ 
+-<<<<<<< HEAD
+-=======
+         raise CommandSuccess('deleted {} messages'.format(size))
+ 
+->>>>>>> 6c46a05f1dc5c07eebfa1668e91cfed10aa6a623
+     @Plugin.command(
+ 	    'addbypass',
+         '<user:user> <role:str> [reason:str...]',
+diff --git a/rowboat/plugins/spam.py b/rowboat/plugins/spam.py
+index b3d52e1..bbf6c36 100644
+--- a/rowboat/plugins/spam.py
++++ b/rowboat/plugins/spam.py
+@@ -19,15 +19,8 @@ from rowboat.types import SlottedModel, DictField, Field
+ from rowboat.models.user import Infraction
+ from rowboat.models.message import Message, EMOJI_RE
+ 
+-<<<<<<< HEAD
+-
+-UPPER_RE = re.compile('[A-Z]')
+-
+-
+-=======
+ UPPER_RE = re.compile('[A-Z]')
+ 
+->>>>>>> 6c46a05f1dc5c07eebfa1668e91cfed10aa6a623
+ PunishmentType = Enum(
+     'NONE',
+     'MUTE',
+@@ -37,10 +30,6 @@ PunishmentType = Enum(
+     'TEMPMUTE'
+ )
+ 
+-<<<<<<< HEAD
+-
+-=======
+->>>>>>> 6c46a05f1dc5c07eebfa1668e91cfed10aa6a623
+ class CheckConfig(SlottedModel):
+     count = Field(int)
+     interval = Field(int)
+@@ -80,11 +69,7 @@ class SubConfig(SlottedModel):
+             raise Exception('Invalid value for `clean_duration` must be between 0 and 86400')
+ 
+         if self.clean_count < 0 or self.clean_count > 1000:
+-<<<<<<< HEAD
+-            raise Exception('Invaliud value for `clean_count` must be between 0 and 1000')
+-=======
+             raise Exception('Invalid value for `clean_count` must be between 0 and 1000')
+->>>>>>> 6c46a05f1dc5c07eebfa1668e91cfed10aa6a623
+ 
+     def get_bucket(self, attr, guild_id):
+         obj = getattr(self, attr)
+@@ -146,11 +131,7 @@ class SpamPlugin(Plugin):
+         if not last_violated > time.time() - 10:
+             self.call(
+                 'ModLogPlugin.log_action_ext',
+-<<<<<<< HEAD
+                 Actions.SPAM_DEBUG,
+-=======
+-                Actions.SPAM,
+->>>>>>> 6c46a05f1dc5c07eebfa1668e91cfed10aa6a623
+                 violation.event.guild.id,
+                 v=violation
+             )
+@@ -163,11 +144,7 @@ class SpamPlugin(Plugin):
+                     self,
+                     violation.event,
+                     violation.member,
+-<<<<<<< HEAD
+-                    'Spam Detected')
+-=======
+                     'Spam Detected',)
+->>>>>>> 6c46a05f1dc5c07eebfa1668e91cfed10aa6a623
+             elif punishment == PunishmentType.TEMPMUTE:
+                 Infraction.tempmute(
+                     self,
+diff --git a/rowboat/plugins/utilities.py b/rowboat/plugins/utilities.py
+index 63374e9..3612dc1 100644
+--- a/rowboat/plugins/utilities.py
++++ b/rowboat/plugins/utilities.py
+@@ -296,7 +296,7 @@ class UtilitiesPlugin(Plugin):
+                 else:
+                     if user.presence.game.url:
+                         content.append(u'Streaming: [{}]({})'.format(user.presence.game.name, user.presence.game.url))
+-                    elif:
++                    else:
+                         content.append(u'Streaming: {}'.format(user.presence.game.name))
+ 
+ 
+-- 
+2.24.1.windows.2
+

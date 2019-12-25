@@ -1,3 +1,5 @@
+import humanize
+
 from datetime import datetime
 from holster.enum import Enum
 from peewee import BigIntegerField, IntegerField, SmallIntegerField, TextField, BooleanField, DateTimeField
@@ -182,7 +184,6 @@ class Infraction(BaseModel):
     @classmethod
     def kick(cls, plugin, event, member, reason):
         from rowboat.plugins.modlog import Actions
-
         User.from_disco_user(member.user)
 
         # Prevent the GuildMemberRemove log event from triggering
@@ -192,6 +193,13 @@ class Infraction(BaseModel):
             ['GuildMemberRemove'],
             user_id=member.user.id
         )
+
+        # TODO: Make these configurable.
+        member.user.open_dm().send_message(':warning: You were **{}** from {} for "{}"'.format(
+            'kicked',
+            event.guild.name,
+            reason or 'no reason'
+        ))
 
         member.kick(reason=reason)
 
@@ -223,6 +231,13 @@ class Infraction(BaseModel):
             ['GuildMemberRemove', 'GuildBanAdd'],
             user_id=member.user.id
         )
+
+        member.user.open_dm().send_message(':warning: You were **{}** from {} for "{}"\n\nThis will be lifted in: {}'.format(
+            'temporarily banned',
+            event.guild.name,
+            reason or 'no reason',
+            humanize.naturaldelta(expires_at - datetime.utcnow())
+        ))
 
         member.ban(reason=reason)
 
@@ -291,6 +306,12 @@ class Infraction(BaseModel):
             user_id=user_id,
         )
 
+        member.user.open_dm().send_message(':warning: You were **{}** from {} for "{}"'.format(
+            'banned',
+            event.guild.name,
+            reason or 'no reason'
+        ))
+
         guild.create_ban(user_id, reason=reason)
 
         plugin.call(
@@ -322,6 +343,12 @@ class Infraction(BaseModel):
             actor_id=event.author.id,
             type_=cls.Types.WARNING,
             reason=reason)
+            
+        member.user.open_dm().send_message(':warning: You were **{}** in {} for "{}"'.format(
+            'warned',
+            event.guild.name,
+            reason or 'no reason'
+        ))
 
         plugin.call(
             'ModLogPlugin.log_action_ext',
@@ -346,6 +373,12 @@ class Infraction(BaseModel):
         )
 
         member.add_role(admin_config.mute_role, reason=reason)
+
+        member.user.open_dm().send_message(':warning: You were **{}** in {} for "{}"'.format(
+            'muted',
+            event.guild.name,
+            reason or 'no reason'
+        ))
 
         plugin.call(
             'ModLogPlugin.log_action_ext',
@@ -382,6 +415,13 @@ class Infraction(BaseModel):
         )
 
         member.add_role(admin_config.mute_role, reason=reason)
+
+        member.user.open_dm().send_message(':warning: You were **{}** in {} for "{}"\n\nThis will be lifted in: {}'.format(
+            'temporarily muted',
+            event.guild.name,
+            reason or 'no reason',
+            humanize.naturaldelta(expires_at - datetime.utcnow())
+        ))
 
         plugin.call(
             'ModLogPlugin.log_action_ext',
