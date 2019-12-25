@@ -289,12 +289,16 @@ class UtilitiesPlugin(Plugin):
 
         if user.presence:
             emoji, status = get_status_emoji(user.presence)
-            content.append('Status: {} <{}>'.format(status, emoji))
+            content.append('Online Status: {} <{}>'.format(status, emoji))
             if user.presence.game and user.presence.game.name:
                 if user.presence.game.type == GameType.DEFAULT:
-                    content.append(u'Game: {}'.format(user.presence.game.name))
+                    content.append(u'Status: {}'.format(user.presence.game.name))
                 else:
-                    content.append(u'Stream: [{}]({})'.format(user.presence.game.name, user.presence.game.url))
+                    if user.presence.game.url:
+                        content.append(u'Streaming: [{}]({})'.format(user.presence.game.name, user.presence.game.url))
+                    elif:
+                        content.append(u'Streaming: {}'.format(user.presence.game.name))
+
 
         created_dt = to_datetime(user.id)
         content.append('Created: {} ago ({})'.format(
@@ -348,7 +352,7 @@ class UtilitiesPlugin(Plugin):
 
         # Wait for them all to complete (we're still going to be as slow as the
         #  slowest query, so no need to be smart about this.)
-        wait_many(newest_msg, oldest_msg, infractions, voice, timeout=10)
+        wait_many(newest_msg, oldest_msg, infractions, voice, timeout=30)
         tags = to_tags(guild_id=event.msg.guild.id)
 
         if newest_msg.value and oldest_msg.value:

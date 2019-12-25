@@ -1,0 +1,301 @@
+From fec723149da06122d1aaaa91afece45c9dec9099 Mon Sep 17 00:00:00 2001
+From: DeJay <contact@dejaydev.com>
+Date: Mon, 18 Nov 2019 22:28:36 -0600
+Subject: [PATCH 12/24] [Chore] Update all depends and patch fixes
+
+---
+ .vscode/settings.json                        |   2 +-
+ docker-compose.yml                           |   2 +-
+ docker/database/.postgres-healthcheck.sh.swp | Bin 1024 -> 0 bytes
+ manage.py                                    |   4 +-
+ requirements.txt                             | 105 +++++++++----------
+ rowboat/constants.py                         |   3 +-
+ rowboat/plugins/admin.py                     |   2 +-
+ rowboat/plugins/core.py                      |  43 +++++++-
+ 8 files changed, 98 insertions(+), 63 deletions(-)
+ delete mode 100644 docker/database/.postgres-healthcheck.sh.swp
+
+diff --git a/.vscode/settings.json b/.vscode/settings.json
+index e959d1f..81af87d 100644
+--- a/.vscode/settings.json
++++ b/.vscode/settings.json
+@@ -1,5 +1,5 @@
+ {
+-    "python.pythonPath": "C:\\Users\\DeJay\\.windows-build-tools\\python27\\python.exe",
++    "python.pythonPath": "/usr/local/opt/python/bin/python3.7",
+     "python.linting.pylintEnabled": true,
+     "python.linting.enabled": true
+ }
+\ No newline at end of file
+diff --git a/docker-compose.yml b/docker-compose.yml
+index 8217228..9948b9f 100644
+--- a/docker-compose.yml
++++ b/docker-compose.yml
+@@ -12,7 +12,7 @@ services:
+     volumes:
+       - ./.data:/data
+   statsd:
+-    image: python:2.7.13
++    image: python:2.7.17
+     volumes:
+       - .:/opt/rowboat
+     command: python /opt/rowboat/docker/nulld.py
+diff --git a/docker/database/.postgres-healthcheck.sh.swp b/docker/database/.postgres-healthcheck.sh.swp
+deleted file mode 100644
+index 9faacb6862536f245da9bf87369373a8f5ec96ee..0000000000000000000000000000000000000000
+GIT binary patch
+literal 0
+HcmV?d00001
+
+literal 1024
+zcmYc?$V<%2S1{5u)iY*50<ysj3`P0*B}hUznWagkc_pQ~hUrPVCHX~$x(0^Wl@{a|
+lm!ub^7VBoDCgzl6Bxj^1XX_PbU{^dUIvN6_AwcsG004$>6tw^V
+
+diff --git a/manage.py b/manage.py
+index 31e0d06..1ea1100 100755
+--- a/manage.py
++++ b/manage.py
+@@ -7,7 +7,7 @@ from rowboat import ENV
+ from rowboat.web import rowboat
+ from rowboat.sql import init_db
+ from disco.util.logging import LOG_FORMAT
+-from yaml import load
++from yaml import safe_load
+ 
+ import os
+ import copy
+@@ -75,7 +75,7 @@ def serve(reloader):
+ @click.option('--env', '-e', default='local')
+ def bot(env):
+     with open('config.yaml', 'r') as f:
+-        config = load(f)
++        config = safe_load(f)
+ 
+     supervisor = BotSupervisor(env={
+         'ENV': env,
+diff --git a/requirements.txt b/requirements.txt
+index 00fb0c6..3a5f4e6 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -1,66 +1,65 @@
+-arrow==0.10.0
+-cairocffi==0.8.0
++arrow==0.15.4
++cairocffi==0.9.0
+ CairoSVG==1.0.19
+-cffi==1.9.1
+-click==6.7
+-contextlib2==0.5.4
+-cssselect==1.0.1
+-dill==0.2.6
++cffi==1.13.2
++click==7.0
++contextlib2==0.6.0.post1
++cssselect==1.1.0
++dill==0.3.1.1
+ -e git+https://github.com/elderlabs/disco.git@8c19162f2f3498fd4d82af0c89d0869751edffa0#egg=disco-py
+ # disco-py==0.0.11-rc.8
+ Distance==0.1.3
+-emoji==0.3.9
++emoji==0.5.4
+ enum34==1.1.6
+ erlpack==0.3.2
+-Flask==0.12
+-future==0.16.0
+-futures==3.0.5
++Flask==1.1.1
++future==0.18.2
++futures==3.3.0
+ greenlet==0.4.15
+-httplib2==0.10.3
++httplib2==0.14.0
+ humanize==0.5.1
+ inflection==0.3.1
+-influxdb==4.0.0
+-itsdangerous==0.24
+-Jinja2==2.9.5
+-lxml==3.7.2
+-markovify==0.5.4
+-MarkupSafe==0.23
+-oauth2client==3.0.0
+-oauthlib==2.0.1
+-olefile==0.44
+-packaging==16.8
+-Pillow==4.0.0
+-ply==3.8
+-protobuf==3.2.0
+-psycogreen==1.0
++influxdb==5.2.3
++itsdangerous==1.1.0
++Jinja2==2.10.3
++lxml==4.4.1
++markovify==0.7.2
++MarkupSafe==1.1.1
++oauth2client==4.1.3
++oauthlib==3.1.0
++olefile==0.46
++packaging==19.2
++Pillow==6.2.1
++ply==3.11
++protobuf==3.10.0
++psycogreen==1.0.1
+ psycopg2==2.8.4
+-pyasn1==0.2.3
+-pyasn1-modules==0.0.8
+-pycparser==2.17
+-pygal==2.3.1
+-pyparsing==2.2.0
+-pyquery==1.2.17
+-python-dateutil==2.6.0
+-pytz==2016.10
+-PyYAML==3.12
+-sentry-sdk==0.10.1
+-redis==2.10.5
+-regex==2017.2.8
+-requests-oauthlib==0.8.0
+-rsa==3.4.2
+-ruamel.ordereddict==0.4.9
+-ruamel.yaml==0.13.14
++pyasn1==0.4.7
++pyasn1-modules==0.2.7
++pycparser==2.19
++pygal==2.4.0
++pyparsing==2.4.5
++pyquery==1.4.1
++python-dateutil==2.8.1
++pytz==2019.3
++PyYAML==5.1.2
++sentry-sdk==0.13.2
++redis==3.3.11
++regex==2019.11.1
++requests-oauthlib==1.3.0
++rsa==4.0
++ruamel.ordereddict==0.4.14
++ruamel.yaml==0.16.5
+ tinycss==0.4
+-typing==3.5.3.0
+-tzlocal==1.3
+-Unidecode==0.4.20
+-Werkzeug==0.11.15
+-wheel==0.24.0
+-xxhash==1.0.1
+-fuzzywuzzy==0.15.0
+-pytest==3.0.7
++typing==3.7.4.1
++tzlocal==2.0.0
++Unidecode==1.1.1
++Werkzeug==0.16.0
++wheel==0.33.6
++xxhash==1.4.3
++fuzzywuzzy==0.17.0
++pytest==4.6.6
+ python-Levenshtein==0.12.0
+ -e git+https://github.com/b1naryth1ef/peewee.git@1b7d9f34d5f93464aa647cea4faab68cc45c1496#egg=peewee
+-gevent_inotifyx==0.1.1
+-datadog==0.16.0
+-
++gevent_inotifyx==0.2
++datadog==0.31.0
+diff --git a/rowboat/constants.py b/rowboat/constants.py
+index 0737c83..785e667 100644
+--- a/rowboat/constants.py
++++ b/rowboat/constants.py
+@@ -17,7 +17,6 @@ STATUS_EMOJI = {
+ }
+ SNOOZE_EMOJI = u'\U0001f4a4'
+ 
+-
+ # Regexes
+ INVITE_LINK_RE = re.compile(r'(discordapp.com/invite|discord.me|discord.gg)(?:/#)?(?:/invite)?/([a-z0-9\-]+)', re.I)
+ URL_RE = re.compile(r'(https?://[^\s]+)')
+@@ -42,5 +41,5 @@ with open('data/badwords.txt', 'r') as f:
+ 
+ # Merge in any overrides in the config
+ with open('config.yaml', 'r') as f:
+-    loaded = yaml.load(f.read())
++    loaded = yaml.safe_load(f.read())
+     locals().update(loaded.get('constants', {}))
+diff --git a/rowboat/plugins/admin.py b/rowboat/plugins/admin.py
+index d4db99a..bf8c93f 100644
+--- a/rowboat/plugins/admin.py
++++ b/rowboat/plugins/admin.py
+@@ -378,7 +378,7 @@ class AdminPlugin(Plugin):
+         embed.set_thumbnail(url=infraction.user.get_avatar_url())
+         embed.add_field(name='User', value=unicode(infraction.user), inline=True)
+         embed.add_field(name='Moderator', value=unicode(infraction.actor), inline=True)
+-        embed.add_field(name='Active', value='yes' if infraction.active else 'no', inline=True)
++        embed.add_field(name='Active', value='yes' if infraction.active else 'no', inline=False)
+         if infraction.active and infraction.expires_at:
+             embed.add_field(name='Expires', value=humanize.naturaldelta(infraction.expires_at - datetime.utcnow()))
+         embed.add_field(name='Reason', value=infraction.reason or '_No Reason Given', inline=False)
+diff --git a/rowboat/plugins/core.py b/rowboat/plugins/core.py
+index e42e3d2..a0a5e24 100644
+--- a/rowboat/plugins/core.py
++++ b/rowboat/plugins/core.py
+@@ -521,7 +521,7 @@ class CorePlugin(Plugin):
+             perms = guild.get_permissions(self.state.me)
+ 
+             if not perms.ban_members and not perms.administrator:
+-                contents.append(u':x: {} - No Permissions'.format(
++                contents.append(u':x: {} - Could not Ban'.format(
+                     guild.name
+                 ))
+                 continue
+@@ -534,7 +534,7 @@ class CorePlugin(Plugin):
+                     reason,
+                     guild=guild)
+             except:
+-                contents.append(u':x: {} - Unknown Error'.format(
++                contents.append(u':x: {} - Error'.format(
+                     guild.name
+                 ))
+                 self.log.exception('Failed to force ban %s in %s', user, gid)
+@@ -543,7 +543,44 @@ class CorePlugin(Plugin):
+                 guild.name
+             ))
+ 
+-        event.msg.reply('Results:\n' + '\n'.join(contents))
++        event.msg.reply('The Damage:\n' + '\n'.join(contents))
++
++    @Plugin.command('unnuke', '<user:snowflake> <reason:str...>', level=-1)
++    def unnuke(self, event, user, reason):
++        contents = []
++
++        for gid, guild in self.guilds.items():
++            guild = self.state.guilds[gid]
++            perms = guild.get_permissions(self.state.me)
++
++            if not perms.ban_members and not perms.administrator:
++                contents.append(u':x: {} - Could not Unban'.format(
++                    guild.name
++                ))
++                continue
++
++            try:
++                Infraction.create(
++                    guild_id=guild.id,
++                    user_id=user,
++                    actor_id=self.client.api.users_me_get().id,
++                    type_=Infraction.Types.UNBAN,
++                    reason=reason
++                )
++
++                GuildBan.get(user_id=user, guild_id=guild.id)
++                guild.delete_ban(user)
++            except:
++                contents.append(u':x: {} - Error'.format(
++                    guild.name
++                ))
++                self.log.exception('Failed to remove ban for %s in %s', user, gid)
++
++            contents.append(u':white_check_mark: {} - Fixed :heart:'.format(
++                guild.name
++            ))
++
++        event.msg.reply('Result:\n' + '\n'.join(contents))
+ 
+     @Plugin.command('about')
+     def command_about(self, event):
+-- 
+2.24.1.windows.2
+

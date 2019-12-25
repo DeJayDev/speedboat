@@ -465,7 +465,7 @@ class CorePlugin(Plugin):
                         embed.title = u'Command Error: {}'.format(command.name)
                         embed.color = 0xff6961
                         embed.add_field(
-                            name='Author', value='({}) `{}`'.format(event.author, event.author.id), inline=True)
+                            name='Author', value=u'({}) `{}`'.format(event.author, event.author.id), inline=True)
                         embed.add_field(name='Channel', value='({}) `{}`'.format(
                             event.channel.name,
                             event.channel.id

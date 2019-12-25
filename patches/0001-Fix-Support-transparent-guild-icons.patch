@@ -1,0 +1,29 @@
+From dfaa5d701f665bc1c3d11193976827f535139d3a Mon Sep 17 00:00:00 2001
+From: DeJay <contact@dejaydev.com>
+Date: Fri, 26 Jul 2019 00:38:01 -0500
+Subject: [PATCH 01/24] [Fix] Support transparent guild icons
+
+---
+ rowboat/plugins/utilities.py | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/rowboat/plugins/utilities.py b/rowboat/plugins/utilities.py
+index fea7480..2c7a325 100644
+--- a/rowboat/plugins/utilities.py
++++ b/rowboat/plugins/utilities.py
+@@ -257,7 +257,11 @@ class UtilitiesPlugin(Plugin):
+         embed = MessageEmbed()
+         if guild.icon:
+             embed.set_thumbnail(url=guild.icon_url)
+-            embed.color = get_dominant_colors_guild(guild)
++            # TODO: Fix whatever caused me to need to do this
++            try: 
++                embed.color = get_dominant_colors_guild(guild)
++            except:
++                embed.color = 'FFFFFF'
+         embed.description = '\n'.join(content)
+         event.msg.reply('', embed=embed)
+ 
+-- 
+2.24.1.windows.2
+

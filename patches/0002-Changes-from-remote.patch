@@ -1,0 +1,43 @@
+From 75d0987210cf24f8867fa973f576abb8614d348f Mon Sep 17 00:00:00 2001
+From: root <swvn10@gmail.com>
+Date: Sun, 29 Sep 2019 02:21:32 +0000
+Subject: [PATCH 02/24] Changes from remote
+
+---
+ rowboat/plugins/core.py | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
+
+diff --git a/rowboat/plugins/core.py b/rowboat/plugins/core.py
+index 1f42c17..e42e3d2 100644
+--- a/rowboat/plugins/core.py
++++ b/rowboat/plugins/core.py
+@@ -490,15 +490,11 @@ class CorePlugin(Plugin):
+ 
+             return
+ 
+-    @Plugin.command('setup', '[force:str]')
+-    def command_setup(self, event, force=False):
++    @Plugin.command('setup')
++    def command_setup(self, event):
+         if not event.guild:
+             return event.msg.reply(':warning: This command can only be used in servers')
+ 
+-        # Make sure we're not already setup
+-        if not force or event.guild.id in self.guilds:
+-            return event.msg.reply(':warning: This server is already setup')
+-
+         global_admin = rdb.sismember('global_admins', event.author.id)
+ 
+         # Make sure this is the owner of the server
+@@ -652,7 +648,7 @@ class CorePlugin(Plugin):
+             guild.name,
+         ))
+ 
+-        general_channel = guild.channels[guild.id]
++        general_channel = list(guild.channels)[0]
+ 
+         try:
+             invite = general_channel.create_invite(
+-- 
+2.24.1.windows.2
+
