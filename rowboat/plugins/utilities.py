@@ -11,7 +11,7 @@ from gevent.pool import Pool
 from datetime import datetime, timedelta
 from collections import defaultdict
 
-from disco.types.user import GameType, Status
+from disco.types.user import ActivityTypes, Status
 from disco.types.message import MessageEmbed
 from disco.util.snowflake import to_datetime
 from disco.util.sanitize import S
@@ -33,8 +33,8 @@ from rowboat.constants import (
 
 
 def get_status_emoji(presence):
-    if presence.game and presence.game.type == GameType.STREAMING:
-        return STATUS_EMOJI[GameType.STREAMING], 'Streaming'
+    if presence.game and presence.game.type == ActivityTypes.STREAMING:
+        return STATUS_EMOJI[ActivityTypes.STREAMING], 'Streaming'
     elif presence.status == Status.ONLINE:
         return STATUS_EMOJI[Status.ONLINE], 'Online'
     elif presence.status == Status.IDLE:
@@ -291,7 +291,7 @@ class UtilitiesPlugin(Plugin):
             emoji, status = get_status_emoji(user.presence)
             content.append('Online Status: {} <{}>'.format(status, emoji))
             if user.presence.game and user.presence.game.name:
-                if user.presence.game.type == GameType.DEFAULT:
+                if user.presence.game.type == ActivityTypes.DEFAULT:
                     content.append(u'Status: {}'.format(user.presence.game.name))
                 else:
                     if user.presence.game.url:
