@@ -369,12 +369,12 @@ class ModLogPlugin(Plugin):
     def on_guild_role_create(self, event):
         self.log_action(Actions.GUILD_ROLE_CREATE, event)
 
-    @Plugin.listen('GuildRoleDelete', priority=Priority.SEQUENTIAL)
+    @Plugin.listen('GuildRoleDelete', priority=Priority.BEFORE)
     def on_guild_role_delete(self, event):
         pre_role = event.guild.roles.get(event.role_id)
         self.log_action(Actions.GUILD_ROLE_DELETE, event, pre_role=pre_role)
 
-    @Plugin.listen('GuildMemberUpdate', priority=Priority.SEQUENTIAL)
+    @Plugin.listen('GuildMemberUpdate', priority=Priority.BEFORE)
     def on_guild_member_update(self, event):
         pre_member = event.guild.members.get(event.id)
 
@@ -436,7 +436,7 @@ class ModLogPlugin(Plugin):
                 )
                 self.log_action(Actions.GUILD_MEMBER_ROLES_RMV, event, role=role)
 
-    @Plugin.listen('PresenceUpdate', priority=Priority.SEQUENTIAL, metadata={'global_': True})
+    @Plugin.listen('PresenceUpdate', priority=Priority.BEFORE, metadata={'global_': True})
     def on_presence_update(self, event):
         plugin = self.bot.plugins.get('CorePlugin')
         if not plugin or not event.user:
@@ -479,7 +479,7 @@ class ModLogPlugin(Plugin):
                         after=unicode(event.user),
                         e=event)
 
-    @Plugin.listen('MessageUpdate', priority=Priority.SEQUENTIAL)
+    @Plugin.listen('MessageUpdate', priority=Priority.BEFORE)
     def on_message_update(self, event):
         if event.author.id == self.state.me.id:
             return

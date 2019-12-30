@@ -77,11 +77,11 @@ class SQLPlugin(Plugin):
     def on_message_delete_bulk(self, event):
         Message.update(deleted=True).where((Message.id << event.ids)).execute()
 
-    @Plugin.listen('MessageReactionAdd', priority=Priority.SEQUENTIAL)
+    @Plugin.listen('MessageReactionAdd', priority=Priority.BEFORE)
     def on_message_reaction_add(self, event):
         Reaction.from_disco_reaction(event)
 
-    @Plugin.listen('MessageReactionRemove', priority=Priority.SEQUENTIAL)
+    @Plugin.listen('MessageReactionRemove', priority=Priority.BEFORE)
     def on_message_reaction_remove(self, event):
         Reaction.delete().where(
             (Reaction.message_id == event.message_id) &
@@ -93,7 +93,7 @@ class SQLPlugin(Plugin):
     def on_message_reaction_remove_all(self, event):
         Reaction.delete().where((Reaction.message_id == event.message_id)).execute()
 
-    @Plugin.listen('GuildEmojisUpdate', priority=Priority.SEQUENTIAL)
+    @Plugin.listen('GuildEmojisUpdate', priority=Priority.BEFORE)
     def on_guild_emojis_update(self, event):
         ids = []
 
