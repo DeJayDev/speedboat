@@ -202,7 +202,7 @@ class Infraction(BaseModel):
                     event.guild.name,
                     reason or 'no reason'
                 ))
-            else:
+            except:
                 plugin.log.warning('Could not DM member %s', member.id)
 
         member.kick(reason=reason)
@@ -244,7 +244,7 @@ class Infraction(BaseModel):
                     reason or 'no reason',
                     humanize.naturaldelta(expires_at - datetime.utcnow())
                 ))
-            else:
+            except:
                 plugin.log.warning('Could not DM member %s', member.id)
 
         member.ban(reason=reason)
@@ -321,7 +321,7 @@ class Infraction(BaseModel):
                     event.guild.name,
                     reason or 'no reason'
                 ))
-            else:
+            except:
                 plugin.log.warning('Could not DM member %s', member.id)
 
         guild.create_ban(user_id, reason=reason)
@@ -363,7 +363,7 @@ class Infraction(BaseModel):
                     event.guild.name,
                     reason or 'no reason'
                 ))
-            else:
+            except:
                 plugin.log.warning('Could not DM member %s', member.id)            
 
         plugin.call(
@@ -397,7 +397,7 @@ class Infraction(BaseModel):
                     event.guild.name,
                     reason or 'no reason'
                 ))
-            else:
+            except:
                 plugin.log.warning('Could not DM member %s', member.id)
         
         plugin.call(
@@ -444,7 +444,7 @@ class Infraction(BaseModel):
                     reason or 'no reason',
                     humanize.naturaldelta(expires_at - datetime.utcnow())
                 ))
-            else:
+            except:
                 plugin.log.warning('Could not DM member %s', member.id)
 
         plugin.call(
