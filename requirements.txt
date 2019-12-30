@@ -20,7 +20,6 @@ greenlet==0.4.15
 httplib2==0.14.0
 humanize==0.5.1
 inflection==0.3.1
-influxdb==5.2.3
 itsdangerous==1.1.0
 Jinja2==2.10.3
 lxml==4.4.1
