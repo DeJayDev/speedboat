@@ -6,6 +6,7 @@ import inspect
 import humanize
 import functools
 import contextlib
+import time
 
 from datetime import datetime, timedelta
 from holster.emitter import Priority, Emitter
@@ -14,6 +15,7 @@ from disco.types.message import MessageEmbed
 from disco.api.http import APIException
 from disco.bot.command import CommandEvent
 from disco.util.sanitize import S
+from disco.util.snowflake import to_datetime
 
 from rowboat import ENV
 from rowboat.util import LocalProxy
@@ -303,7 +305,7 @@ class CorePlugin(Plugin):
             embed.color = 0xffb347
             embed.add_field(name='Replayed Events', value=str(self.client.gw.replayed_events))
 
-    @Plugin.listen('Ready', priority=Priority.BEFORE)
+    @Plugin.listen('Ready', priority=Priority.SEQUENTIAL)
     def on_ready(self, event):
         reconnects = self.client.gw.reconnects
         self.log.info('Started session %s', event.session_id)
@@ -320,7 +322,7 @@ class CorePlugin(Plugin):
                 embed.title = 'Connected'
                 embed.color = 0x77dd77
 
-    @Plugin.listen('GuildCreate', priority=Priority.BEFORE, conditional=lambda e: not e.created)
+    @Plugin.listen('GuildCreate', priority=Priority.SEQUENTIAL, conditional=lambda e: not e.created)
     def on_guild_create(self, event):
         try:
             guild = Guild.with_id(event.id)
@@ -730,3 +732,11 @@ class CorePlugin(Plugin):
     def control_commands(self, event):
         event.msg.reply('__**Punishments**__\n`!mute <mention or ID> [reason]` - Mutes user from talking in text channel (role must be set up).\n`!unmute <mention or ID> [reason]` - Unmutes user.\n`!tempmute <mention or ID> <duration> [reason]` - Temporarily mutes user from talking in text channel for duration.\n`!kick <mention or ID> [reason]` - Kicks user from server.\n`!ban <mention or ID> [reason]` - Bans user, does not delete messages. Must still be in server.\n`!unban <ID> [reason]` - Unbans user. Must use ID.\n`!tempban <mention or ID> <duration> [reason]` - Temporarily bans user for duration.\n`!forceban <ID> <reason>` - Bans user who is not in the server. Must use ID.\n`!softban <mention or ID> [reason]` - Softbans (bans/unbans) user.\n\n__**Admin Utilities**__\n`!clean all <#>` - Deletes # of messages in current channel.\n`!clean bots <#>` - Deletes # of messages sent by bots in current channel.\n`!clean user <mention or ID> <#>` - Deletes # of user\'s messages in current channel. Must use ID if they are no longer in the server.\n`!archive user <mention or ID> [#]` - Creates an archive with all messages found by user.\n`!archive (here / all ) [#]` - Creates an archive with all messages in the server.\n`!archive channel <channel> [#]` - Creates an archive with all messages in the channel.\n`!search <tag or ID>` - Returns some information about the user, ID, time joined, infractions, etc.\n`!role add <mention or ID> <role> [reason]` - Adds the role (either ID or fuzzy-match name) to the user.\n`!role rmv/remove <mention or ID> <role> [reason]` - Removes the role from the user.\n`!r add <duration> <message>` - Adds a reminder to be sent after the specified duration.')
         event.msg.reply('__**Infractions**__\n`!inf search <mention or ID>` - Searches infractions based on the given query.\n`!inf info <inf #>` - Returns information on an infraction.\n`!inf duration <inf #> <duration>` - Updates the duration of an infraction ([temp]ban, [temp]mutes). Duration starts from time of initial action.\n`!reason <inf #> <reason>` - Sets the reason for an infraction.\n\n__**Reactions and Starboard**__\n`!stars <lock | unlock>` - Lock or unlocks the starboard. Locking prevents new posts from being starred.\n`!stars <block | unblock> <mention or ID>` - Blocks or unblocks a user\'s stars from starboard. Their reactions won\'t count and messages won\'t be posted.\n`!stars hide <message ID>` - Removes a starred message from starboard using message ID.\n`!reactions clean <user> [count] [emoji]` - Removes reactions placed by specified user.')
+
+    @Plugin.command('ping', level=-1)
+    def ping(self, event):
+        pre = time.time()
+        post = (time.mktime(to_datetime(event.msg.id).timetuple()) - pre) / 1000
+        msg = event.msg.reply(":eyes:")
+        ping = (time.time() - pre) * 1000
+        msg.edit(":eyes: `BOT: {}ms` `API: {}ms`".format(int(post), int(ping)))

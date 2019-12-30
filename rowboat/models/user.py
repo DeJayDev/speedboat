@@ -195,11 +195,15 @@ class Infraction(BaseModel):
         )
 
         # TODO: Make these configurable.
-        member.user.open_dm().send_message(':warning: You were **{}** from {} for "{}"'.format(
-            'kicked',
-            event.guild.name,
-            reason or 'no reason'
-        ))
+        if member.user.bot is not False: 
+            try:
+                member.user.open_dm().send_message(u':warning: You were **{}** from {} for "{}"'.format(
+                    'kicked',
+                    event.guild.name,
+                    reason or 'no reason'
+                ))
+            else:
+                plugin.log.warning('Could not DM member %s', member.id)
 
         member.kick(reason=reason)
 
@@ -232,12 +236,16 @@ class Infraction(BaseModel):
             user_id=member.user.id
         )
 
-        member.user.open_dm().send_message(':warning: You were **{}** from {} for "{}"\n\nThis will be lifted in: {}'.format(
-            'temporarily banned',
-            event.guild.name,
-            reason or 'no reason',
-            humanize.naturaldelta(expires_at - datetime.utcnow())
-        ))
+        if member.user.bot is not False: 
+            try:
+                member.user.open_dm().send_message(u':warning: You were **{}** from {} for "{}"\n\nThis will be lifted in: {}'.format(
+                    'temporarily banned',
+                    event.guild.name,
+                    reason or 'no reason',
+                    humanize.naturaldelta(expires_at - datetime.utcnow())
+                ))
+            else:
+                plugin.log.warning('Could not DM member %s', member.id)
 
         member.ban(reason=reason)
 
@@ -306,11 +314,15 @@ class Infraction(BaseModel):
             user_id=user_id,
         )
 
-        member.user.open_dm().send_message(':warning: You were **{}** from {} for "{}"'.format(
-            'banned',
-            event.guild.name,
-            reason or 'no reason'
-        ))
+        if member.user.bot is not False: 
+            try:
+                member.user.open_dm().send_message(u':warning: You were **{}** from {} for "{}"'.format(
+                    'banned',
+                    event.guild.name,
+                    reason or 'no reason'
+                ))
+            else:
+                plugin.log.warning('Could not DM member %s', member.id)
 
         guild.create_ban(user_id, reason=reason)
 
@@ -343,12 +355,16 @@ class Infraction(BaseModel):
             actor_id=event.author.id,
             type_=cls.Types.WARNING,
             reason=reason)
-            
-        member.user.open_dm().send_message(':warning: You were **{}** in {} for "{}"'.format(
-            'warned',
-            event.guild.name,
-            reason or 'no reason'
-        ))
+
+        if member.user.bot is not False: 
+            try:
+                member.user.open_dm().send_message(u':warning: You were **{}** in {} for "{}"'.format(
+                    'warned',
+                    event.guild.name,
+                    reason or 'no reason'
+                ))
+            else:
+                plugin.log.warning('Could not DM member %s', member.id)            
 
         plugin.call(
             'ModLogPlugin.log_action_ext',
@@ -374,12 +390,16 @@ class Infraction(BaseModel):
 
         member.add_role(admin_config.mute_role, reason=reason)
 
-        member.user.open_dm().send_message(':warning: You were **{}** in {} for "{}"'.format(
-            'muted',
-            event.guild.name,
-            reason or 'no reason'
-        ))
-
+        if member.user.bot is not False: 
+            try:
+                member.user.open_dm().send_message(u':warning: You were **{}** in {} for "{}"'.format(
+                    'muted',
+                    event.guild.name,
+                    reason or 'no reason'
+                ))
+            else:
+                plugin.log.warning('Could not DM member %s', member.id)
+        
         plugin.call(
             'ModLogPlugin.log_action_ext',
             Actions.MEMBER_MUTED,
@@ -416,12 +436,16 @@ class Infraction(BaseModel):
 
         member.add_role(admin_config.mute_role, reason=reason)
 
-        member.user.open_dm().send_message(':warning: You were **{}** in {} for "{}"\n\nThis will be lifted in: {}'.format(
-            'temporarily muted',
-            event.guild.name,
-            reason or 'no reason',
-            humanize.naturaldelta(expires_at - datetime.utcnow())
-        ))
+        if member.user.bot is not False: 
+            try:
+                member.user.open_dm().send_message(u':warning: You were **{}** in {} for "{}"\n\nThis will be lifted in: {}'.format(
+                    'temporarily muted',
+                    event.guild.name,
+                    reason or 'no reason',
+                    humanize.naturaldelta(expires_at - datetime.utcnow())
+                ))
+            else:
+                plugin.log.warning('Could not DM member %s', member.id)
 
         plugin.call(
             'ModLogPlugin.log_action_ext',

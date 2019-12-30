@@ -238,7 +238,7 @@ class AdminPlugin(Plugin):
             member=member,
         )
 
-    @Plugin.listen('GuildMemberRemove', priority=Priority.BEFORE)
+    @Plugin.listen('GuildMemberRemove', priority=Priority.SEQUENTIAL)
     def on_guild_member_remove(self, event):
         if event.user.id in event.guild.members:
             GuildMemberBackup.create_from_member(event.guild.members.get(event.user.id))
@@ -250,7 +250,7 @@ class AdminPlugin(Plugin):
 
         self.restore_user(event, event.member)
 
-    @Plugin.listen('GuildMemberUpdate', priority=Priority.BEFORE)
+    @Plugin.listen('GuildMemberUpdate', priority=Priority.SEQUENTIAL)
     def on_guild_member_update(self, event):
         pre_member = event.guild.members.get(event.id)
         if not pre_member:
@@ -271,7 +271,7 @@ class AdminPlugin(Plugin):
     def on_guild_ban_remove(self, event):
         Infraction.clear_active(event, event.user.id, [Infraction.Types.BAN, Infraction.Types.TEMPBAN])
 
-    @Plugin.listen('GuildRoleUpdate', priority=Priority.BEFORE)
+    @Plugin.listen('GuildRoleUpdate', priority=Priority.SEQUENTIAL)
     def on_guild_role_update(self, event):
         if event.role.id not in event.config.locked_roles:
             return
@@ -1093,12 +1093,6 @@ class AdminPlugin(Plugin):
             actor=unicode(event.author),
             reason=reason or 'no reason',
         )
-
-        if rated[0][0] > 40:
-            if len(rated) == 1:
-                role_obj = rated[0][1]
-            elif rated[0][0] - rated[1][0] > 20:
-                role_obj = rated[0][1]
 
         if not role_obj:
             raise CommandFail('too many matches for that role, try something more exact or the role ID')
