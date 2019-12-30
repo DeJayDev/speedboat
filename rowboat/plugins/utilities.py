@@ -214,7 +214,7 @@ class UtilitiesPlugin(Plugin):
                     (User.username == username) &
                     (User.discriminator == int(discrim))))
 
-        users = User.select().where(reduce(operator.or_, queries).limit(10))
+        users = User.select().where(reduce(operator.or_, queries)).limit(10)
         if len(users) == 0:
             return event.msg.reply(u'No users found for query `{}`'.format(S(query, escape_codeblocks=True)))
 
