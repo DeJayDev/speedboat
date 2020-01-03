@@ -1,4 +1,4 @@
-FROM mhart/alpine-node:8.17
+FROM node:8.17-slim
 
 WORKDIR /opt/frontend
 
