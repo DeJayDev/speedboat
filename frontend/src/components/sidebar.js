@@ -33,12 +33,6 @@ class GuildLinks extends Component {
       links.push(
         <SidebarLink icon='ban' to={'/guilds/' + this.props.guild.id + '/infractions'} text='Infractions' key='infractions' />
       );
-
-      if (STATS_ENABLED) {
-        links.push(
-          <SidebarLink icon='bar-chart-o' to={'/guilds/' + this.props.guild.id + '/stats'} text='Stats' key='stats' />
-        );
-      }
     }
 
     return (
