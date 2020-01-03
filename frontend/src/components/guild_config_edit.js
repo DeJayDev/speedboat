@@ -18,9 +18,7 @@ export default class GuildConfigEdit extends Component {
       contents: null,
       hasUnsavedChanges: false,
     }
-  }
 
-  componentWillMount() {
     globalState.getGuild(this.props.params.gid).then((guild) => {
       globalState.currentGuild = guild;
 
