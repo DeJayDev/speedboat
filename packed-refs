@@ -1,0 +1,14 @@
+# pack-refs with: peeled fully-peeled sorted 
+162d1ea9d8cbad36e235c748c01943414c0bc2fa refs/remotes/origin/feature/audit-log
+017d2bac2963654f90bc197ed09976a3e8f37573 refs/remotes/origin/feature/music
+7ac7d5c35f0e689fd91a75c66404d69ddb74a2eb refs/remotes/origin/feature/twitch
+1801a3359ea98c83fb5956fe20a48ebe7fc785fa refs/remotes/origin/master
+dbd2cec04b157a0db4e56f9847874c4098292781 refs/tags/v1.0.0
+fec6773d335d33b385d1e7006dbc056c05b0b959 refs/tags/v1.0.1
+45220aa7de4834408e4fecf7265527f9a5fce49b refs/tags/v1.0.2
+6abac666748d941626b0cddaa8f6b90db95f55ab refs/tags/v1.0.3
+f2c74612d7bafd7c72dcc2df4188a1a16fe9c60d refs/tags/v1.0.5
+581d856091ede048c624a4edb8ec5e5a45c63c11 refs/tags/v1.1.0
+64f9a089ee95f81d1926199d997dcc4f1abb57fc refs/tags/v1.1.1
+0fd7420d190457d1dcb8736823b75fd3dc46066f refs/tags/v1.2.0
+4c918238fa86e0d64b0b66f2dff47c439f6d1e57 refs/tags/v1.3.0
