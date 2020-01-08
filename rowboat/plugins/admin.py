@@ -13,6 +13,7 @@ from fuzzywuzzy import fuzz
 from datetime import datetime, timedelta
 
 from disco.bot import CommandLevels
+from disco.api.http import APIException
 from disco.types.user import User as DiscoUser
 from disco.types.message import MessageTable, MessageEmbed, MessageEmbedField, MessageEmbedThumbnail
 from disco.types.permissions import Permissions
@@ -886,7 +887,7 @@ class AdminPlugin(Plugin):
         if mode in ('all', 'channel'):
             cid = event.channel.id
             if channel:
-                cid = channel if isinstance(channel, (int,log)) else channel.id
+                cid = channel if isinstance(channel, (int,long)) else channel.id
             channel = event.guild.channels.get(cid)
             if not channel:
               raise CommandFail('Channel not Found')
