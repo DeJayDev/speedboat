@@ -412,7 +412,7 @@ class Infraction(BaseModel):
 
         member.add_role(admin_config.mute_role, reason=reason)
 
-        msg_status = Fals
+        msg_status = False
 
         if member.user.bot is not False: 
             try:
