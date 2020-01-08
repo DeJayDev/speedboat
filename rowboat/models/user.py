@@ -207,7 +207,7 @@ class Infraction(BaseModel):
                     reason or 'no reason'
                 ))
             except APIException as err:
-                if err.status_code !== 50007:
+                if err.status_code != 50007:
                     msg_status = True
                 plugin.log.warning('Could not DM member %s', member.id)
 
@@ -254,7 +254,7 @@ class Infraction(BaseModel):
                     humanize.naturaldelta(expires_at - datetime.utcnow())
                 ))
             except APIException as err:
-                if err.status_code !== 50007:
+                if err.status_code != 50007:
                     msg_status = True
                 plugin.log.warning('Could not DM member %s', member.id)
 
@@ -336,7 +336,7 @@ class Infraction(BaseModel):
                     reason or 'no reason'
                 ))
             except APIException as err:
-                if err.status_code !== 50007:
+                if err.status_code != 50007:
                     msg_status = True
                 plugin.log.warning('Could not DM member %s', member.id)
 
@@ -376,7 +376,7 @@ class Infraction(BaseModel):
                     reason or 'no reason'
                 ))
             except APIException as err:
-                if err.status_code !== 50007:
+                if err.status_code != 50007:
                     msg_status = True
                 plugin.log.warning('Could not DM member %s', member.id)
 
@@ -422,7 +422,7 @@ class Infraction(BaseModel):
                     reason or 'no reason'
                 ))
             except APIException as err:
-                if err.status_code !== 50007:
+                if err.status_code != 50007:
                     msg_status = True
                 plugin.log.warning('Could not DM member %s', member.id)
         
@@ -474,7 +474,7 @@ class Infraction(BaseModel):
                     humanize.naturaldelta(expires_at - datetime.utcnow())
                 ))
             except APIException as err:
-                if err.status_code !== 50007:
+                if err.status_code != 50007:
                     msg_status = True
                 plugin.log.warning('Could not DM member %s', member.id)
 
