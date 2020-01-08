@@ -347,7 +347,7 @@ class CorePlugin(Plugin):
         self.log.info('Requesting Guild: %s (%s)', event.guild.name, event.guild.id)
         guild.sync(event.guild)
         
-	event.guild.request_guild_members()
+	    guild.request_guild_members()
 
         self.guilds[event.id] = guild
 

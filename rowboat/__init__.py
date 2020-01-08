@@ -4,6 +4,7 @@ import subprocess
 import sentry_sdk as sentry
 
 from disco.util.logging import LOG_FORMAT
+from sentry_sdk.integrations.redis import RedisIntegration
 
 ENV = os.getenv('ENV', 'local')
 DSN = os.getenv('DSN')
@@ -12,9 +13,10 @@ REV = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip()
 VERSION = '1.5.0'
 
 sentry.init(
-    DSN,
+    dsn=DSN,
     release=REV,
     environment=ENV,
+    integrations=[RedisIntegration()]
 )
 
 # Log things to file
