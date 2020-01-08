@@ -687,7 +687,7 @@ class CorePlugin(Plugin):
             guild.name,
         ))
 
-        general_channel = list(guild.channels)[0]
+        general_channel = guild.channels[list(guild.channels)[0]]
 
         try:
             invite = general_channel.create_invite(
@@ -700,7 +700,7 @@ class CorePlugin(Plugin):
                 guild.name,
             ))
 
-        msg.edit(u'Ok, here is a temporary invite for you: {}'.format(
+        msg.edit(u'Ok, here is a temporary invite for you: discord.gg/{}'.format(
             invite.code,
         ))
 
