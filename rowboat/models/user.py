@@ -6,7 +6,7 @@ from peewee import BigIntegerField, IntegerField, SmallIntegerField, TextField, 
 from playhouse.postgres_ext import BinaryJSONField
 
 from rowboat.sql import BaseModel
-
+from disco.api.http import APIException
 
 @BaseModel.register
 class User(BaseModel):
@@ -130,6 +130,7 @@ class Infraction(BaseModel):
     expires_at = DateTimeField(null=True)
     created_at = DateTimeField(default=datetime.utcnow)
     active = BooleanField(default=True)
+    messaged = BooleanField(default=False)
 
     class Meta:
         db_table = 'infractions'
@@ -148,6 +149,7 @@ class Infraction(BaseModel):
             'expires_at': self.expires_at,
             'created_at': self.created_at,
             'active': self.active,
+            'messaged': self.messaged,
         }
 
         base['type'] = {
@@ -194,6 +196,8 @@ class Infraction(BaseModel):
             user_id=member.user.id
         )
 
+        msg_status = False
+
         # TODO: Make these configurable.
         if member.user.bot is not False: 
             try:
@@ -202,7 +206,9 @@ class Infraction(BaseModel):
                     event.guild.name,
                     reason or 'no reason'
                 ))
-            except:
+            except APIException as err:
+                if err.status_code !== 50007:
+                    msg_status = True
                 plugin.log.warning('Could not DM member %s', member.id)
 
         member.kick(reason=reason)
@@ -222,7 +228,8 @@ class Infraction(BaseModel):
             user_id=member.user.id,
             actor_id=event.author.id,
             type_=cls.Types.KICK,
-            reason=reason)
+            reason=reason,
+            messaged=msg_status)
 
     @classmethod
     def tempban(cls, plugin, event, member, reason, expires_at):
@@ -236,6 +243,8 @@ class Infraction(BaseModel):
             user_id=member.user.id
         )
 
+        msg_status = False
+
         if member.user.bot is not False: 
             try:
                 member.user.open_dm().send_message(u':warning: You were **{}** from {} for "{}"\n\nThis will be lifted in: {}'.format(
@@ -244,7 +253,9 @@ class Infraction(BaseModel):
                     reason or 'no reason',
                     humanize.naturaldelta(expires_at - datetime.utcnow())
                 ))
-            except:
+            except APIException as err:
+                if err.status_code !== 50007:
+                    msg_status = True
                 plugin.log.warning('Could not DM member %s', member.id)
 
         member.ban(reason=reason)
@@ -265,7 +276,8 @@ class Infraction(BaseModel):
             actor_id=event.author.id,
             type_=cls.Types.TEMPBAN,
             reason=reason,
-            expires_at=expires_at)
+            expires_at=expires_at,
+            messaged=msg_status)
 
     @classmethod
     def softban(cls, plugin, event, member, reason):
@@ -314,6 +326,8 @@ class Infraction(BaseModel):
             user_id=user_id,
         )
 
+        msg_status = False
+
         if member.user.bot is not False: 
             try:
                 member.user.open_dm().send_message(u':warning: You were **{}** from {} for "{}"'.format(
@@ -321,7 +335,9 @@ class Infraction(BaseModel):
                     event.guild.name,
                     reason or 'no reason'
                 ))
-            except:
+            except APIException as err:
+                if err.status_code !== 50007:
+                    msg_status = True
                 plugin.log.warning('Could not DM member %s', member.id)
 
         guild.create_ban(user_id, reason=reason)
@@ -341,7 +357,8 @@ class Infraction(BaseModel):
             user_id=user_id,
             actor_id=event.author.id,
             type_=cls.Types.BAN,
-            reason=reason)
+            reason=reason,
+            messaged=msg_status)
 
     @classmethod
     def warn(cls, plugin, event, member, reason, guild):
@@ -349,12 +366,7 @@ class Infraction(BaseModel):
         User.from_disco_user(member.user)
         user_id = member.user.id
 
-        cls.create(
-            guild_id=guild.id,
-            user_id=user_id,
-            actor_id=event.author.id,
-            type_=cls.Types.WARNING,
-            reason=reason)
+        msg_status = False
 
         if member.user.bot is not False: 
             try:
@@ -363,8 +375,10 @@ class Infraction(BaseModel):
                     event.guild.name,
                     reason or 'no reason'
                 ))
-            except:
-                plugin.log.warning('Could not DM member %s', member.id)            
+            except APIException as err:
+                if err.status_code !== 50007:
+                    msg_status = True
+                plugin.log.warning('Could not DM member %s', member.id)
 
         plugin.call(
             'ModLogPlugin.log_action_ext',
@@ -374,6 +388,14 @@ class Infraction(BaseModel):
             actor=unicode(event.author) if event.author.id != member.id else 'Automatic',
             reason=reason or 'no reason'
         )
+
+        cls.create(
+            guild_id=guild.id,
+            user_id=user_id,
+            actor_id=event.author.id,
+            type_=cls.Types.WARNING,
+            reason=reason,
+            messaged=msg_status)
 
     @classmethod
     def mute(cls, plugin, event, member, reason):
@@ -390,6 +412,8 @@ class Infraction(BaseModel):
 
         member.add_role(admin_config.mute_role, reason=reason)
 
+        msg_status = Fals
+
         if member.user.bot is not False: 
             try:
                 member.user.open_dm().send_message(u':warning: You were **{}** in {} for "{}"'.format(
@@ -397,7 +421,9 @@ class Infraction(BaseModel):
                     event.guild.name,
                     reason or 'no reason'
                 ))
-            except:
+            except APIException as err:
+                if err.status_code !== 50007:
+                    msg_status = True
                 plugin.log.warning('Could not DM member %s', member.id)
         
         plugin.call(
@@ -415,7 +441,8 @@ class Infraction(BaseModel):
             actor_id=event.author.id,
             type_=cls.Types.MUTE,
             reason=reason,
-            metadata={'role': admin_config.mute_role})
+            metadata={'role': admin_config.mute_role},
+            messaged=msg_status)
 
     @classmethod
     def tempmute(cls, plugin, event, member, reason, expires_at):
@@ -436,6 +463,8 @@ class Infraction(BaseModel):
 
         member.add_role(admin_config.mute_role, reason=reason)
 
+        msg_status = False
+
         if member.user.bot is not False: 
             try:
                 member.user.open_dm().send_message(u':warning: You were **{}** in {} for "{}"\n\nThis will be lifted in: {}'.format(
@@ -444,7 +473,9 @@ class Infraction(BaseModel):
                     reason or 'no reason',
                     humanize.naturaldelta(expires_at - datetime.utcnow())
                 ))
-            except:
+            except APIException as err:
+                if err.status_code !== 50007:
+                    msg_status = True
                 plugin.log.warning('Could not DM member %s', member.id)
 
         plugin.call(
@@ -464,7 +495,8 @@ class Infraction(BaseModel):
             type_=cls.Types.TEMPMUTE,
             reason=reason,
             expires_at=expires_at,
-            metadata={'role': admin_config.mute_role})
+            metadata={'role': admin_config.mute_role},
+            messaged=msg_status)
 
     @classmethod
     def clear_active(cls, event, user_id, types):
