@@ -36,4 +36,7 @@ def parse_duration(raw, source=None, negative=False, safe=False):
     if negative:
         value = value * -1
 
+    if value > 999999999: # Fixes SPEEDBOAT-60 on Sentry
+        raise CommandError('Invalid duration')
+
     return (source or datetime.utcnow()) + timedelta(seconds=value + 1)

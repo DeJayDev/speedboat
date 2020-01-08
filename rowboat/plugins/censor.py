@@ -114,7 +114,7 @@ class CensorPlugin(Plugin):
         }
 
         # Cache for 12 hours
-        rdb.setex('inv:{}'.format(code), json.dumps(obj), 43200)
+        rdb.setex('inv:{}'.format(code), 43200, json.dumps(obj))
         return obj
 
     @Plugin.listen('MessageUpdate')
