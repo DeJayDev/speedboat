@@ -42,7 +42,7 @@ def get_dominant_colors_user(user, url=None):
     if rdb.exists(key):
         return int(rdb.get(key))
     else:
-        r = requests.get(url or user.avatar_url)
+        r = requests.get(url or user.get_avatar_url())
         try:
             r.raise_for_status()
         except:

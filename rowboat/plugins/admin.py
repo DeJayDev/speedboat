@@ -1239,7 +1239,7 @@ class AdminPlugin(Plugin):
                     value=u'<:{1}:{0}> (`{1}`, used {2} times)'.format(*emojis[0]))
 
         embed.thumbnail = MessageEmbedThumbnail(url=user.avatar_url)
-        embed.color = get_dominant_colors_user(user)
+        embed.color = get_dominant_colors_user(user, User.from_disco_user(user).get_avatar_url())
         event.msg.reply('', embed=embed)
 
     @Plugin.command('emojistats', '<mode:str> <sort:str>', level=CommandLevels.MOD)
