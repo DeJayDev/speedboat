@@ -7,7 +7,7 @@ from disco.gateway.packets import OPCode, RECV
 from disco.types.message import MessageTable, MessageEmbed
 
 from rowboat.redis import rdb
-from rowboat.plugins import BasePlugin as Plugin
+from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
 from rowboat.util.redis import RedisSet
 from rowboat.models.event import Event
 from rowboat.models.user import User
@@ -110,7 +110,7 @@ class InternalPlugin(Plugin):
             else:
                 error = count
 
-        event.msg.reply('Command `{}` was used a total of {} times, {} of those had errors'.format(
+        raise CommandSuccess('Command `{}` was used a total of {} times, {} of those had errors'.format(
             name,
             success + error,
             error
@@ -123,12 +123,12 @@ class InternalPlugin(Plugin):
     @Plugin.command('add', '<name:str>', group='events', level=-1)
     def on_events_add(self, event, name):
         self.events.add(name)
-        event.msg.reply(':ok_hand: added {} to the list of tracked events'.format(name))
+        raise CommandSuccess('Added {} to the list of tracked events'.format(name))
 
     @Plugin.command('remove', '<name:str>', group='events', level=-1)
     def on_events_remove(self, event, name):
         self.events.remove(name)
-        event.msg.reply(':ok_hand: removed {} from the list of tracked events'.format(name))
+        raise CommandSuccess('Removed {} from the list of tracked events'.format(name))
 
     @Plugin.schedule(300, init=False)
     def prune_old_events(self):

@@ -3,7 +3,7 @@ import time
 from datadog import initialize, statsd
 
 from rowboat import ENV
-from rowboat.plugins import BasePlugin as Plugin
+from rowboat.plugins import RowboatPlugin as Plugin
 
 
 def to_tags(obj):

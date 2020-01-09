@@ -16,7 +16,7 @@ from disco.types.message import MessageEmbed
 from disco.util.snowflake import to_datetime
 from disco.util.sanitize import S
 
-from rowboat.plugins import RowboatPlugin as Plugin, CommandFail
+from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
 from rowboat.util.timing import Eventual
 from rowboat.util.input import parse_duration
 from rowboat.util.gevent import wait_many
@@ -77,7 +77,7 @@ class UtilitiesPlugin(Plugin):
         """
         Flip a coin
         """
-        event.msg.reply(random.choice(['heads', 'tails']))
+        raise CommandSuccess(random.choice(['heads', 'tails']))
 
     @Plugin.command('number', '[end:int] [start:int]', group='random', global_=True)
     def random_number(self, event, end=10, start=0):
@@ -87,12 +87,12 @@ class UtilitiesPlugin(Plugin):
 
         # Because someone will be an idiot
         if end > 9223372036854775807:
-            return event.msg.reply(':warning: ending number too big!')
+            raise CommandSuccess('Ending number too big!')
 
         if end <= start:
-            return event.msg.reply(':warning: ending number must be larger than starting number!')
+            raise CommandSuccess('Ending number must be larger than starting number!')
 
-        event.msg.reply(str(random.randint(start, end)))
+        raise CommandSuccess(str(random.randint(start, end)))
 
     @Plugin.command('cat', global_=True)
     def cat(self, event):
@@ -127,7 +127,7 @@ class UtilitiesPlugin(Plugin):
     @Plugin.command('emoji', '<emoji:str>', global_=True)
     def emoji(self, event, emoji):
         if not EMOJI_RE.match(emoji):
-            return event.msg.reply(u'Unknown emoji: `{}`'.format(emoji))
+            raise CommandFail(u'Unknown emoji: `{}`'.format(emoji))
 
         fields = []
 
@@ -186,9 +186,9 @@ class UtilitiesPlugin(Plugin):
                 Message.author_id == user.id
             ).order_by(Message.timestamp.desc()).limit(1).get()
         except Message.DoesNotExist:
-            return event.msg.reply(u"I've never seen {}".format(user))
+            raise CommandFail(u"I've never seen {}".format(user))
 
-        event.msg.reply(u'I last saw {} {} ago (at {})'.format(
+        raise CommandSuccess(u'I last saw {} {} ago (at {})'.format(
             user,
             humanize.naturaldelta(datetime.utcnow() - msg.timestamp),
             msg.timestamp
@@ -216,13 +216,13 @@ class UtilitiesPlugin(Plugin):
 
         users = User.select().where(reduce(operator.or_, queries)).limit(10)
         if len(users) == 0:
-            return event.msg.reply(u'No users found for query `{}`'.format(S(query, escape_codeblocks=True)))
+            raise CommandFail(u'No users found for query `{}`'.format(S(query, escape_codeblocks=True)))
 
         if len(users) == 1:
             if users[0].user_id in self.state.users:
                 return self.info(event, self.state.users.get(users[0].user_id))
 
-        return event.msg.reply(u'Found the following users for your query: ```{}```'.format(
+        raise CommandSuccess(u'Found the following users for your query: ```{}```'.format(
             u'\n'.join(map(lambda i: u'{} ({})'.format(unicode(i), i.user_id), users[:25]))
         ))
 
@@ -230,7 +230,7 @@ class UtilitiesPlugin(Plugin):
     def server(self, event, guild_id=None):
         guild = self.state.guilds.get(guild_id) if guild_id else event.guild
         if not guild:
-            raise CommandFail('invalid server')
+            raise CommandFail('Invalid server')
 
         content = []
         content.append(u'**\u276F Server Information**')
@@ -465,17 +465,17 @@ class UtilitiesPlugin(Plugin):
     @Plugin.command('clear', group='r', global_=True)
     def cmd_remind_clear(self, event):
         count = Reminder.delete_for_user(event.author.id)
-        return event.msg.reply(':ok_hand: I cleared {} reminders for you'.format(count))
+        raise CommandSuccess('I cleared {} reminders for you'.format(count))
 
     @Plugin.command('add', '<duration:str> <content:str...>', group='r', global_=True)
     @Plugin.command('remind', '<duration:str> <content:str...>', global_=True)
     def cmd_remind(self, event, duration, content):
         if Reminder.count_for_user(event.author.id) > 15:
-            return event.msg.reply(':warning: you can only have 15 reminders going at once!')
+            raise CommandFail('You can only have 15 reminders going at once!')
 
         remind_at = parse_duration(duration)
         if remind_at > (datetime.utcnow() + timedelta(seconds=5 * YEAR_IN_SEC)):
-            return event.msg.reply(':warning: thats too far in the future, I\'ll forget!')
+            raise CommandSuccess('Thats too far in the future, I\'ll forget!')
 
         r = Reminder.create(
             message_id=event.msg.id,
@@ -483,7 +483,7 @@ class UtilitiesPlugin(Plugin):
             content=content
         )
         self.reminder_task.set_next_schedule(r.remind_at)
-        event.msg.reply(':ok_hand: I\'ll remind you at {} ({})'.format(
+        raise CommandSuccess('I\'ll remind you at {} ({})'.format(
             r.remind_at.isoformat(),
             humanize.naturaldelta(r.remind_at - datetime.utcnow()),
         ))

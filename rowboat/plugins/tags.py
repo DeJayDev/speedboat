@@ -22,7 +22,7 @@ class TagsPlugin(Plugin):
         content = S(content)
 
         if len(content) > event.config.max_tag_length:
-            raise CommandFail('tag content is too long (max {} characters)'.format(event.config.max_tag_length))
+            raise CommandFail('Tag content is too long (max {} characters)'.format(event.config.max_tag_length))
 
         _, created = Tag.get_or_create(
             guild_id=event.guild.id,
@@ -32,7 +32,7 @@ class TagsPlugin(Plugin):
         )
 
         if not created:
-            raise CommandFail('a tag by that name already exists')
+            raise CommandFail('A tag by that name already exists')
 
         raise CommandSuccess(u'ok, your tag named `{}` has been created'.format(name))
 
@@ -47,7 +47,7 @@ class TagsPlugin(Plugin):
                 (Tag.name == S(name))
             ).get()
         except Tag.DoesNotExist:
-            raise CommandFail('no tag by that name exists')
+            raise CommandFail('No tag by that name exists')
 
         # Track the usage of the tag
         Tag.update(times_used=Tag.times_used + 1).where(
@@ -69,11 +69,11 @@ class TagsPlugin(Plugin):
                 (Tag.name == S(name))
             ).get()
         except Tag.DoesNotExist:
-            raise CommandFail('no tag by that name exists')
+            raise CommandFail('No tag by that name exists')
 
         if tag.author_id != event.author.id:
             if event.user_level <= event.config.min_level_remove_others:
-                raise CommandFail('you do not have the required permissions to remove other users tags')
+                raise CommandFail('You do not have the required permissions to remove other users tags')
 
         tag.delete_instance()
         raise CommandSuccess(u'ok, deleted tag `{}`'.format(tag.name))
@@ -88,7 +88,7 @@ class TagsPlugin(Plugin):
                 (Tag.name == S(name))
             ).get()
         except Tag.DoesNotExist:
-            raise CommandFail('no tag by that name exists')
+            raise CommandFail('No tag by that name exists')
 
         embed = MessageEmbed()
         embed.title = tag.name
