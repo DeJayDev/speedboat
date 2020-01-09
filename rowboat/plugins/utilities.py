@@ -390,10 +390,7 @@ class UtilitiesPlugin(Plugin):
 
         embed = MessageEmbed()
 
-        avatar = u'https://cdn.discordapp.com/avatars/{}/{}.png'.format(
-            user.id,
-            user.avatar,
-        )
+        avatar = User.with_id(user.id).get_avatar_url()
 
         embed.set_author(name=u'{}#{}'.format(
             user.username,
