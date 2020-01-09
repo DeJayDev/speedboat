@@ -303,18 +303,18 @@ class ModLogPlugin(Plugin):
     @Plugin.command('hush', group='modlog', level=CommandLevels.ADMIN)
     def command_hush(self, event):
         if event.guild.id in self.hushed:
-            return event.msg.reply(':warning: modlog is already hushed')
+            raise CommandFail('Modlog is already hushed')
 
         self.hushed[event.guild.id] = True
-        event.msg.reply(':white_check_mark: modlog hushed, do your dirty work in peace')
+        raise CommandSuccess('Modlog hushed, do your dirty work in peace')
 
     @Plugin.command('unhush', group='modlog', level=CommandLevels.ADMIN)
     def command_unhush(self, event):
         if event.guild.id not in self.hushed:
-            return event.msg.reply(':warning: modlog is not hushed')
+            raise CommandFail('Modlog is not hushed')
 
         del self.hushed[event.guild.id]
-        event.msg.reply(':white_check_mark: modlog unhushed, shhhhh... nobody saw anything')
+        raise CommandSuccess('Modlog unhushed, shhhhh... nobody saw anything')
 
     @Plugin.schedule(120)
     def cleanup_debounce(self):

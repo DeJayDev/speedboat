@@ -7,7 +7,7 @@ from disco.bot import CommandLevels
 from disco.api.http import APIException
 from disco.types.message import MessageEmbed
 
-from rowboat.plugins import RowboatPlugin as Plugin, CommandFail
+from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
 from rowboat.types.plugin import PluginConfig
 from rowboat.types import ChannelField, Field, SlottedModel, ListField, DictField
 from rowboat.models.user import StarboardBlock, User
@@ -81,7 +81,7 @@ class StarboardPlugin(Plugin):
                 )
             ).get()
         except StarboardEntry.DoesNotExist:
-            raise CommandFail('no starboard message with that id')
+            raise CommandFail('No starboard message with that id')
 
         _, sb_config = event.config.get_board(star.message.channel_id)
 
@@ -90,7 +90,7 @@ class StarboardPlugin(Plugin):
                 star.message.channel_id,
                 star.message_id)
         except:
-            raise CommandFail('no starboard message with that id')
+            raise CommandFail('No starboard message with that id')
 
         content, embed = self.get_embed(star, source_msg, sb_config)
         event.msg.reply(content, embed=embed)
@@ -116,7 +116,7 @@ class StarboardPlugin(Plugin):
                     (Message.guild_id == event.guild.id)
                 ).tuples())[0]
             except:
-                return event.msg.reply(':warning: failed to crunch the numbers on that user')
+                raise CommandFail('Failed to crunch the numbers on that user')
 
             embed = MessageEmbed()
             embed.color = 0xffd700
@@ -169,7 +169,7 @@ class StarboardPlugin(Plugin):
                 (StarboardEntry.message_id == mid)
             ).get()
         except StarboardEntry.DoesNotExist:
-            return event.msg.reply(':warning: no starboard entry exists with that message id')
+            raise CommandFail('No starboard entry exists with that message id')
 
         msg = self.client.api.channels_messages_get(
             entry.message.channel_id,
@@ -192,7 +192,7 @@ class StarboardPlugin(Plugin):
             ).execute()
 
         self.queue_update(event.guild.id, event.config)
-        event.msg.reply(u'Forcing an update on message {}'.format(mid))
+        raise CommandSuccess(u'Forcing an update on message {}'.format(mid))
 
     @Plugin.command('block', '<user:user>', group='stars', level=CommandLevels.MOD)
     def stars_block(self, event, user):
@@ -204,7 +204,7 @@ class StarboardPlugin(Plugin):
             })
 
         if not created:
-            event.msg.reply(u'{} is already blocked from the starboard'.format(
+            raise CommandFail(u'{} is already blocked from the starboard'.format(
                 user,
             ))
             return
@@ -215,7 +215,7 @@ class StarboardPlugin(Plugin):
         # Finally, queue an update for the guild
         self.queue_update(event.guild.id, event.config)
 
-        event.msg.reply(u'Blocked {} from the starboard'.format(
+        raise CommandSuccess(u'Blocked {} from the starboard'.format(
             user,
         ))
 
@@ -227,10 +227,9 @@ class StarboardPlugin(Plugin):
         ).execute()
 
         if not count:
-            event.msg.reply(u'{} was not blocked from the starboard'.format(
+            raise CommandFail(u'{} was not blocked from the starboard'.format(
                 user,
             ))
-            return
 
         # Renable posts and stars for this user
         StarboardEntry.unblock_user(user.id)
@@ -238,7 +237,7 @@ class StarboardPlugin(Plugin):
         # Finally, queue an update for the guild
         self.queue_update(event.guild.id, event.config)
 
-        event.msg.reply(u'Unblocked {} from the starboard'.format(
+        raise CommandSuccess(u'Unblocked {} from the starboard'.format(
             user,
         ))
 
@@ -253,11 +252,11 @@ class StarboardPlugin(Plugin):
         ).execute()
 
         if not count:
-            event.msg.reply(u'No hidden starboard message with that ID')
-            return
+            raise CommandFail(u'No hidden starboard message with that ID')
+            
 
         self.queue_update(event.guild.id, event.config)
-        event.msg.reply(u'Message {} has been unhidden from the starboard'.format(
+        raise CommandSuccess(u'Message {} has been unhidden from the starboard'.format(
             mid,
         ))
 
@@ -271,11 +270,10 @@ class StarboardPlugin(Plugin):
         ).execute()
 
         if not count:
-            event.msg.reply(u'No starred message with that ID')
-            return
+            raise CommandFail(u'No starred message with that ID')
 
         self.queue_update(event.guild.id, event.config)
-        event.msg.reply(u'Message {} has been hidden from the starboard'.format(
+        raise CommandSuccess(u'Message {} has been hidden from the starboard'.format(
             mid,
         ))
 
@@ -318,19 +316,19 @@ class StarboardPlugin(Plugin):
     @Plugin.command('lock', group='stars', level=CommandLevels.ADMIN)
     def lock_stars(self, event):
         if event.guild.id in self.locks:
-            event.msg.reply(':warning: starboard is already locked')
+            raise CommandFail('Starboard is already locked')
             return
 
         self.locks[event.guild.id] = True
-        event.msg.reply(':white_check_mark: starboard has been locked')
+        raise CommandSuccess('Starboard has been locked')
 
     @Plugin.command('unlock', group='stars', level=CommandLevels.ADMIN)
     def unlock_stars(self, event):
         if event.guild.id in self.locks:
             del self.locks[event.guild.id]
-            event.msg.reply(':white_check_mark: starboard has been unlocked')
+            raise CommandSuccess('Starboard has been unlocked')
             return
-        event.msg.reply(':warning: starboard is not locked')
+        raise CommandFail('Starboard is not locked')
 
     def queue_update(self, guild_id, config):
         if guild_id in self.locks:

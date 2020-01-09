@@ -350,7 +350,7 @@ class AdminPlugin(Plugin):
                 unicode(inf.reason).encode('utf-8'),
             ])
 
-        event.msg.reply('Ok, here is an archive of all infractions', attachments=[
+        raise CommandSuccess('Ok, here is an archive of all infractions', attachments=[
             ('infractions.csv', buff.getvalue())
         ])
 
@@ -371,7 +371,7 @@ class AdminPlugin(Plugin):
                     (Infraction.guild_id == event.guild.id)
             ).get()
         except Infraction.DoesNotExist:
-            raise CommandFail('cannot find an infraction with ID `{}`'.format(infraction))
+            raise CommandFail('Cannot find an infraction with ID `{}`'.format(infraction))
 
         type_ = {i.index: i for i in Infraction.Types.attrs}[infraction.type_]
         embed = MessageEmbed()
@@ -460,13 +460,13 @@ class AdminPlugin(Plugin):
         try:
             inf = Infraction.get(id=infraction)
         except Infraction.DoesNotExist:
-            raise CommandFail('invalid infraction (try `!infractions recent`)')
+            raise CommandFail('Invalid infraction (try `!infractions recent`)')
 
         if inf.actor_id != event.author.id and event.user_level < CommandLevels.ADMIN:
-            raise CommandFail('only administrators can modify the duration of infractions created by other moderators')
+            raise CommandFail('Only administrators can modify the duration of infractions created by other moderators')
 
         if not inf.active:
-            raise CommandFail('that infraction is not active and cannot be updated')
+            raise CommandFail('That infraction is not active and cannot be updated')
 
         expires_dt = parse_duration(duration, inf.created_at)
 
@@ -482,18 +482,18 @@ class AdminPlugin(Plugin):
                 Infraction.Types.TEMPMUTE.index,
                 Infraction.Types.TEMPBAN.index,
                 Infraction.Types.TEMPROLE.index]:
-            raise CommandFail('cannot set the duration for that type of infraction')
+            raise CommandFail('Cannot set the duration for that type of infraction')
 
         inf.expires_at = expires_dt
         inf.save()
         self.queue_infractions()
 
         if converted:
-            raise CommandSuccess('ok, I\'ve made that infraction temporary, it will now expire on {}'.format(
+            raise CommandSuccess('Ok, I\'ve made that infraction temporary, it will now expire on {}'.format(
                 inf.expires_at.isoformat()
             ))
         else:
-            raise CommandSuccess('ok, I\'ve updated that infractions duration, it will now expire on {}'.format(
+            raise CommandSuccess('Ok, I\'ve updated that infractions duration, it will now expire on {}'.format(
                 inf.expires_at.isoformat()
             ))
 
@@ -505,14 +505,13 @@ class AdminPlugin(Plugin):
             inf = None
 
         if inf is None or inf.guild_id != event.guild.id:
-            event.msg.reply('Unknown infraction ID')
-            return
+            raise CommandFail('Unknown infraction ID')
 
         if not inf.actor_id:
             inf.actor_id = event.author.id
 
         if inf.actor_id != event.author.id and event.user_level < event.config.reason_edit_level:
-            raise CommandFail('you do not have the permissions required to edit other moderators infractions')
+            raise CommandFail('You do not have the permissions required to edit other moderators infractions')
 
         inf.reason = reason
         inf.save()
@@ -536,7 +535,7 @@ class AdminPlugin(Plugin):
         if member:
             self.restore_user(event, member)
         else:
-            raise CommandFail('invalid user')
+            raise CommandFail('Invalid user')
 
     @Plugin.command('clear', '<user_id:snowflake>', level=CommandLevels.MOD, group='backups')
     def backups_clear(self, event, user_id):
@@ -546,7 +545,7 @@ class AdminPlugin(Plugin):
         ).execute())
 
         if deleted:
-            event.msg.reply(':ok_hand: I\'ve cleared the member backup for that user')
+            raise CommandSuccess('I\'ve cleared the member backup for that user')
         else:
             raise CommandFail('I couldn\'t find any member backups for that user')
 
@@ -554,14 +553,14 @@ class AdminPlugin(Plugin):
         if event.author.id == victim_id:
             if not throw:
                 return False
-            raise CommandFail('cannot execute that action on yourself')
+            raise CommandFail('Cannot execute that action on yourself')
 
         victim_level = self.bot.plugins.get('CorePlugin').get_level(event.guild, victim_id)
 
         if event.user_level <= victim_level:
             if not throw:
                 return False
-            raise CommandFail('invalid permissions')
+            raise CommandFail('Invalid permissions')
 
         return True
 
@@ -582,7 +581,7 @@ class AdminPlugin(Plugin):
         if member:
             self.can_act_on(event, member.id)
             if not event.config.mute_role:
-                raise CommandFail('mute is not properly setup on this server')
+                raise CommandFail('Mute is not properly setup on this server')
 
             if event.config.mute_role in member.roles:
                 raise CommandFail(u'{} is already muted'.format(member.user))
@@ -623,7 +622,7 @@ class AdminPlugin(Plugin):
                         u=member.user,
                     ))
         else:
-            raise CommandFail('invalid user')
+            raise CommandFail('Invalid user')
 
     @Plugin.command(
         'temprole',
@@ -632,12 +631,12 @@ class AdminPlugin(Plugin):
     def temprole(self, event, user, role, duration, reason=None):
         member = event.guild.get_member(user)
         if not member:
-            raise CommandFail('invalid user')
+            raise CommandFail('Invalid user')
 
         self.can_act_on(event, member.id)
         role_id = role if isinstance(role, (int, long)) else event.config.role_aliases.get(role.lower())
         if not role_id or role_id not in event.guild.roles:
-            raise CommandFail('invalid or unknown role')
+            raise CommandFail('Invalid or unknown role')
 
         if role_id in member.roles:
             raise CommandFail(u'{} is already in that role'.format(member.user))
@@ -664,7 +663,7 @@ class AdminPlugin(Plugin):
         if member:
             self.can_act_on(event, member.id)
             if not event.config.mute_role:
-                raise CommandFail('mute is not setup on this server')
+                raise CommandFail('Mute is not setup on this server')
 
             if event.config.mute_role not in member.roles:
                 raise CommandFail(u'{} is not muted'.format(member.user))
@@ -689,9 +688,9 @@ class AdminPlugin(Plugin):
             )
 
             if event.config.confirm_actions:
-                event.msg.reply(u':ok_hand: {} is now unmuted'.format(member.user))
+                raise CommandSuccess(u':ok_hand: {} is now unmuted'.format(member.user))
         else:
-            raise CommandFail('invalid user')
+            raise CommandFail('Invalid user')
 
     @Plugin.command('kick', '<user:user|snowflake> [reason:str...]', level=CommandLevels.MOD)
     def kick(self, event, user, reason=None):
@@ -707,7 +706,7 @@ class AdminPlugin(Plugin):
                     u=member.user,
                 ))
         else:
-            raise CommandFail('invalid user')
+            raise CommandFail('Invalid user')
 
     @Plugin.command('mkick', parser=True, level=CommandLevels.MOD)
     @Plugin.parser.add_argument('users', type=long, nargs='+')
@@ -718,10 +717,10 @@ class AdminPlugin(Plugin):
             member = event.guild.get_member(user_id)
             if not member:
                 # TODO: this sucks, batch these
-                raise CommandFail('failed to kick {}, user not found'.format(user_id))
+                raise CommandFail('Failed to kick {}, user not found'.format(user_id))
 
             if not self.can_act_on(event, member.id, throw=False):
-                raise CommandFail('failed to kick {}, invalid permissions'.format(user_id))
+                raise CommandFail('Failed to kick {}, invalid permissions'.format(user_id))
 
             members.append(member)
 
@@ -749,7 +748,7 @@ class AdminPlugin(Plugin):
         for member in members:
             Infraction.kick(self, event, member, args.reason)
 
-        raise CommandSuccess('kicked {} users'.format(len(members)))
+        raise CommandSuccess('Kicked {} users'.format(len(members)))
 
     @Plugin.command('ban', '<user:user|snowflake> [reason:str...]', level=CommandLevels.MOD)
     @Plugin.command('forceban', '<user:snowflake> [reason:str...]', level=CommandLevels.MOD)
@@ -765,7 +764,7 @@ class AdminPlugin(Plugin):
                 self.can_act_on(event, member.id)
                 Infraction.ban(self, event, member, reason, guild=event.guild)
             else:
-                raise CommandFail('invalid user')
+                raise CommandFail('Invalid user')
 
         if event.config.confirm_actions:
             event.msg.reply(maybe_string(
@@ -792,7 +791,7 @@ class AdminPlugin(Plugin):
                     u=member.user,
                 ))
         else:
-            raise CommandFail('invald user')
+            raise CommandFail('Invalid user')
 
     @Plugin.command('tempban', '<user:user|snowflake> <duration:str> [reason:str...]', level=CommandLevels.MOD)
     def tempban(self, event, duration, user, reason=None):
@@ -811,7 +810,7 @@ class AdminPlugin(Plugin):
                     t=humanize.naturaldelta(expires_dt - datetime.utcnow()),
                 ))
         else:
-            raise CommandFail('invalid user')
+            raise CommandFail('Invalid user')
 
     @Plugin.command('warn', '<user:user|snowflake> [reason:str...]', level=CommandLevels.MOD)
     def warn(self, event, user, reason=None):
@@ -820,7 +819,7 @@ class AdminPlugin(Plugin):
             self.can_act_on(event, member.id)
             Infraction.warn(self, event, member, reason, guild=event.guild)
         else:
-            raise CommandFail('invalid user')
+            raise CommandFail('Invalid user')
 
         if event.config.confirm_actions:
             event.msg.reply(maybe_string(
@@ -846,7 +845,7 @@ class AdminPlugin(Plugin):
         group='archive')
     def archive(self, event, size=50, mode=None, user=None, channel=None):
         if size < 1 or size > 15000:
-            raise CommandFail('too many messages must be between 1-15000')
+            raise CommandFail('Too many messages must be between 1-15000')
 
 
         member = event.guild.get_member(user)
@@ -854,7 +853,7 @@ class AdminPlugin(Plugin):
             self.can_act_on(event, member.id)
             Infraction.warn(self, event, member, reason, guild=event.guild)
         else:
-            raise CommandFail('invalid user')
+            raise CommandFail('Invalid user')
 
         if event.config.confirm_actions:
             event.msg.reply(maybe_string(
@@ -880,7 +879,7 @@ class AdminPlugin(Plugin):
         group='archive')
     def archive(self, event, size=50, mode=None, user=None, channel=None):
         if size < 1 or size > 15000:
-            raise CommandFail('too many messages must be between 1-15000')
+            raise CommandFail('Too many messages must be between 1-15000')
 
         q = Message.select(Message.id).join(User).order_by(Message.id.desc()).limit(size)
 
@@ -905,14 +904,14 @@ class AdminPlugin(Plugin):
             )
 
         archive = MessageArchive.create_from_message_ids([i.id for i in q])
-        event.msg.reply('OK, archived {} messages at {}'.format(len(archive.message_ids), archive.url))
+        raise CommandSuccess('Archived {} messages at {}'.format(len(archive.message_ids), archive.url))
 
     @Plugin.command('extend', '<archive_id:str> <duration:str>', level=CommandLevels.MOD, group='archive')
     def archive_extend(self, event, archive_id, duration):
         try:
             archive = MessageArchive.get(archive_id=archive_id)
         except MessageArchive.DoesNotExist:
-            raise CommandFail('invalid message archive id')
+            raise CommandFail('Invalid message archive id')
 
         archive.expires_at = parse_duration(duration)
 
@@ -922,7 +921,7 @@ class AdminPlugin(Plugin):
             (MessageArchive.archive_id == archive_id)
         ).execute()
 
-        raise CommandSuccess('duration of archive {} has been extended (<{}>)'.format(
+        raise CommandSuccess('Duration of archive {} has been extended (<{}>)'.format(
             archive_id,
             archive.url,
         ))
@@ -930,10 +929,10 @@ class AdminPlugin(Plugin):
     @Plugin.command('clean cancel', level=CommandLevels.MOD)
     def clean_cacnel(self, event):
         if event.channel.id not in self.cleans:
-            raise CommandFail('no clean is running in this channel')
+            raise CommandFail('No clean is running in this channel')
 
         self.cleans[event.channel.id].kill()
-        event.msg.reply('Ok, the running clean was cancelled')
+        raise CommandSuccess('Ok, the running clean was cancelled')
 
     @Plugin.command('clean all', '[size:int]', level=CommandLevels.MOD, context={'mode': 'all'})
     @Plugin.command('clean bots', '[size:int]', level=CommandLevels.MOD, context={'mode': 'bots'})
@@ -943,10 +942,10 @@ class AdminPlugin(Plugin):
         Removes messages
         """
         if size > 1 or size > 10000:
-            raise CommandFail('too many messages. Must be between 1-10000')
+            raise CommandFail('Too many messages. Must be between 1-10000')
 
         if event.channel.id in self.cleans:
-            raise CommandFail('a clean is already running on this channel')
+            raise CommandFail('A clean is already running on this channel')
 
         query = Message.select(Message.id).where(
             (Message.deleted >> False) &
@@ -996,7 +995,7 @@ class AdminPlugin(Plugin):
         self.cleans[event.channel.id].join()
         del self.cleans[event.channel.id]
 
-        raise CommandSuccess('deleted {} messages'.format(size))
+        raise CommandSuccess('Deleted {} messages'.format(size))
 
     @Plugin.command(
 	    'addbypass',
@@ -1052,7 +1051,7 @@ class AdminPlugin(Plugin):
                         role_obj = rated[0][1]
 
         if not role_obj:
-            raise CommandFail('too many matches for that role, try something more exact or the role ID')
+            raise CommandFail('Too many matches for that role, try something more exact or the role ID')
 
         author_member = event.guild.get_member(event.author)
         highest_role = sorted(
@@ -1060,11 +1059,11 @@ class AdminPlugin(Plugin):
             key=lambda i: i.position,
             reverse=True)
         if not author_member.owner and (not highest_role or highest_role[0].position <= role_obj.position):
-            raise CommandFail('you can only {} roles that are ranked lower than your highest role'.format(mode))
+            raise CommandFail('You can only {} roles that are ranked lower than your highest role'.format(mode))
 
         member = event.guild.get_member(user)
         if not member:
-            raise CommandFail('invalid member')
+            raise CommandFail('Invalid member')
 
         self.can_act_on(event, member.id)
 
@@ -1096,7 +1095,7 @@ class AdminPlugin(Plugin):
         )
 
         if not role_obj:
-            raise CommandFail('too many matches for that role, try something more exact or the role ID')
+            raise CommandFail('Too many matches for that role, try something more exact or the role ID')
 
         author_member = event.guild.get_member(event.author)
         highest_role = sorted(
@@ -1104,11 +1103,11 @@ class AdminPlugin(Plugin):
             key=lambda i: i.position,
             reverse=True)
         if not author_member.owner and (not highest_role or highest_role[0].position <= role_obj.position):
-            raise CommandFail('you can only {} roles that are ranked lower than your highest role'.format(mode))
+            raise CommandFail('You can only {} roles that are ranked lower than your highest role'.format(mode))
 
         member = event.guild.get_member(user)
         if not member:
-            raise CommandFail('invalid member')
+            raise CommandFail('Invalid member')
 
         self.can_act_on(event, member.id)
 
@@ -1139,7 +1138,7 @@ class AdminPlugin(Plugin):
             reason=reason or 'no reason',
         )
 
-        event.msg.reply(u':ok_hand: {} role {} to {}'.format('added' if mode == 'add' else 'removed',
+        raise CommandSuccess(u':ok_hand: {} role {} to {}'.format('added' if mode == 'add' else 'removed',
             role_obj.name,
             member))
 
@@ -1245,10 +1244,10 @@ class AdminPlugin(Plugin):
     @Plugin.command('emojistats', '<mode:str> <sort:str>', level=CommandLevels.MOD)
     def emojistats_custom(self, event, mode, sort):
         if mode not in ('server', 'global'):
-            raise CommandFail('invalid emoji mode, must be `server` or `global`')
+            raise CommandFail('Invalid emoji mode, must be `server` or `global`')
 
         if sort not in ('least', 'most'):
-            raise CommandFail('invalid emoji sort, must be `least` or `most`')
+            raise CommandFail('Invalid emoji sort, must be `least` or `most`')
 
         order = 'DESC' if sort == 'most' else 'ASC'
 
@@ -1274,7 +1273,7 @@ class AdminPlugin(Plugin):
         ]
 
         if not invites:
-            return event.msg.reply('I didn\'t find any invites matching your criteria')
+            raise CommandFail('I didn\'t find any invites matching your criteria')
 
         msg = event.msg.reply(
             'Ok, a total of {} invites created by {} users with {} total uses would be pruned.'.format(
@@ -1320,7 +1319,7 @@ class AdminPlugin(Plugin):
             user = user.id
 
         if count > 50:
-            raise CommandFail('cannot clean more than 50 reactions')
+            raise CommandFail('Cannot clean more than 50 reactions')
 
         lock = rdb.lock('clean-reactions-{}'.format(user))
         if not lock.acquire(blocking=False):
@@ -1354,7 +1353,7 @@ class AdminPlugin(Plugin):
             ).order_by(Reaction.message_id.desc()).limit(count).tuples())
 
             if not reactions:
-                raise CommandFail('no reactions to purge')
+                raise CommandFail('No reactions to purge')
 
             msg = event.msg.reply('Hold on while I clean {} reactions'.format(
                 len(reactions)
@@ -1416,7 +1415,7 @@ class AdminPlugin(Plugin):
 
         role = event.guild.roles.get(event.config.group_roles.get(name.lower()))
         if not role:
-            raise CommandFail('invalid or unknown group')
+            raise CommandFail('Invalid or unknown group')
 
         has_any_admin_perms = any(role.permissions.can(i) for i in (
             Permissions.KICK_MEMBERS,
@@ -1436,11 +1435,11 @@ class AdminPlugin(Plugin):
 
         # Sanity check
         if has_any_admin_perms:
-            raise CommandFail('cannot join group with admin permissions')
+            raise CommandFail('Cannot join group with admin permissions')
 
         member = event.guild.get_member(event.author)
         if role.id in member.roles:
-            raise CommandFail('you are already a member of that group')
+            raise CommandFail('You are already a member of that group')
 
         member.add_role(role)
         if event.config.group_confirm_reactions:
@@ -1455,11 +1454,11 @@ class AdminPlugin(Plugin):
 
         role_id = event.config.group_roles.get(name.lower())
         if not role_id or role_id not in event.guild.roles:
-            raise CommandFail('invalid or unknown group')
+            raise CommandFail('Invalid or unknown group')
 
         member = event.guild.get_member(event.author)
         if role_id not in member.roles:
-            raise CommandFail('you are not a member of that group')
+            raise CommandFail('You are not a member of that group')
 
         member.remove_role(role_id)
         if event.config.group_confirm_reactions:
@@ -1470,10 +1469,10 @@ class AdminPlugin(Plugin):
     @Plugin.command('unlock', '<role_id:snowflake>', group='role', level=CommandLevels.ADMIN)
     def unlock_role(self, event, role_id):
         if role_id not in event.config.locked_roles:
-            raise CommandFail('role %s is not locked' % role_id)
+            raise CommandFail('Role %s is not locked' % role_id)
 
         if role_id in self.unlocked_roles and self.unlocked_roles[role_id] > time.time():
-            raise CommandFail('role %s is already unlocked' % role_id)
+            raise CommandFail('Role %s is already unlocked' % role_id)
 
         self.unlocked_roles[role_id] = time.time() + 300
-        raise CommandSuccess('role is unlocked for 5 minutes')
+        raise CommandSuccess('Role is unlocked for 5 minutes')

@@ -20,8 +20,7 @@ from disco.util.snowflake import to_datetime
 from rowboat import ENV
 from rowboat.util import LocalProxy
 from rowboat.util.stats import timed
-from rowboat.plugins import BasePlugin as Plugin
-from rowboat.plugins import CommandResponse
+from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
 from rowboat.sql import init_db
 from rowboat.redis import rdb
 
@@ -495,24 +494,24 @@ class CorePlugin(Plugin):
     @Plugin.command('setup')
     def command_setup(self, event):
         if not event.guild:
-            return event.msg.reply(':warning: This command can only be used in servers')
+            raise CommandFail('This command can only be used in servers')
 
         global_admin = rdb.sismember('global_admins', event.author.id)
 
         # Make sure this is the owner of the server
         if not global_admin:
             if not event.guild.owner_id == event.author.id:
-                return event.msg.reply(':warning: Only the server owner can setup speedboat')
+                raise CommandFail('Only the server owner can setup speedboat')
 
         # Make sure we have admin perms
         m = event.guild.members.select_one(id=self.state.me.id)
         if not m.permissions.administrator and not global_admin:
-            return event.msg.reply(':warning: Bot must have the Administrator permission')
+            raise CommandFail('Bot must have the Administrator permission')
 
         guild = Guild.setup(event.guild)
         rdb.srem(GUILDS_WAITING_SETUP_KEY, str(event.guild.id))
         self.guilds[event.guild.id] = guild
-        event.msg.reply(':ok_hand: successfully loaded configuration')
+        raise CommandSuccess('Successfully loaded configuration')
 
     @Plugin.command('nuke', '<user:snowflake> <reason:str...>', level=-1)
     def nuke(self, event, user, reason):
@@ -605,7 +604,7 @@ class CorePlugin(Plugin):
             if command.lower() in cmd.triggers:
                 break
         else:
-            event.msg.reply(u"Couldn't find command for `{}`".format(S(command, escape_codeblocks=True)))
+            raise CommandFail(u"Couldn't find command for `{}`".format(S(command, escape_codeblocks=True)))
             return
 
         code = cmd.func.__code__
@@ -674,7 +673,7 @@ class CorePlugin(Plugin):
 
     @Plugin.command('reconnect', group='control', level=-1)
     def control_reconnect(self, event):
-        event.msg.reply('Ok, closing connection')
+        raise CommandSuccess('Closing connection')
         self.client.gw.ws.close()
 
     @Plugin.command('invite', '<guild:snowflake>', group='guilds', level=-1)
@@ -707,26 +706,26 @@ class CorePlugin(Plugin):
     @Plugin.command('wh', '<guild:snowflake>', group='guilds', level=-1)
     def guild_whitelist(self, event, guild):
         rdb.sadd(GUILDS_WAITING_SETUP_KEY, str(guild))
-        event.msg.reply('Ok, guild %s is now in the whitelist' % guild)
+        raise CommandSuccess('Ok, guild %s is now in the whitelist' % guild)
 
     @Plugin.command('unwh', '<guild:snowflake>', group='guilds', level=-1)
     def guild_unwhitelist(self, event, guild):
         rdb.srem(GUILDS_WAITING_SETUP_KEY, str(guild))
-        event.msg.reply('Ok, I\'ve made sure guild %s is no longer in the whitelist' % guild)
+        raise CommandSuccess('Ok, I\'ve made sure guild %s is no longer in the whitelist' % guild)
 
     @Plugin.command('leave', '<guild:snowflake>', group='guilds', level=-1)
     def guild_leave(self, event, guild):
         guild = self.state.guilds.get(guild)
         guild.leave()
-        event.msg.reply('Ok, I\'ve left that guild.')
+        raise CommandSuccess('Ok, I\'ve left that guild.')
 
     @Plugin.command('disable', '<plugin:str>', group='plugins', level=-1)
     def plugin_disable(self, event, plugin):
         plugin = self.bot.plugins.get(plugin)
         if not plugin:
-            return event.msg.reply('Hmmm, it appears that plugin doesn\'t exist!?')
+            raise CommandFail('It appears that plugin doesn\'t exist')
         self.bot.rmv_plugin(plugin.__class__)
-        event.msg.reply('Ok, that plugin has been disabled and unloaded')
+        raise CommandSuccess('Ok, that plugin has been disabled and unloaded')
 
     @Plugin.command('commands', group='control', level=-1)
     def control_commands(self, event):

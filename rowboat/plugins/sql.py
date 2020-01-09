@@ -16,7 +16,7 @@ from disco.types.guild import Guild as DiscoGuild
 from disco.types.channel import Channel as DiscoChannel, MessageIterator
 from disco.util.snowflake import to_datetime, from_datetime
 
-from rowboat.plugins import BasePlugin as Plugin
+from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
 from rowboat.sql import database
 from rowboat.models.user import User
 from rowboat.models.guild import GuildEmoji, GuildVoiceSession
@@ -168,29 +168,28 @@ class SQLPlugin(Plugin):
 
         text = [msg.content for msg in q]
         self.models[entity.id] = markovify.NewlineText('\n'.join(text))
-        event.msg.reply(u':ok_hand: created markov model for {} using {} messages'.format(entity, len(text)))
+        raise CommandSuccess(u'Created markov model for {} using {} messages'.format(entity, len(text)))
 
     @Plugin.command('one', '<entity:user|channel>', level=-1, group='markov', global_=True)
     def command_markov_one(self, event, entity):
         if entity.id not in self.models:
-            return event.msg.reply(':warning: no model created yet for {}'.format(entity))
+            raise CommandFail('No model created yet for {}'.format(entity))
 
         sentence = self.models[entity.id].make_sentence(max_overlap_ratio=1, max_overlap_total=500)
         if not sentence:
-            event.msg.reply(':warning: not enough data :(')
-            return
+            raise CommandFail('Not enough data :(')
+
         event.msg.reply(u'{}: {}'.format(entity, sentence))
 
     @Plugin.command('many', '<entity:user|channel> [count|int]', level=-1, group='markov', global_=True)
     def command_markov_many(self, event, entity, count=5):
         if entity.id not in self.models:
-            return event.msg.reply(':warning: no model created yet for {}'.format(entity))
+            raise CommandFail('No model created yet for {}'.format(entity))
 
         for _ in range(int(count)):
             sentence = self.models[entity.id].make_sentence(max_overlap_total=500)
             if not sentence:
-                event.msg.reply(':warning: not enough data :(')
-                return
+                raise CommandFail('Not enough data :(')
             event.msg.reply(u'{}: {}'.format(entity, sentence))
 
     @Plugin.command('list', level=-1, group='markov', global_=True)
@@ -203,25 +202,25 @@ class SQLPlugin(Plugin):
             return event.msg.reply(':warning: no model with that ID')
 
         del self.models[oid]
-        event.msg.reply(':ok_hand: deleted model')
+        raise CommandSuccess('Deleted model')
 
     @Plugin.command('clear', level=-1, group='markov', global_=True)
     def command_markov_clear(self, event):
         self.models = {}
-        event.msg.reply(':ok_hand: cleared models')
+        raise CommandSuccess('Cleared all models')
 
     @Plugin.command('message', '<channel:snowflake> <message:snowflake>', level=-1, group='backfill', global_=True)
     def command_backfill_message(self, event, channel, message):
         channel = self.state.channels.get(channel)
         Message.from_disco_message(channel.get_message(message))
-        return event.msg.reply(':ok_hand: backfilled')
+        raise CommandSuccess('Backfill Complete')
 
     @Plugin.command('reactions', '<message:snowflake>', level=-1, group='backfill', global_=True)
     def command_sql_reactions(self, event, message):
         try:
             message = Message.get(id=message)
         except Message.DoesNotExist:
-            return event.msg.reply(':warning: no message found')
+            raise CommandFail('No message found')
 
         message = self.state.channels.get(message.channel_id).get_message(message.id)
         for reaction in message.reactions:
@@ -273,13 +272,13 @@ class SQLPlugin(Plugin):
     def command_backfill_channel(self, event, channel=None):
         channel = self.state.channels.get(channel) if channel else event.channel
         backfill_channel.queue(channel.id)
-        event.msg.reply(':ok_hand: enqueued channel to be backfilled')
+        raise CommandSuccess('Enqueued channel to be backfilled')
 
     @Plugin.command('backfill guild', '[guild:guild] [concurrency:int]', level=-1, global_=True)
     def command_backfill_guild(self, event, guild=None, concurrency=1):
         guild = guild or event.guild
         backfill_guild.queue(guild.id)
-        event.msg.reply(':ok_hand: enqueued guild to be backfilled')
+        raise CommandSuccess('Enqueued guild to be backfilled')
 
     @Plugin.command('usage', '<word:str> [unit:str] [amount:int]', level=-1, group='words')
     def words_usage(self, event, word, unit='days', amount=7):
