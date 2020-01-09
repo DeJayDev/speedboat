@@ -14,10 +14,9 @@ class TagsConfig(PluginConfig):
     max_tag_length = Field(int)
     min_level_remove_others = Field(int, default=int(CommandLevels.MOD))
 
-
 @Plugin.with_config(TagsConfig)
 class TagsPlugin(Plugin):
-    @Plugin.command('create', '<name:str> <content:str...>', group='tags', aliases=['add'], level=CommandLevels.TRUSTED)
+    @Plugin.command('create', '<name:str> <content:str...>', group='tag', aliases=['add', 'new'], level=CommandLevels.TRUSTED)
     def on_tags_create(self, event, name, content):
         name = S(name)
         content = S(content)
@@ -38,7 +37,7 @@ class TagsPlugin(Plugin):
         raise CommandSuccess(u'ok, your tag named `{}` has been created'.format(name))
 
     @Plugin.command('tags', '<name:str>', aliases=['tag'], level=CommandLevels.TRUSTED)
-    @Plugin.command('show', '<name:str>', group='tags', level=CommandLevels.TRUSTED)
+    @Plugin.command('show', '<name:str>', group='tag', level=CommandLevels.TRUSTED)
     def on_tags(self, event, name):
         try:
             tag = Tag.select(Tag, User).join(
@@ -60,7 +59,7 @@ class TagsPlugin(Plugin):
             tag.content
         ))
 
-    @Plugin.command('remove', '<name:str>', group='tags', aliases=['del', 'rm'], level=CommandLevels.TRUSTED)
+    @Plugin.command('remove', '<name:str>', group='tag', aliases=['del', 'rm'], level=CommandLevels.TRUSTED)
     def on_tags_remove(self, event, name):
         try:
             tag = Tag.select(Tag, User).join(
@@ -79,7 +78,7 @@ class TagsPlugin(Plugin):
         tag.delete_instance()
         raise CommandSuccess(u'ok, deleted tag `{}`'.format(tag.name))
 
-    @Plugin.command('info', '<name:str>', group='tags', level=CommandLevels.TRUSTED)
+    @Plugin.command('info', '<name:str>', group='tag', level=CommandLevels.TRUSTED)
     def on_tags_info(self, event, name):
         try:
             tag = Tag.select(Tag, User).join(
