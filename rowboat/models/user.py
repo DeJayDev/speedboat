@@ -315,8 +315,9 @@ class Infraction(BaseModel):
         from rowboat.plugins.modlog import Actions
         if isinstance(member, (int, long)):
             user_id = member
+            user_ob = User.with_id(user_id)
         else:
-            User.from_disco_user(member.user)
+            user_ob = User.from_disco_user(member.user)
             user_id = member.user.id
 
         plugin.call(
@@ -328,7 +329,7 @@ class Infraction(BaseModel):
 
         msg_status = False
 
-        if member.user.bot is not False: 
+        if user_ob is not False: 
             try:
                 member.user.open_dm().send_message(u':warning: You were **{}** from {} for "{}"'.format(
                     'banned',
