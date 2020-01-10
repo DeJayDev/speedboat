@@ -20,7 +20,7 @@ from disco.util.snowflake import to_datetime
 from rowboat import ENV
 from rowboat.util import LocalProxy
 from rowboat.util.stats import timed
-from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
+from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess, CommandResponse
 from rowboat.sql import init_db
 from rowboat.redis import rdb
 
