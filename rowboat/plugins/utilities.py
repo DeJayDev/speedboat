@@ -188,9 +188,9 @@ class UtilitiesPlugin(Plugin):
         except Message.DoesNotExist:
             raise CommandFail(u"I've never seen {}".format(user))
 
-        raise CommandSuccess(u'I last saw {} {} ago (at {})'.format(
+        raise CommandSuccess(u'I last saw {} {} (at {})'.format(
             user,
-            humanize.naturaldelta(datetime.utcnow() - msg.timestamp),
+            humanize.naturaltime(datetime.utcnow() - msg.timestamp),
             msg.timestamp
         ))
 
@@ -301,8 +301,8 @@ class UtilitiesPlugin(Plugin):
 
 
         created_dt = to_datetime(user.id)
-        content.append('Created: {} ago ({})'.format(
-            humanize.naturaldelta(datetime.utcnow() - created_dt),
+        content.append('Created: {} ({})'.format(
+            humanize.naturaltime(datetime.utcnow() - created_dt),
             created_dt.isoformat()
         ))
 
@@ -426,10 +426,10 @@ class UtilitiesPlugin(Plugin):
             reminder.delete_instance()
             return
 
-        msg = channel.send_message(u'<@{}> you asked me at {} ({} ago) to remind you about: {}'.format(
+        msg = channel.send_message(u'<@{}> you asked me at {} ({}) to remind you about: {}'.format(
             message.author_id,
             reminder.created_at,
-            humanize.naturaldelta(reminder.created_at - datetime.utcnow()),
+            humanize.naturaltime(reminder.created_at - datetime.utcnow()),
             S(reminder.content)
         ))
 
