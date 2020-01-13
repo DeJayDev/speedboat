@@ -847,7 +847,6 @@ class AdminPlugin(Plugin):
         if size < 1 or size > 15000:
             raise CommandFail('Too many messages must be between 1-15000')
 
-
         member = event.guild.get_member(user)
         if member:
             self.can_act_on(event, member.id)
@@ -941,7 +940,7 @@ class AdminPlugin(Plugin):
         """
         Removes messages
         """
-        if size > 1 or size > 10000:
+        if size < 1 or size > 10000:
             raise CommandFail('Too many messages. Must be between 1-10000')
 
         if event.channel.id in self.cleans:
