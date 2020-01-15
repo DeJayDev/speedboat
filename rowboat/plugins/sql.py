@@ -238,7 +238,7 @@ class SQLPlugin(Plugin):
             chlist = list(event.guild.channels.values())
         for gch in chlist:
             if int(self.state.channels[gch.id].type) == 0 or int(self.state.channels[gch.id].type) == 5:
-                if self.state.channels[gch.id].get_permissions(self.state.me).can(Permissions.VIEW_CHANNEL):
+                if self.state.channels[gch.id].get_permissions(self.state.me).can(Permissions.READ_MESSAGES):
                     channels.append(self.state.channels[gch.id])
 
         start_at = parse_duration(duration, negative=True)
