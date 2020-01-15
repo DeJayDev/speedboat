@@ -122,7 +122,7 @@ class Guild(ModelBase):
         try:
             bans = guild.get_bans()
         except:
-            log.exception('sync_bans failed for Guild %s', guild_id)
+            log.exception('sync_bans failed for Guild %s', self.guild_id)
             return
 
         log.info('Syncing %s bans for guild %s', len(bans), guild.id)

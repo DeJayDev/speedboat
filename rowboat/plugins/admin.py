@@ -1148,7 +1148,7 @@ class AdminPlugin(Plugin):
             fn.Sum(fn.array_length(Message.attachments, 1)),
         ).where(
             (Message.author_id == user.id)
-        ).tuples().async()
+        ).tuples().execute()
 
         reactions_given = Reaction.select(
             fn.Count('*'),
@@ -1161,7 +1161,7 @@ class AdminPlugin(Plugin):
             (Reaction.user_id == user.id)
         ).group_by(
             Reaction.emoji_id, Reaction.emoji_name
-        ).order_by(fn.Count('*').desc()).tuples().async()
+        ).order_by(fn.Count('*').desc()).tuples().execute()
 
         # Query for most used emoji
         emojis = Message.raw('''
@@ -1175,16 +1175,16 @@ class AdminPlugin(Plugin):
             GROUP BY 1, 2
             ORDER BY 3 DESC
             LIMIT 1
-        ''', (user.id, )).tuples().async()
+        ''', (user.id, )).tuples().execute()
 
         deleted = Message.select(
             fn.Count('*')
         ).where(
             (Message.author_id == user.id) &
             (Message.deleted == 1)
-        ).tuples().async()
+        ).tuples().execute()
 
-        wait_many(message_stats, reactions_given, emojis, deleted, timeout=10)
+        # wait_many(message_stats, reactions_given, emojis, deleted, timeout=10)
 
         # If we hit an exception executing the core query, throw an exception
         if message_stats.exception:
