@@ -1,5 +1,29 @@
 # Changelog
 
+## V1.6.1
+
+Hopefully this is how you do minor versions. This version fixes some things that I've observed to be broken and updates us to a newer version of peewee, for hopefully faster database queries.
+
+### Features
+
+- Updates to peewee3
+- Moves everything to CommandSuccess or CommandFail
+- Stores if a user was messaged when they were punished
+- Adds invalid duration response to the parse_duration function
+- Migrates to node:8.17-slim image
+- Updates to postgres:9.6.16
+
+### Bug Fixes
+
+- Migrates to naturaltime instead of naturaldelta for commands that tell you how long ago something happen
+- Changes some syntax of redis messages to fit how redis works now
+- Fixes a upper/lower bound problem in the purge command
+- Fixes get_dominant_colors_user in the stats command
+- Fixes info to get the users avatar_url instead of building the url
+- Fixes get_dominant_colors_user to use a real DiscoUser
+- Fixes a bug in the unban command
+- Fixes the guilds invite superuser command
+- Fixes command in the archive command
 
 ## V1.6.0
 
@@ -9,7 +33,7 @@ This update attempts to catch Speedboat up to the rest of the rowboat clones by 
 
 ### Features
 
-- Removes the force option from setup (Bad Idea Dooley)
+- Removes the force option from setup
 - Moves project to Parcel 📦 (Hopefully this reduces some server side load)
 - Update rowboat and workers to Python 2.7.17
 - Also updates all requirements to their newest versions (@dependabot was being annoying)
@@ -39,7 +63,7 @@ This update attempts to catch Speedboat up to the rest of the rowboat clones by 
 
 ### Features 
 
-- Adds a force option to setup (Good Idea Dooley)
+- Adds a force option to setup
 - Uses Discos `register_plugin_base_class`
 - Uses Sentrys Unified SDK instead of Raven
 - Begins removal of holster, because b1nzy said so
