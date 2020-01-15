@@ -684,7 +684,7 @@ class AdminPlugin(Plugin):
             )
 
             if event.config.confirm_actions:
-                raise CommandSuccess(u':ok_hand: {} is now unmuted'.format(member.user))
+                raise CommandSuccess(u'{} is now unmuted'.format(member.user))
         else:
             raise CommandFail('Invalid user')
 
@@ -1133,7 +1133,7 @@ class AdminPlugin(Plugin):
             reason=reason or 'no reason',
         )
 
-        raise CommandSuccess(u':ok_hand: {} role {} to {}'.format('added' if mode == 'add' else 'removed',
+        raise CommandSuccess(u'{} role {} to {}'.format('added' if mode == 'add' else 'removed',
             role_obj.name,
             member))
 
