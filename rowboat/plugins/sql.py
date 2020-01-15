@@ -14,6 +14,7 @@ from disco.types.message import MessageTable
 from disco.types.user import User as DiscoUser
 from disco.types.guild import Guild as DiscoGuild
 from disco.types.channel import Channel as DiscoChannel, MessageIterator
+from disco.types.permissions import Permissions
 from disco.util.snowflake import to_datetime, from_datetime
 
 from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
@@ -236,9 +237,9 @@ class SQLPlugin(Plugin):
         else:
             chlist = list(event.guild.channels.values())
         for gch in chlist:
-            if self.state.channels[gch].type == 0 or self.state.channels[gch].type == 5:
-                if self.state.channels[gch].get_permissions(self.state.me).can(Permissions.VIEW_CHANNEL):
-                    channels.append(self.state.channels[gch])
+            if int(self.state.channels[gch.id].type) == 0 or int(self.state.channels[gch.id].type) == 5:
+                if self.state.channels[gch.id].get_permissions(self.state.me).can(Permissions.VIEW_CHANNEL):
+                    channels.append(self.state.channels[gch.id])
 
         start_at = parse_duration(duration, negative=True)
         pool = Pool(pool)
