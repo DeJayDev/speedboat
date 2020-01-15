@@ -135,7 +135,7 @@ class SQLPlugin(Plugin):
 
     @Plugin.command('sql', level=-1, global_=True)
     def command_sql(self, event):
-        conn = database.obj.get_conn()
+        conn = database.obj.connection()
 
         try:
             tbl = MessageTable(codeblock=False)
@@ -230,13 +230,17 @@ class SQLPlugin(Plugin):
     @Plugin.command('global', '<duration:str> [pool:int]', level=-1, global_=True, context={'mode': 'global'}, group='recover')
     @Plugin.command('here', '<duration:str> [pool:int]', level=-1, global_=True, context={'mode': 'here'}, group='recover')
     def command_recover(self, event, duration, pool=4, mode=None):
+        channels = []
         if mode == 'global':
-            channels = list(self.state.channels.values())
+            chlist = list(self.state.channels.values())
         else:
-            channels = list(event.guild.channels.values())
+            chlist = list(event.guild.channels.values())
+        for gch in chlist:
+            if self.state.channels[gch].type == 0 or self.state.channels[gch].type == 5:
+                if self.state.channels[gch].get_permissions(self.state.me).can(Permissions.VIEW_CHANNEL):
+                    channels.append(self.state.channels[gch])
 
         start_at = parse_duration(duration, negative=True)
-
         pool = Pool(pool)
 
         total = len(channels)
