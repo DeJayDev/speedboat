@@ -6,6 +6,7 @@ from holster.enum import Enum
 from disco.types.base import cached_property
 from disco.util.sanitize import S
 from disco.api.http import APIException
+from disco.types.permissions import Permissions
 
 from rowboat.redis import rdb
 from rowboat.util.stats import timed
