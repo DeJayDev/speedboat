@@ -321,4 +321,4 @@ class GuildVoiceSession(ModelBase):
                 channel_id=after.channel_id,
                 user_id=after.user_id,
                 started_at=datetime.utcnow(),
-            ).returning(GuildVoiceSession.id).on_conflict('DO NOTHING').execute()
+            ).returning(GuildVoiceSession.id).on_conflict_ignore().execute()
