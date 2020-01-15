@@ -10,18 +10,12 @@ REGISTERED_MODELS = []
 # Create a database proxy we can setup post-init
 database = Proxy()
 
-
 OP['IRGX'] = 'irgx'
-
 
 def pg_regex_i(lhs, rhs):
     return Expression(lhs, OP.IRGX, rhs)
 
-
-PostgresqlExtDatabase.register_ops({OP.IRGX: '~*'})
-
-
-class BaseModel(Model):
+class ModelBase(Model):
     class Meta:
         database = database
 
@@ -29,7 +23,6 @@ class BaseModel(Model):
     def register(cls):
         REGISTERED_MODELS.append(cls)
         return cls
-
 
 def init_db(env):
     if env == 'docker':
@@ -51,7 +44,6 @@ def init_db(env):
 
         if hasattr(model, 'SQL'):
             database.execute_sql(model.SQL)
-
 
 def reset_db():
     init_db()

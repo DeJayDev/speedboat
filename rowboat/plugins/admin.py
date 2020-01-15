@@ -395,6 +395,7 @@ class AdminPlugin(Plugin):
         event.msg.reply('', embed=embed)
 
     @Plugin.command('search', '[query:user|str...]', group='infractions', level=CommandLevels.MOD)
+    @Plugin.command('recent', aliases=['latest'], group='infractions', level=CommandLevels.MOD)
     def infraction_search(self, event, query=None):
         q = (Infraction.guild_id == event.guild.id)
 
@@ -449,11 +450,6 @@ class AdminPlugin(Plugin):
             )
 
         event.msg.reply(tbl.compile())
-
-    @Plugin.command('recent', aliases=['latest'], group='infractions', level=CommandLevels.MOD)
-    def infractions_recent(self, event):
-        # TODO: fucking write this bruh
-        pass
 
     @Plugin.command('duration', '<infraction:int> <duration:str>', group='infractions', level=CommandLevels.MOD)
     def infraction_duration(self, event, infraction, duration):
@@ -655,7 +651,7 @@ class AdminPlugin(Plugin):
                 t=humanize.naturaldelta(expire_dt - datetime.utcnow()),
             ))
 
-    @Plugin.command('unmute', '<user:user|snowflake>', level=CommandLevels.MOD)
+    @Plugin.command('unmute', '<user:user|snowflake>', aliases=['umute'], level=CommandLevels.MOD)
     def unmute(self, event, user, reason=None):
         # TODO: eventually we should pull the role from the GuildMemberBackup if they arent in server
         member = event.guild.get_member(user)

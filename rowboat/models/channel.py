@@ -1,11 +1,11 @@
 from peewee import (BigIntegerField, SmallIntegerField, CharField, TextField, BooleanField)
 
-from rowboat.sql import BaseModel
+from rowboat.sql import ModelBase
 from rowboat.models.message import Message
 
 
-@BaseModel.register
-class Channel(BaseModel):
+@ModelBase.register
+class Channel(ModelBase):
     channel_id = BigIntegerField(primary_key=True)
     guild_id = BigIntegerField(null=True)
     name = CharField(null=True, index=True)
@@ -17,7 +17,7 @@ class Channel(BaseModel):
     deleted = BooleanField(default=False)
 
     class Meta:
-        db_table = 'channels'
+        table_name = 'channels'
 
     @classmethod
     def generate_first_message_id(cls, channel_id):
@@ -37,7 +37,11 @@ class Channel(BaseModel):
             name=channel.name or None,
             topic=channel.topic or None,
             type_=channel.type,
-        ).upsert(target=cls.channel_id).returning(cls.first_message_id).execute())[0]
+        ).on_conflict(
+            conflict_target=cls.channel_id,
+            preserve=(cls.channel_id, cls.guild_id, cls.type_),
+            update={cls.name: channel.name, cls.topic: channel.topic}
+        ).returning(cls.first_message_id).execute())[0]
 
         # Update the first message ID
         if not channel.first_message_id:
