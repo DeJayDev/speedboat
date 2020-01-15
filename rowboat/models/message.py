@@ -111,7 +111,7 @@ class Message(ModelBase):
         q = cls.insert_many(map(cls.convert_message, messages)).returning(cls.id)
 
         if safe:
-            q = q.on_conflict('DO NOTHING')
+            q = q.on_conflict_ignore()
 
         return q.execute()
 
@@ -162,7 +162,7 @@ class Reaction(ModelBase):
                 'emoji_id': reaction.emoji.id or None,
                 'emoji_name': reaction.emoji.name or None
             } for i in user_ids
-        ]).on_conflict('DO NOTHING').execute()
+        ]).on_conflict_ignore().execute()
 
     @classmethod
     def from_disco_reaction(cls, obj):
