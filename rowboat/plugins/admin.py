@@ -407,20 +407,15 @@ class AdminPlugin(Plugin):
         if query and (isinstance(query, int) or query.isdigit()):
             q &= (
                 (Infraction.id == int(query)) |
-                (Infraction.user_id == int(query)) |
-                (Infraction.actor_id == int(query)))
+                (Infraction.user_id == int(query)))
         elif query:
             q &= (Infraction.reason ** query)
 
         user = User.alias()
-        actor = User.alias()
 
-        infractions = Infraction.select(Infraction, user, actor).join(
+        infractions = Infraction.select(Infraction, user).join(
             user,
             on=((Infraction.user_id == user.user_id).alias('user'))
-        ).switch(Infraction).join(
-            actor,
-            on=((Infraction.actor_id == actor.user_id).alias('actor'))
         ).where(q).order_by(Infraction.created_at.desc()).limit(6)
 
         tbl = MessageTable()
@@ -441,7 +436,7 @@ class AdminPlugin(Plugin):
 
             tbl.add(
                 inf.id,
-                inf.created_at.isoformat(),
+                inf.created_at.isoformat().strftime("%Y-%m-%d %H:%m:%S"),
                 str(type_),
                 unicode(inf.user),
                 unicode(inf.actor),

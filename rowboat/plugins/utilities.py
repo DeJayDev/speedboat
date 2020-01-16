@@ -344,19 +344,21 @@ class UtilitiesPlugin(Plugin):
 
         if newest_msg and oldest_msg:
             content.append(u'\n **\u276F Activity**')
-            content.append('Last Message: `{} ({})`'.format(
+            content.append('Last Message: {} ({})'.format(
                 humanize.naturaltime(datetime.utcnow() - to_datetime(newest_msg)),
                 to_datetime(newest_msg).strftime("%b %d %Y %H:%M:%S"),
             ))
-            content.append('First Message: `{} ({})`'.format(
+            content.append('First Message: {} ({})'.format(
                 humanize.naturaltime(datetime.utcnow() - to_datetime(oldest_msg)),
                 to_datetime(oldest_msg).strftime("%b %d %Y %H:%M:%S"),
             ))
 
+        content.append(u'\n**\u276F Infractions**')
         if len(infractions) > 0: 
             total = len(infractions)
-            content.append(u'\n**\u276F Infractions**')
             content.append('Total Infractions: **{:,}**'.format(total))
+        else:
+            content.append('**No Infractions**')
 
         if voice[0]:
             content.append(u'\n**\u276F Voice**')
