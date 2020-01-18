@@ -14,6 +14,7 @@ from disco.types.message import MessageTable
 from disco.types.user import User as DiscoUser
 from disco.types.guild import Guild as DiscoGuild
 from disco.types.channel import Channel as DiscoChannel, MessageIterator
+from disco.types.permissions import Permissions
 from disco.util.snowflake import to_datetime, from_datetime
 
 from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
@@ -135,7 +136,7 @@ class SQLPlugin(Plugin):
 
     @Plugin.command('sql', level=-1, global_=True)
     def command_sql(self, event):
-        conn = database.obj.get_conn()
+        conn = database.obj.connection()
 
         try:
             tbl = MessageTable(codeblock=False)
@@ -230,13 +231,17 @@ class SQLPlugin(Plugin):
     @Plugin.command('global', '<duration:str> [pool:int]', level=-1, global_=True, context={'mode': 'global'}, group='recover')
     @Plugin.command('here', '<duration:str> [pool:int]', level=-1, global_=True, context={'mode': 'here'}, group='recover')
     def command_recover(self, event, duration, pool=4, mode=None):
+        channels = []
         if mode == 'global':
-            channels = list(self.state.channels.values())
+            chlist = list(self.state.channels.values())
         else:
-            channels = list(event.guild.channels.values())
+            chlist = list(event.guild.channels.values())
+        for gch in chlist:
+            if int(self.state.channels[gch.id].type) == 0 or int(self.state.channels[gch.id].type) == 5:
+                if self.state.channels[gch.id].get_permissions(self.state.me).can(Permissions.READ_MESSAGES):
+                    channels.append(self.state.channels[gch.id])
 
         start_at = parse_duration(duration, negative=True)
-
         pool = Pool(pool)
 
         total = len(channels)

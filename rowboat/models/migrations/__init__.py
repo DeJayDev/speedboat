@@ -27,7 +27,7 @@ class Migrate(object):
         self.m = PostgresqlMigrator(database)
 
     def run(self):
-        conn = database.obj.get_conn()
+        conn = database.obj.connection()
 
         for rule in self.rules:
             with conn.cursor() as cur:
@@ -42,7 +42,7 @@ class Migrate(object):
         migrate(*self.actions)
 
         print 'Executing {} raw queries'.format(len(self.raw_actions))
-        conn = database.obj.get_conn()
+        conn = database.obj.connection()
         for query, args in self.raw_actions:
             with conn.cursor() as cur:
                 cur.execute(query, args)

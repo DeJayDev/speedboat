@@ -6,6 +6,7 @@ from holster.enum import Enum
 from disco.types.base import cached_property
 from disco.util.sanitize import S
 from disco.api.http import APIException
+from disco.types.permissions import Permissions
 
 from rowboat.redis import rdb
 from rowboat.util.stats import timed
@@ -138,6 +139,12 @@ class CensorPlugin(Plugin):
 
         if author.id == self.state.me.id:
             return
+
+        if event.message.author.bot or rdb.sismember('ignored_channels', event.message.channel_id):
+            return
+        if not event.channel.type == 1:
+            if not event.message.channel.get_permissions(self.state.me).can(Permissions.SEND_MESSAGES):
+                return
 
         if event.webhook_id:
             return

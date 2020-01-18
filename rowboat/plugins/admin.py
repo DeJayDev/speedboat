@@ -395,6 +395,7 @@ class AdminPlugin(Plugin):
         event.msg.reply('', embed=embed)
 
     @Plugin.command('search', '[query:user|str...]', group='infractions', level=CommandLevels.MOD)
+    @Plugin.command('recent', aliases=['latest'], group='infractions', level=CommandLevels.MOD)
     def infraction_search(self, event, query=None):
         q = (Infraction.guild_id == event.guild.id)
 
@@ -406,20 +407,15 @@ class AdminPlugin(Plugin):
         if query and (isinstance(query, int) or query.isdigit()):
             q &= (
                 (Infraction.id == int(query)) |
-                (Infraction.user_id == int(query)) |
-                (Infraction.actor_id == int(query)))
+                (Infraction.user_id == int(query)))
         elif query:
             q &= (Infraction.reason ** query)
 
         user = User.alias()
-        actor = User.alias()
 
-        infractions = Infraction.select(Infraction, user, actor).join(
+        infractions = Infraction.select(Infraction, user).join(
             user,
             on=((Infraction.user_id == user.user_id).alias('user'))
-        ).switch(Infraction).join(
-            actor,
-            on=((Infraction.actor_id == actor.user_id).alias('actor'))
         ).where(q).order_by(Infraction.created_at.desc()).limit(6)
 
         tbl = MessageTable()
@@ -440,7 +436,7 @@ class AdminPlugin(Plugin):
 
             tbl.add(
                 inf.id,
-                inf.created_at.isoformat(),
+                inf.created_at.isoformat().strftime("%Y-%m-%d %H:%m:%S"),
                 str(type_),
                 unicode(inf.user),
                 unicode(inf.actor),
@@ -449,11 +445,6 @@ class AdminPlugin(Plugin):
             )
 
         event.msg.reply(tbl.compile())
-
-    @Plugin.command('recent', aliases=['latest'], group='infractions', level=CommandLevels.MOD)
-    def infractions_recent(self, event):
-        # TODO: fucking write this bruh
-        pass
 
     @Plugin.command('duration', '<infraction:int> <duration:str>', group='infractions', level=CommandLevels.MOD)
     def infraction_duration(self, event, infraction, duration):
@@ -655,7 +646,7 @@ class AdminPlugin(Plugin):
                 t=humanize.naturaldelta(expire_dt - datetime.utcnow()),
             ))
 
-    @Plugin.command('unmute', '<user:user|snowflake>', level=CommandLevels.MOD)
+    @Plugin.command('unmute', '<user:user|snowflake>', aliases=['umute'], level=CommandLevels.MOD)
     def unmute(self, event, user, reason=None):
         # TODO: eventually we should pull the role from the GuildMemberBackup if they arent in server
         member = event.guild.get_member(user)
@@ -688,7 +679,7 @@ class AdminPlugin(Plugin):
             )
 
             if event.config.confirm_actions:
-                raise CommandSuccess(u':ok_hand: {} is now unmuted'.format(member.user))
+                raise CommandSuccess(u'{} is now unmuted'.format(member.user))
         else:
             raise CommandFail('Invalid user')
 
@@ -847,7 +838,6 @@ class AdminPlugin(Plugin):
         if size < 1 or size > 15000:
             raise CommandFail('Too many messages must be between 1-15000')
 
-
         member = event.guild.get_member(user)
         if member:
             self.can_act_on(event, member.id)
@@ -941,7 +931,7 @@ class AdminPlugin(Plugin):
         """
         Removes messages
         """
-        if size > 1 or size > 10000:
+        if size < 1 or size > 10000:
             raise CommandFail('Too many messages. Must be between 1-10000')
 
         if event.channel.id in self.cleans:
@@ -1138,7 +1128,7 @@ class AdminPlugin(Plugin):
             reason=reason or 'no reason',
         )
 
-        raise CommandSuccess(u':ok_hand: {} role {} to {}'.format('added' if mode == 'add' else 'removed',
+        raise CommandSuccess(u'{} role {} to {}'.format('added' if mode == 'add' else 'removed',
             role_obj.name,
             member))
 
@@ -1153,7 +1143,7 @@ class AdminPlugin(Plugin):
             fn.Sum(fn.array_length(Message.attachments, 1)),
         ).where(
             (Message.author_id == user.id)
-        ).tuples().async()
+        ).tuples().execute()
 
         reactions_given = Reaction.select(
             fn.Count('*'),
@@ -1166,7 +1156,7 @@ class AdminPlugin(Plugin):
             (Reaction.user_id == user.id)
         ).group_by(
             Reaction.emoji_id, Reaction.emoji_name
-        ).order_by(fn.Count('*').desc()).tuples().async()
+        ).order_by(fn.Count('*').desc()).tuples().execute()
 
         # Query for most used emoji
         emojis = Message.raw('''
@@ -1180,16 +1170,16 @@ class AdminPlugin(Plugin):
             GROUP BY 1, 2
             ORDER BY 3 DESC
             LIMIT 1
-        ''', (user.id, )).tuples().async()
+        ''', (user.id, )).tuples().execute()
 
         deleted = Message.select(
             fn.Count('*')
         ).where(
             (Message.author_id == user.id) &
             (Message.deleted == 1)
-        ).tuples().async()
+        ).tuples().execute()
 
-        wait_many(message_stats, reactions_given, emojis, deleted, timeout=10)
+        # wait_many(message_stats, reactions_given, emojis, deleted, timeout=10)
 
         # If we hit an exception executing the core query, throw an exception
         if message_stats.exception:
