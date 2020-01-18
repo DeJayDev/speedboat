@@ -8,15 +8,15 @@ from holster.enum import Enum
 from datetime import datetime
 from playhouse.postgres_ext import BinaryJSONField, ArrayField
 
-from rowboat.sql import BaseModel
+from rowboat.sql import ModelBase
 from rowboat.redis import emit
 from rowboat.models.user import User
 
 log = logging.getLogger(__name__)
 
 
-@BaseModel.register
-class Guild(BaseModel):
+@ModelBase.register
+class Guild(ModelBase):
     WhitelistFlags = Enum(
         'MUSIC',
         'MODLOG_CUSTOM_FORMAT',
@@ -49,7 +49,7 @@ class Guild(BaseModel):
     # '''
 
     class Meta:
-        db_table = 'guilds'
+        table_name = 'guilds'
 
     @classmethod
     def with_id(cls, guild_id):
@@ -122,7 +122,7 @@ class Guild(BaseModel):
         try:
             bans = guild.get_bans()
         except:
-            log.exception('sync_bans failed for Guild %s', guild_id)
+            log.exception('sync_bans failed for Guild %s', self.guild_id)
             return
 
         log.info('Syncing %s bans for guild %s', len(bans), guild.id)
@@ -153,8 +153,8 @@ class Guild(BaseModel):
         return base
 
 
-@BaseModel.register
-class GuildEmoji(BaseModel):
+@ModelBase.register
+class GuildEmoji(ModelBase):
     emoji_id = BigIntegerField(primary_key=True)
     guild_id = BigIntegerField()
     name = CharField(index=True)
@@ -166,7 +166,7 @@ class GuildEmoji(BaseModel):
     deleted = BooleanField(default=False)
 
     class Meta:
-        db_table = 'guild_emojis'
+        table_name = 'guild_emojis'
 
     @classmethod
     def from_disco_guild_emoji(cls, emoji, guild_id=None):
@@ -186,14 +186,14 @@ class GuildEmoji(BaseModel):
         return ge
 
 
-@BaseModel.register
-class GuildBan(BaseModel):
+@ModelBase.register
+class GuildBan(ModelBase):
     user_id = BigIntegerField()
     guild_id = BigIntegerField()
     reason = TextField(null=True)
 
     class Meta:
-        db_table = 'guild_bans'
+        table_name = 'guild_bans'
         primary_key = CompositeKey('user_id', 'guild_id')
 
     @classmethod
@@ -205,8 +205,8 @@ class GuildBan(BaseModel):
         return obj
 
 
-@BaseModel.register
-class GuildConfigChange(BaseModel):
+@ModelBase.register
+class GuildConfigChange(ModelBase):
     user_id = BigIntegerField(null=True)
     guild_id = BigIntegerField()
 
@@ -216,7 +216,7 @@ class GuildConfigChange(BaseModel):
     created_at = DateTimeField(default=datetime.utcnow)
 
     class Meta:
-        db_table = 'guild_config_changes'
+        table_name = 'guild_config_changes'
 
         indexes = (
             (('user_id', 'guild_id'), False),
@@ -236,8 +236,8 @@ class GuildConfigChange(BaseModel):
         ).where(Guild.guild_id == self.guild_id).execute()
 
 
-@BaseModel.register
-class GuildMemberBackup(BaseModel):
+@ModelBase.register
+class GuildMemberBackup(ModelBase):
     user_id = BigIntegerField()
     guild_id = BigIntegerField()
 
@@ -248,7 +248,7 @@ class GuildMemberBackup(BaseModel):
     deaf = BooleanField(null=True)
 
     class Meta:
-        db_table = 'guild_member_backups'
+        table_name = 'guild_member_backups'
         primary_key = CompositeKey('user_id', 'guild_id')
 
     @classmethod
@@ -280,8 +280,8 @@ class GuildMemberBackup(BaseModel):
         )
 
 
-@BaseModel.register
-class GuildVoiceSession(BaseModel):
+@ModelBase.register
+class GuildVoiceSession(ModelBase):
     session_id = TextField()
     user_id = BigIntegerField()
     guild_id = BigIntegerField()
@@ -291,7 +291,7 @@ class GuildVoiceSession(BaseModel):
     ended_at = DateTimeField(default=None, null=True)
 
     class Meta:
-        db_table = 'guild_voice_sessions'
+        table_name = 'guild_voice_sessions'
 
         indexes = (
             # Used for conflicts
@@ -321,4 +321,4 @@ class GuildVoiceSession(BaseModel):
                 channel_id=after.channel_id,
                 user_id=after.user_id,
                 started_at=datetime.utcnow(),
-            ).returning(GuildVoiceSession.id).on_conflict('DO NOTHING').execute()
+            ).returning(GuildVoiceSession.id).on_conflict_ignore().execute()

@@ -6,7 +6,7 @@ from holster.enum import Enum
 from peewee import IntegerField, DateTimeField
 from playhouse.postgres_ext import BinaryJSONField, BooleanField
 
-from rowboat.sql import BaseModel
+from rowboat.sql import ModelBase
 from rowboat.redis import rdb
 
 NotificationTypes = Enum(
@@ -18,17 +18,17 @@ NotificationTypes = Enum(
 )
 
 
-@BaseModel.register
-class Notification(BaseModel):
+@ModelBase.register
+class Notification(ModelBase):
     Types = NotificationTypes
 
-    type_ = IntegerField(db_column='type')
+    type_ = IntegerField(column_name='type')
     metadata = BinaryJSONField(default={})
     read = BooleanField(default=False)
     created_at = DateTimeField(default=datetime.utcnow)
 
     class Meta:
-        db_table = 'notifications'
+        table_name = 'notifications'
 
         indexes = (
             (('created_at', 'read'), False),

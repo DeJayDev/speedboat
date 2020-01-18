@@ -5,11 +5,11 @@ from holster.enum import Enum
 from peewee import BigIntegerField, IntegerField, SmallIntegerField, TextField, BooleanField, DateTimeField
 from playhouse.postgres_ext import BinaryJSONField
 
-from rowboat.sql import BaseModel
+from rowboat.sql import ModelBase
 from disco.api.http import APIException
 
-@BaseModel.register
-class User(BaseModel):
+@ModelBase.register
+class User(ModelBase):
     user_id = BigIntegerField(primary_key=True)
     username = TextField()
     discriminator = SmallIntegerField()
@@ -25,7 +25,7 @@ class User(BaseModel):
     '''
 
     class Meta:
-        db_table = 'users'
+        table_name = 'users'
 
         indexes = (
             (('user_id', 'username', 'discriminator'), True),
@@ -104,8 +104,8 @@ class User(BaseModel):
         return u'{}#{}'.format(self.username, str(self.discriminator).zfill(4))
 
 
-@BaseModel.register
-class Infraction(BaseModel):
+@ModelBase.register
+class Infraction(ModelBase):
     Types = Enum(
         'MUTE',
         'KICK',
@@ -123,7 +123,7 @@ class Infraction(BaseModel):
     user_id = BigIntegerField()
     actor_id = BigIntegerField(null=True)
 
-    type_ = IntegerField(db_column='type')
+    type_ = IntegerField(column_name='type')
     reason = TextField(null=True)
     metadata = BinaryJSONField(default={})
 
@@ -133,7 +133,7 @@ class Infraction(BaseModel):
     messaged = BooleanField(default=False)
 
     class Meta:
-        db_table = 'infractions'
+        table_name = 'infractions'
 
         indexes = (
             (('guild_id', 'user_id'), False),
@@ -515,8 +515,8 @@ class Infraction(BaseModel):
         ).execute() >= 1
 
 
-@BaseModel.register
-class StarboardBlock(BaseModel):
+@ModelBase.register
+class StarboardBlock(ModelBase):
     guild_id = BigIntegerField()
     user_id = BigIntegerField()
     actor_id = BigIntegerField()

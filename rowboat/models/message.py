@@ -15,13 +15,13 @@ from disco.types.base import UNSET
 from rowboat import REV
 from rowboat.util import default_json
 from rowboat.models.user import User
-from rowboat.sql import BaseModel
+from rowboat.sql import ModelBase
 
 EMOJI_RE = re.compile(r'<:.+:([0-9]+)>')
 
 
-@BaseModel.register
-class Message(BaseModel):
+@ModelBase.register
+class Message(ModelBase):
     id = BigIntegerField(primary_key=True)
     channel_id = BigIntegerField()
     guild_id = BigIntegerField(null=True)
@@ -46,7 +46,7 @@ class Message(BaseModel):
     '''
 
     class Meta:
-        db_table = 'messages'
+        table_name = 'messages'
 
         indexes = (
             # These indexes are mostly just general use
@@ -111,7 +111,7 @@ class Message(BaseModel):
         q = cls.insert_many(map(cls.convert_message, messages)).returning(cls.id)
 
         if safe:
-            q = q.on_conflict('DO NOTHING')
+            q = q.on_conflict_ignore()
 
         return q.execute()
 
@@ -137,15 +137,15 @@ class Message(BaseModel):
         return cls.select().where(cls.channel_id == channel.id)
 
 
-@BaseModel.register
-class Reaction(BaseModel):
+@ModelBase.register
+class Reaction(ModelBase):
     message_id = BigIntegerField()
     user_id = BigIntegerField()
     emoji_id = BigIntegerField(null=True)
     emoji_name = TextField()
 
     class Meta:
-        db_table = 'reactions'
+        table_name = 'reactions'
 
         indexes = (
             (('message_id', 'user_id', 'emoji_id', 'emoji_name'), True),
@@ -162,7 +162,7 @@ class Reaction(BaseModel):
                 'emoji_id': reaction.emoji.id or None,
                 'emoji_name': reaction.emoji.name or None
             } for i in user_ids
-        ]).on_conflict('DO NOTHING').execute()
+        ]).on_conflict_ignore().execute()
 
     @classmethod
     def from_disco_reaction(cls, obj):
@@ -173,8 +173,8 @@ class Reaction(BaseModel):
             emoji_name=obj.emoji.name or None)
 
 
-@BaseModel.register
-class MessageArchive(BaseModel):
+@ModelBase.register
+class MessageArchive(ModelBase):
     FORMATS = ['txt', 'csv', 'json']
 
     archive_id = UUIDField(primary_key=True, default=uuid.uuid4)
@@ -185,7 +185,7 @@ class MessageArchive(BaseModel):
     expires_at = DateTimeField(default=lambda: datetime.utcnow() + timedelta(days=7))
 
     class Meta:
-        db_table = 'message_archives'
+        table_name = 'message_archives'
 
         indexes = (
             (('created_at', ), False),
@@ -265,8 +265,8 @@ class MessageArchive(BaseModel):
             attachments=msg.attachments)
 
 
-@BaseModel.register
-class StarboardEntry(BaseModel):
+@ModelBase.register
+class StarboardEntry(ModelBase):
     message = ForeignKeyField(Message, primary_key=True)
 
     # Information on where this starboard message lies
@@ -288,7 +288,7 @@ class StarboardEntry(BaseModel):
     '''
 
     class Meta:
-        db_table = 'starboard_entries'
+        table_name = 'starboard_entries'
 
         indexes = (
             (('star_channel_id', 'star_message_id'), True),
@@ -361,8 +361,8 @@ class StarboardEntry(BaseModel):
         ).execute()
 
 
-@BaseModel.register
-class Reminder(BaseModel):
+@ModelBase.register
+class Reminder(ModelBase):
     message_id = BigIntegerField(primary_key=True)
 
     created_at = DateTimeField(default=datetime.utcnow)
@@ -370,7 +370,7 @@ class Reminder(BaseModel):
     content = TextField()
 
     class Meta:
-        db_table = 'reminders'
+        table_name = 'reminders'
 
     @classmethod
     def with_message_join(cls, fields=None):
@@ -395,8 +395,8 @@ class Reminder(BaseModel):
         ).execute()
 
 
-@BaseModel.register
-class Command(BaseModel):
+@ModelBase.register
+class Command(ModelBase):
     message_id = BigIntegerField(primary_key=True)
 
     plugin = TextField()
@@ -406,7 +406,7 @@ class Command(BaseModel):
     traceback = TextField(null=True)
 
     class Meta:
-        db_table = 'commands'
+        table_name = 'commands'
 
         indexes = (
             (('success', ), False),

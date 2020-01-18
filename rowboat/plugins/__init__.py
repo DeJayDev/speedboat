@@ -133,4 +133,4 @@ class CommandFail(CommandResponse):
     EMOJI = 'no_entry_sign'
 
 class CommandSuccess(CommandResponse):
-    EMOJI = 'ballot_box_with_check'
+    EMOJI = 'ok_hand'

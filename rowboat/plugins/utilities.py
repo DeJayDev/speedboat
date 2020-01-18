@@ -20,7 +20,7 @@ from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
 from rowboat.util.timing import Eventual
 from rowboat.util.input import parse_duration
 from rowboat.util.gevent import wait_many
-from rowboat.util.stats import statsd, to_tags
+from rowboat.util.stats import to_tags
 from rowboat.types.plugin import PluginConfig
 from rowboat.models.guild import GuildVoiceSession
 from rowboat.models.user import User, Infraction
@@ -188,9 +188,9 @@ class UtilitiesPlugin(Plugin):
         except Message.DoesNotExist:
             raise CommandFail(u"I've never seen {}".format(user))
 
-        raise CommandSuccess(u'I last saw {} {} ago (at {})'.format(
+        raise CommandSuccess(u'I last saw {} {} (at {})'.format(
             user,
-            humanize.naturaldelta(datetime.utcnow() - msg.timestamp),
+            humanize.naturaltime(datetime.utcnow() - msg.timestamp),
             msg.timestamp
         ))
 
@@ -301,8 +301,8 @@ class UtilitiesPlugin(Plugin):
 
 
         created_dt = to_datetime(user.id)
-        content.append('Created: {} ago ({})'.format(
-            humanize.naturaldelta(datetime.utcnow() - created_dt),
+        content.append('Created: {} ({})'.format(
+            humanize.naturaltime(datetime.utcnow() - created_dt),
             created_dt.isoformat()
         ))
 
@@ -323,70 +323,49 @@ class UtilitiesPlugin(Plugin):
                     ', '.join((member.guild.roles.get(r).name for r in member.roles))
                 ))
 
-        # Execute a bunch of queries async
-        newest_msg = Message.select(Message.timestamp).where(
-            (Message.author_id == user.id) &
+        # Execute a bunch of queries
+        newest_msg = Message.select(fn.MAX(Message.id)).where(
+            (Message.author_id == user.id) & 
             (Message.guild_id == event.guild.id)
-        ).limit(1).order_by(Message.timestamp.desc()).async()
+        ).tuples()[0][0]
 
-        oldest_msg = Message.select(Message.timestamp).where(
-            (Message.author_id == user.id) &
+        oldest_msg = Message.select(fn.MIN(Message.id)).where(
+            (Message.author_id == user.id) & 
             (Message.guild_id == event.guild.id)
-        ).limit(1).order_by(Message.timestamp.asc()).async()
+        ).tuples()[0][0]
 
-        infractions = Infraction.select(
-            Infraction.guild_id,
-            fn.COUNT('*')
-        ).where(
-            (Infraction.user_id == user.id)
-        ).group_by(Infraction.guild_id).tuples().async()
+        voice = GuildVoiceSession.select(fn.COUNT(GuildVoiceSession.user_id),
+            fn.SUM(GuildVoiceSession.ended_at - GuildVoiceSession.started_at)).where(
+                (GuildVoiceSession.user_id == user.id) & (~(GuildVoiceSession.ended_at >> None)) & (
+                    GuildVoiceSession.guild_id == event.guild.id)).tuples()[0]
 
-        voice = GuildVoiceSession.select(
-            GuildVoiceSession.user_id,
-            fn.COUNT('*'),
-            fn.SUM(GuildVoiceSession.ended_at - GuildVoiceSession.started_at)
-        ).where(
-            (GuildVoiceSession.user_id == user.id) &
-            (~(GuildVoiceSession.ended_at >> None))
-        ).group_by(GuildVoiceSession.user_id).tuples().async()
+        infractions = Infraction.select(Infraction.id).where(
+            (Infraction.user_id == user.id) & (Infraction.guild_id == event.guild.id)).tuples()
 
-        # Wait for them all to complete (we're still going to be as slow as the
-        #  slowest query, so no need to be smart about this.)
-        wait_many(newest_msg, oldest_msg, infractions, voice, timeout=30)
-        tags = to_tags(guild_id=event.msg.guild.id)
-
-        if newest_msg.value and oldest_msg.value:
-            statsd.timing('sql.duration.newest_msg', newest_msg.value._query_time, tags=tags)
-            statsd.timing('sql.duration.oldest_msg', oldest_msg.value._query_time, tags=tags)
-            newest_msg = newest_msg.value.get()
-            oldest_msg = oldest_msg.value.get()
-
+        if newest_msg and oldest_msg:
             content.append(u'\n **\u276F Activity**')
-            content.append('Last Message: {} ago ({})'.format(
-                humanize.naturaldelta(datetime.utcnow() - newest_msg.timestamp),
-                newest_msg.timestamp.isoformat(),
+            content.append('Last Message: {} ({})'.format(
+                humanize.naturaltime(datetime.utcnow() - to_datetime(newest_msg)),
+                to_datetime(newest_msg).strftime("%b %d %Y %H:%M:%S"),
             ))
-            content.append('First Message: {} ago ({})'.format(
-                humanize.naturaldelta(datetime.utcnow() - oldest_msg.timestamp),
-                oldest_msg.timestamp.isoformat(),
+            content.append('First Message: {} ({})'.format(
+                humanize.naturaltime(datetime.utcnow() - to_datetime(oldest_msg)),
+                to_datetime(oldest_msg).strftime("%b %d %Y %H:%M:%S"),
             ))
 
-        if infractions.value:
-            statsd.timing('sql.duration.infractions', infractions.value._query_time, tags=tags)
-            infractions = list(infractions.value)
-            total = sum(i[1] for i in infractions)
-            content.append(u'\n**\u276F Infractions**')
-            content.append('Total Infractions: {}'.format(total))
-            content.append('Unique Servers: {}'.format(len(infractions)))
+        content.append(u'\n**\u276F Infractions**')
+        if len(infractions) > 0: 
+            total = len(infractions)
+            content.append('Total Infractions: **{:,}**'.format(total))
+        else:
+            content.append('**No Infractions**')
 
-        if voice.value:
-            statsd.timing('plugin.utilities.info.sql.voice', voice.value._query_time, tags=tags)
-            voice = list(voice.value)
+        if voice[0]:
             content.append(u'\n**\u276F Voice**')
-            content.append(u'Sessions: {}'.format(voice[0][1]))
-            content.append(u'Time: {}'.format(humanize.naturaldelta(
-                voice[0][2]
-            )))
+            content.append('Sessions: `{:,}`'.format(voice[0]))
+            content.append('Time: `{}`'.format(str(humanize.naturaldelta(
+                voice[1]
+            )).title()))
 
         embed = MessageEmbed()
 
@@ -426,10 +405,10 @@ class UtilitiesPlugin(Plugin):
             reminder.delete_instance()
             return
 
-        msg = channel.send_message(u'<@{}> you asked me at {} ({} ago) to remind you about: {}'.format(
+        msg = channel.send_message(u'<@{}> you asked me at {} ({}) to remind you about: {}'.format(
             message.author_id,
             reminder.created_at,
-            humanize.naturaldelta(reminder.created_at - datetime.utcnow()),
+            humanize.naturaltime(reminder.created_at - datetime.utcnow()),
             S(reminder.content)
         ))
 

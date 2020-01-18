@@ -3,11 +3,11 @@ from peewee import (
 )
 from datetime import datetime
 
-from rowboat.sql import BaseModel
+from rowboat.sql import ModelBase
 
 
-@BaseModel.register
-class Tag(BaseModel):
+@ModelBase.register
+class Tag(ModelBase):
     guild_id = BigIntegerField()
     author_id = BigIntegerField()
 
@@ -18,5 +18,5 @@ class Tag(BaseModel):
     created_at = DateTimeField(default=datetime.utcnow)
 
     class Meta:
-        db_table = 'tags'
+        table_name = 'tags'
         primary_key = CompositeKey('guild_id', 'name')

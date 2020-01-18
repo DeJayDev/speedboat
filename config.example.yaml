@@ -3,8 +3,22 @@ token: ''
 manhole_enable: true
 manhole_bind: 127.0.0.1:7171
 
+DSN: ''
+
+web:
+    CLIENT_SECRET: ''
+    SECRET_KEY: ''
+    DISCORD_CLIENT_ID: ''
+    DISCORD_CLIENT_SECRET: ''
+    DISCORD_API_BASE_URL: 'https://discordapp.com/api' #Leave this
+    DISCORD_TOKEN_URL: 'https://discordapp.com/api/oauth2/token' #Leave this
+    DISCORD_AUTH_URL: 'https://discordapp.com/oauth2/authorize' #Leave this
+    DISCORD_REDIRECT_URI: ''
+
 state:
-  sync_guild_members: false
+  sync_guild_members: true
+
+ENV: 'docker'
 
 bot:
   commands_enabled: false
@@ -20,3 +34,4 @@ bot:
     - rowboat.plugins.sql
     - rowboat.plugins.internal
     - rowboat.plugins.stats
+    - rowboat.plugins.tags
