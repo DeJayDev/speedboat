@@ -418,7 +418,7 @@ class UtilitiesPlugin(Plugin):
         self.queue_reminders()
 
     def trigger_reminder(self, reminder):
-        message = reminder.message_id
+        message = Message.get(reminder.message_id)
         channel = self.state.channels.get(message.channel_id)
         if not channel:
             self.log.warning('Not triggering reminder, channel %s was not found!',
