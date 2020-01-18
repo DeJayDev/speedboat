@@ -439,7 +439,7 @@ class AdminPlugin(Plugin):
                 inf.created_at.strftime("%Y-%m-%d %H:%m:%S"),
                 str(type_),
                 unicode(inf.user),
-                unicode(inf.actor),
+                unicode(User.with_id(inf.actor_id)),
                 active,
                 clamp(reason, 128)
             )
