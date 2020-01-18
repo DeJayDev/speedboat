@@ -436,7 +436,7 @@ class AdminPlugin(Plugin):
 
             tbl.add(
                 inf.id,
-                inf.created_at.isoformat().strftime("%Y-%m-%d %H:%m:%S"),
+                inf.created_at.strftime("%Y-%m-%d %H:%m:%S"),
                 str(type_),
                 unicode(inf.user),
                 unicode(inf.actor),
