@@ -1181,10 +1181,6 @@ class AdminPlugin(Plugin):
 
         # wait_many(message_stats, reactions_given, emojis, deleted, timeout=10)
 
-        # If we hit an exception executing the core query, throw an exception
-        if message_stats.exception:
-            message_stats.get()
-
         q = message_stats.value[0]
         embed = MessageEmbed()
         embed.fields.append(
