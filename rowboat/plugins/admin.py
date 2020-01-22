@@ -1172,7 +1172,7 @@ class AdminPlugin(Plugin):
             GROUP BY 1, 2
             ORDER BY 3 DESC
             LIMIT 1
-        ''', (user.id, )).tuples()[0][0]
+        ''', (user.id, )).tuples()
 
         deleted = Message.select(
             fn.Count('*')
