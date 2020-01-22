@@ -305,8 +305,8 @@ class AdminPlugin(Plugin):
             event.guild.delete_ban(user)
 
             GuildBan.delete().where(
-                (GuildBan.user_id == user.id) &
-                (GuildBan.guild_id == event.guild_id)
+                (GuildBan.user_id == user) &
+                (GuildBan.guild_id == event.guild.id)
             )
         except (GuildBan.DoesNotExist, APIException) as e:
             if hasattr(e, 'code') and e.code != 10026: # Unknown Ban
