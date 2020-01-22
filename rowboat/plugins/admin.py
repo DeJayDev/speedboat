@@ -1143,7 +1143,7 @@ class AdminPlugin(Plugin):
             fn.Sum(fn.array_length(Message.attachments, 1)),
         ).where(
             (Message.author_id == user.id)
-        ).tuples().execute()
+        ).tuples()[0]
 
         reactions_given = Reaction.select(
             fn.Count('*'),
@@ -1156,7 +1156,7 @@ class AdminPlugin(Plugin):
             (Reaction.user_id == user.id)
         ).group_by(
             Reaction.emoji_id, Reaction.emoji_name
-        ).order_by(fn.Count('*').desc()).tuples().execute()
+        ).order_by(fn.Count('*').desc()).tuples()[0][0]
 
         # Query for most used emoji
         emojis = Message.raw('''
@@ -1170,18 +1170,18 @@ class AdminPlugin(Plugin):
             GROUP BY 1, 2
             ORDER BY 3 DESC
             LIMIT 1
-        ''', (user.id, )).tuples().execute()
+        ''', (user.id, )).tuples()[0][0]
 
         deleted = Message.select(
             fn.Count('*')
         ).where(
             (Message.author_id == user.id) &
             (Message.deleted == 1)
-        ).tuples().execute()
+        ).tuples()[0]
 
         # wait_many(message_stats, reactions_given, emojis, deleted, timeout=10)
 
-        q = message_stats.value[0]
+        q = message_stats
         embed = MessageEmbed()
         embed.fields.append(
             MessageEmbedField(name='Total Messages Sent', value=q[0] or '0', inline=True))
@@ -1190,7 +1190,7 @@ class AdminPlugin(Plugin):
 
         if deleted.value:
             embed.fields.append(
-                MessageEmbedField(name='Total Deleted Messages', value=deleted.value[0][0], inline=True))
+                MessageEmbedField(name='Total Deleted Messages', value=deleted[0], inline=True))
         embed.fields.append(
             MessageEmbedField(name='Total Custom Emojis', value=q[2] or '0', inline=True))
         embed.fields.append(
@@ -1198,9 +1198,7 @@ class AdminPlugin(Plugin):
         embed.fields.append(
             MessageEmbedField(name='Total Attachments', value=q[4] or '0', inline=True))
 
-        if reactions_given.value:
-            reactions_given = reactions_given.value
-
+        if reactions_given:
             embed.fields.append(
                 MessageEmbedField(name='Total Reactions', value=sum(i[0] for i in reactions_given), inline=True))
 
