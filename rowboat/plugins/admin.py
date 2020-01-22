@@ -298,14 +298,14 @@ class AdminPlugin(Plugin):
             self.role_debounces[event.role.id] = time.time() + 60
             event.role.update(**to_update)
 
-    @Plugin.command('unban', '<user:user> [reason:str...]', level=CommandLevels.MOD)
+    @Plugin.command('unban', '<user:snowflake> [reason:str...]', level=CommandLevels.MOD)
     def unban(self, event, user, reason=None):
         try:
-            GuildBan.get(user_id=user.id, guild_id=event.guild.id)
-            event.guild.delete_ban(user.id)
+            GuildBan.get(user_id=user, guild_id=event.guild.id)
+            event.guild.delete_ban(user)
 
             GuildBan.delete().where(
-                (GuildBan.user_id == user.id) &
+                (GuildBan.user_id == user) &
                 (GuildBan.guild_id == event.guild_id)
             )
         except (GuildBan.DoesNotExist, APIException) as e:
@@ -316,12 +316,12 @@ class AdminPlugin(Plugin):
 
         Infraction.create(
             guild_id=event.guild.id,
-            user_id=user.id,
+            user_id=user,
             actor_id=event.author.id,
             type_=Infraction.Types.UNBAN,
             reason=reason
         )
-        raise CommandSuccess('Unbanned user with id `{}`'.format(user.id))
+        raise CommandSuccess('Unbanned user with id `{}`'.format(user))
 
     @Plugin.command('archive', group='infractions', level=CommandLevels.ADMIN)
     def infractions_archive(self, event):
