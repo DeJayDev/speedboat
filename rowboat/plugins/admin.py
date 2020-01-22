@@ -1133,7 +1133,9 @@ class AdminPlugin(Plugin):
             member))
 
     @Plugin.command('stats', '<user:user>', level=CommandLevels.MOD)
-    def msgstats(self, event, user):
+    def msgstats(self, event, user=None):
+        if user is None:
+            user = event.author
         # Query for the basic aggregate message statistics
         message_stats = Message.select(
             fn.Count('*'),
@@ -1188,7 +1190,7 @@ class AdminPlugin(Plugin):
         embed.fields.append(
             MessageEmbedField(name='Total Characters Sent', value=q[1] or '0', inline=True))
 
-        if deleted.value:
+        if deleted:
             embed.fields.append(
                 MessageEmbedField(name='Total Deleted Messages', value=deleted[0], inline=True))
         embed.fields.append(
@@ -1213,8 +1215,8 @@ class AdminPlugin(Plugin):
                     reactions_given[0][0],
                 ), inline=True))
 
-        if emojis.value:
-            emojis = list(emojis.value)
+        if emojis:
+            emojis = list(emojis)
 
             if emojis:
                 embed.add_field(
