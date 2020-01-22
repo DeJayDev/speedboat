@@ -329,7 +329,7 @@ class Infraction(ModelBase):
 
         msg_status = False
 
-        if user_ob is not False: 
+        if not isinstance(member, (int, long)) and if user_ob is not False: 
             try:
                 member.user.open_dm().send_message(u':warning: You were **{}** from {} for "{}"'.format(
                     'banned',
