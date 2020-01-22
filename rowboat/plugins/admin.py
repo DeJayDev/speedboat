@@ -1132,7 +1132,7 @@ class AdminPlugin(Plugin):
             role_obj.name,
             member))
 
-    @Plugin.command('stats', '<user:user>', level=CommandLevels.MOD)
+    @Plugin.command('stats', '[user:user]', level=CommandLevels.MOD)
     def msgstats(self, event, user=None):
         if user is None:
             user = event.author
@@ -1158,7 +1158,7 @@ class AdminPlugin(Plugin):
             (Reaction.user_id == user.id)
         ).group_by(
             Reaction.emoji_id, Reaction.emoji_name
-        ).order_by(fn.Count('*').desc()).tuples()[0][0]
+        ).order_by(fn.Count('*').desc()).tuples()
 
         # Query for most used emoji
         emojis = Message.raw('''
@@ -1200,9 +1200,9 @@ class AdminPlugin(Plugin):
         embed.fields.append(
             MessageEmbedField(name='Total Attachments', value=q[4] or '0', inline=True))
 
-        if reactions_given:
+        if len(reactions_given) > 0:
             embed.fields.append(
-                MessageEmbedField(name='Total Reactions', value=sum(i[0] for i in reactions_given), inline=True))
+                MessageEmbedField(name='Total Reactions', value=len(reactions_given), inline=True))
 
             emoji = (
                 reactions_given[0][2]
