@@ -741,6 +741,48 @@ class AdminPlugin(Plugin):
 
         raise CommandSuccess('Kicked {} users'.format(len(members)))
 
+    @Plugin.command('mban', parser=True, level=CommandLevels.MOD)
+    @Plugin.parser.add_argument('users', type=long, nargs='+')
+    @Plugin.parser.add_argument('-r', '--reason', default='', help='reason for modlog')
+    def mban(self, event, args):
+        members = []
+        for user_id in args.users:
+            member = event.guild.get_member(user_id)
+            if not member:
+                # TODO: this sucks, batch these
+                raise CommandFail('Failed to ban {}, user not found'.format(user_id))
+
+            if not self.can_act_on(event, member.id, throw=False):
+                raise CommandFail('Failed to ban {}, invalid permissions'.format(user_id))
+
+            members.append(member)
+
+        msg = event.msg.reply('Ok, ban {} users for `{}`?'.format(len(members), args.reason or 'no reason'))
+        msg.chain(False).\
+            add_reaction(GREEN_TICK_EMOJI).\
+            add_reaction(RED_TICK_EMOJI)
+
+        try:
+            mra_event = self.wait_for_event(
+                'MessageReactionAdd',
+                message_id=msg.id,
+                conditional=lambda e: (
+                    e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
+                    e.user_id == event.author.id
+                )).get(timeout=10)
+        except gevent.Timeout:
+            return
+        finally:
+            msg.delete()
+
+        if mra_event.emoji.id != GREEN_TICK_EMOJI_ID:
+            return
+
+        for member in members:
+            Infraction.ban(self, event, member, args.reason)
+
+        raise CommandSuccess('Banned {} users'.format(len(members)))
+
     @Plugin.command('ban', '<user:user|snowflake> [reason:str...]', level=CommandLevels.MOD)
     @Plugin.command('forceban', '<user:snowflake> [reason:str...]', level=CommandLevels.MOD)
     def ban(self, event, user, reason=None):
