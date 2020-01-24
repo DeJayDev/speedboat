@@ -880,39 +880,6 @@ class AdminPlugin(Plugin):
         if size < 1 or size > 15000:
             raise CommandFail('Too many messages must be between 1-15000')
 
-        member = event.guild.get_member(user)
-        if member:
-            self.can_act_on(event, member.id)
-            Infraction.warn(self, event, member, reason, guild=event.guild)
-        else:
-            raise CommandFail('Invalid user')
-
-        if event.config.confirm_actions:
-            event.msg.reply(maybe_string(
-                reason,
-                u':ok_hand: warned {u} (`{o}`)',
-                u':ok_hand: warned {u}',
-                u=member.user if member else user,
-            ))
-
-    @Plugin.command('here', '[size:int]', level=CommandLevels.MOD, context={'mode': 'all'}, group='archive')
-    @Plugin.command('all', '[size:int]', level=CommandLevels.MOD, context={'mode': 'all'}, group='archive')
-    @Plugin.command(
-        'user',
-        '<user:user|snowflake> [size:int]',
-        level=CommandLevels.MOD,
-        context={'mode': 'user'},
-        group='archive')
-    @Plugin.command(
-        'channel',
-        '<channel:channel|snowflake> [size:int]',
-        level=CommandLevels.MOD,
-        context={'mode': 'channel'},
-        group='archive')
-    def archive(self, event, size=50, mode=None, user=None, channel=None):
-        if size < 1 or size > 15000:
-            raise CommandFail('Too many messages must be between 1-15000')
-
         q = Message.select(Message.id).join(User).order_by(Message.id.desc()).limit(size)
 
         if mode in ('all', 'channel'):
