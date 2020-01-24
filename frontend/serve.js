@@ -16,25 +16,21 @@ if (process.env.NODE_ENV == 'docker') {
 
 var proxyOptions = {
   target: proxyURL,
-  onProxyReq: relayRequestHeaders,
-  onProxyRes: relayResponseHeaders
+  onProxyReq(proxyReq, req, res) {
+    console.log(proxyReq.headers)
+    Object.keys(req.headers).forEach(header => {
+      proxyReq.setHeader(key, req.headers[header])
+    });
+  },
+  onProxyRes(proxyRes, req, res) {
+    console.log('proxyres: ' + proxyRes.headers)
+    Object.keys(proxyRes.headers).forEach(header => {
+      res.append(key, proxyRes.headers[header])
+    });
+  }
 }
 
-function relayRequestHeaders(apiReq, req) {
-  Object.keys(req.headers).forEach(header => {
-    apiReq.setHeader(key, req.headers[header])
-  });
-}
-
-function relayResponseHeaders(apiRes, req, res) {
-  Object.keys(apiRes.headers).forEach(header => {
-    res.append(key, apiRes.headers[header])
-  });
-}
-
-app.use('/api', (req, res) => {
-  proxy(proxyOptions)
-});
+app.use('/api', proxy(proxyOptions));
 
 app.use(bundler.middleware());
 

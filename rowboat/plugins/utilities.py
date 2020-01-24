@@ -286,20 +286,7 @@ class UtilitiesPlugin(Plugin):
         content.append(u'**\u276F User Information**')
         content.append(u'ID: {}'.format(user.id))
         content.append(u'Profile: <@{}>'.format(user.id))
-
-        if user.presence:
-            emoji, status = get_status_emoji(user.presence)
-            content.append('Online Status: {} <{}>'.format(status, emoji))
-            if user.presence.game and user.presence.game.name:
-                if user.presence.game.type == GameType.DEFAULT:
-                    content.append(u'Status: {}'.format(user.presence.game.name))
-                else:
-                    if user.presence.game.url:
-                        content.append(u'Streaming: [{}]({})'.format(user.presence.game.name, user.presence.game.url))
-                    else:
-                        content.append(u'Streaming: {}'.format(user.presence.game.name))
-
-
+        
         created_dt = to_datetime(user.id)
         content.append('Created: {} ({})'.format(
             humanize.naturaltime(datetime.utcnow() - created_dt),
@@ -307,6 +294,21 @@ class UtilitiesPlugin(Plugin):
         ))
 
         member = event.guild.get_member(user.id) if event.guild else None
+
+        if member.user.presence: #I couldn't get this to work w/o it lol
+            emoji, status = get_status_emoji(user.presence)
+            content.append('Online Status: {} <{}>'.format(status, emoji))
+            if user.presence.game and user.presence.game.name:
+                if user.presence.game.type == GameType.DEFAULT:
+                    content.append(u'Status: {}'.format(user.presence.game.name))
+                if user.presence.game.type == GameType.LISTENING:
+                    content.append(u'Listening to Spotify')
+                else:
+                    if user.presence.game.url:
+                        content.append(u'Streaming: [{}]({})'.format(user.presence.game.name, user.presence.game.url))
+                    else:
+                        content.append(u'Streaming: {}'.format(user.presence.game.name))
+
         if member:
             content.append(u'\n**\u276F Member Information**')
 
@@ -332,7 +334,7 @@ class UtilitiesPlugin(Plugin):
         oldest_msg = Message.select(fn.MIN(Message.id)).where(
             (Message.author_id == user.id) & 
             (Message.guild_id == event.guild.id)
-        ).tuples()[0][0]
+        ).tuples()[0][0] #Slow Query
 
         voice = GuildVoiceSession.select(fn.COUNT(GuildVoiceSession.user_id),
             fn.SUM(GuildVoiceSession.ended_at - GuildVoiceSession.started_at)).where(
@@ -353,12 +355,10 @@ class UtilitiesPlugin(Plugin):
                 to_datetime(oldest_msg).strftime("%b %d %Y %H:%M:%S"),
             ))
 
-        content.append(u'\n**\u276F Infractions**')
         if len(infractions) > 0: 
+            content.append(u'\n**\u276F Infractions**')
             total = len(infractions)
             content.append('Total Infractions: **{:,}**'.format(total))
-        else:
-            content.append('**No Infractions**')
 
         if voice[0]:
             content.append(u'\n**\u276F Voice**')
