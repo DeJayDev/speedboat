@@ -17,11 +17,13 @@ if (process.env.NODE_ENV == 'docker') {
 var proxyOptions = {
   target: proxyURL,
   onProxyReq(proxyReq, req, res) {
+    if(!proxyReq.headers) return;
     Object.keys(proxyReq.headers).forEach(header => {
       req.setHeader(header, req.headers[header])
     });
   },
   onProxyRes(proxyRes, req, res) {
+    if(!proxyRes.headers) return;
     Object.keys(proxyRes.headers).forEach(header => {
       res.append(header, proxyRes.headers[header])
     });
