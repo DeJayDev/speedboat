@@ -19,13 +19,13 @@ var proxyOptions = {
   onProxyReq(proxyReq, req, res) {
     console.log(proxyReq.headers)
     Object.keys(req.headers).forEach(header => {
-      proxyReq.setHeader(key, req.headers[header])
+      proxyReq.setHeader(header, req.headers[header])
     });
   },
   onProxyRes(proxyRes, req, res) {
     console.log('proxyres: ' + proxyRes.headers)
     Object.keys(proxyRes.headers).forEach(header => {
-      res.append(key, proxyRes.headers[header])
+      res.append(header, proxyRes.headers[header])
     });
   }
 }
