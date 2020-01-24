@@ -14,6 +14,12 @@ if (process.env.NODE_ENV == 'docker') {
   proxyURL = 'http://web:8686';
 }
 
+var proxyOptions = {
+  target: proxyURL,
+  onProxyReq: relayRequestHeaders,
+  onProxyRes: relayResponseHeaders
+}
+
 function relayRequestHeaders(apiReq, req) {
   Object.keys(req.headers).forEach(header => {
     apiReq.setHeader(key, req.headers[header])
@@ -27,11 +33,7 @@ function relayResponseHeaders(apiRes, req, res) {
 }
 
 app.use('/api', (req, res) => {
-  proxy({
-    target: proxyURL,
-    onProxyReq: relayRequestHeaders,
-    onProxyRes: relayResponseHeaders
-  })
+  proxy(proxyOptions)
 });
 
 app.use(bundler.middleware());
