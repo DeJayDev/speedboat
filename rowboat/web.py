@@ -10,7 +10,7 @@ from rowboat.sql import init_db
 from rowboat.models.user import User
 from rowboat.types.guild import PluginsConfig
 
-from yaml import load
+from yaml import load_safe
 
 rowboat = Holster(Flask(__name__))
 logging.getLogger('peewee').setLevel(logging.DEBUG)
@@ -23,7 +23,7 @@ def before_first_request():
     PluginsConfig.force_load_plugin_configs()
 
     with open('config.yaml', 'r') as f:
-        data = load(f)
+        data = load_safe(f)
 
     rowboat.app.config.update(data['web'])
     rowboat.app.secret_key = data['web']['SECRET_KEY']
