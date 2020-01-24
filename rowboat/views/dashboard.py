@@ -49,7 +49,7 @@ def archive(aid, fmt):
 
     mime_type = None
     if fmt == 'json':
-        mime_type == 'application/json'
+        mime_type = 'application/json'
     elif fmt == 'txt':
         mime_type = 'text/plain'
     elif fmt == 'csv':
