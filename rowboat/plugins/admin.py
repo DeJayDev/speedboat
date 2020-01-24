@@ -394,6 +394,7 @@ class AdminPlugin(Plugin):
         embed.timestamp = infraction.created_at.isoformat()
         event.msg.reply('', embed=embed)
 
+    @Plugin.command('warnings', '<user:user|snowflake>', level=CommandLevels.MOD)
     @Plugin.command('search', '[query:user|str...]', group='infractions', level=CommandLevels.MOD)
     @Plugin.command('recent', aliases=['latest'], group='infractions', level=CommandLevels.MOD)
     def infraction_search(self, event, query=None):
