@@ -281,6 +281,26 @@ class UtilitiesPlugin(Plugin):
     def info(self, event, user=None):
         if user is None:
             user = event.author
+
+        user_id = 0
+        if isinstance(user, (int, long)):
+            user_id = user
+            user = self.state.users.get(user)
+
+        if user and not user_id:
+            user = self.state.users.get(user.id)
+
+        if not user:
+            if user_id:
+                try:
+                    user = self.client.api.users_get(user_id)
+                except APIException:
+                    raise CommandFail('Unknown User')
+                User.from_disco_user(user)
+            else:
+                raise CommandFail('Unknown User')
+
+        self.client.api.channels_typing(event.channel.id)
         
         content = []
         content.append(u'**\u276F User Information**')
@@ -295,7 +315,7 @@ class UtilitiesPlugin(Plugin):
 
         member = event.guild.get_member(user.id) if event.guild else None
 
-        if member.user.presence: #I couldn't get this to work w/o it lol
+        if user.presence: #I couldn't get this to work w/o it lol
             emoji, status = get_status_emoji(user.presence)
             content.append('Online Status: {} <{}>'.format(status, emoji))
             if user.presence.game and user.presence.game.name:
