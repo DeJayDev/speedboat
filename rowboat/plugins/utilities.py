@@ -277,7 +277,7 @@ class UtilitiesPlugin(Plugin):
         embed.description = '\n'.join(content)
         event.msg.reply('', embed=embed)
 
-    @Plugin.command('info', '[user:user]')
+    @Plugin.command('info', '[user:user|snowflake]')
     def info(self, event, user=None):
         if user is None:
             user = event.author

@@ -35,7 +35,7 @@ def auth_logout():
 
 @auth.route('/discord')
 def auth_discord():
-    discord = make_discord_session(scope=('identify', ))
+    discord = make_discord_session(scope=('identify'))
     auth_url, state = discord.authorization_url(current_app.config['DISCORD_AUTH_URL'])
     session['state'] = state
     return redirect(auth_url)
