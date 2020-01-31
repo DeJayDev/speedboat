@@ -310,7 +310,7 @@ class UtilitiesPlugin(Plugin):
         created_dt = to_datetime(user.id)
         content.append('Created: {} ({})'.format(
             humanize.naturaltime(datetime.utcnow() - created_dt),
-            created_dt.isoformat()
+            created_dt.strftime("%b %d %Y %H:%M:%S")
         ))
 
         member = event.guild.get_member(user.id) if event.guild else None
@@ -320,14 +320,14 @@ class UtilitiesPlugin(Plugin):
             content.append('Online Status: {} <{}>'.format(status, emoji))
             if user.presence.game and user.presence.game.name:
                 if user.presence.game.type == GameType.DEFAULT:
-                    content.append(u'Status: {}'.format(user.presence.game.name))
+                    content.append(u'{}'.format(user.presence.game.name))
                 if user.presence.game.type == GameType.LISTENING:
                     content.append(u'Listening to Spotify')
                 else:
                     if user.presence.game.url:
                         content.append(u'Streaming: [{}]({})'.format(user.presence.game.name, user.presence.game.url))
                     else:
-                        content.append(u'Streaming: {}'.format(user.presence.game.name))
+                        content.append(u'{}'.format(user.presence.game.name))
 
         if member:
             content.append(u'\n**\u276F Member Information**')
@@ -337,7 +337,7 @@ class UtilitiesPlugin(Plugin):
 
             content.append('Joined: {} ago ({})'.format(
                 humanize.naturaldelta(datetime.utcnow() - member.joined_at),
-                member.joined_at.isoformat(),
+                member.joined_at.strftime("%b %d %Y %H:%M:%S"),
             ))
 
             if member.roles:
