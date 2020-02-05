@@ -112,7 +112,6 @@ def add_global_admin(user_id):
     User.update(admin=True).where(User.user_id == user_id).execute()
     print 'Ok, added {} as a global admin'.format(user_id)
 
-
 @cli.command('wh-add')
 @click.argument('guild-id')
 @click.argument('flag')
