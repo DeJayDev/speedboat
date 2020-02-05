@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 from holster.emitter import Priority, Emitter
 from disco.bot import Bot
 from disco.types.message import MessageEmbed
+from disco.types.permissions import Permissions
 from disco.api.http import APIException
 from disco.bot.command import CommandEvent
 from disco.util.sanitize import S
@@ -386,8 +387,12 @@ class CorePlugin(Plugin):
         commands.
         """
         # Ignore messages sent by bots
-        if event.message.author.bot:
+        # TODO: Add command to add channel to ignored_channels
+        if event.message.author.bot or rdb.sismember('ignored_channels', event.message.channel_id):
             return
+        if not event.channel.type == 1:
+            if not event.message.channel.get_permissions(self.state.me).can(Permissions.SEND_MESSAGES):
+                return
 
         # If this is message for a guild, grab the guild object
         if hasattr(event, 'guild') and event.guild:

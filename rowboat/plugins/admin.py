@@ -305,8 +305,8 @@ class AdminPlugin(Plugin):
             event.guild.delete_ban(user)
 
             GuildBan.delete().where(
-                (GuildBan.user_id == user.id) &
-                (GuildBan.guild_id == event.guild_id)
+                (GuildBan.user_id == user) &
+                (GuildBan.guild_id == event.guild.id)
             )
         except (GuildBan.DoesNotExist, APIException) as e:
             if hasattr(e, 'code') and e.code != 10026: # Unknown Ban
@@ -394,6 +394,7 @@ class AdminPlugin(Plugin):
         embed.timestamp = infraction.created_at.isoformat()
         event.msg.reply('', embed=embed)
 
+    @Plugin.command('warnings', '<user:user|snowflake>', level=CommandLevels.MOD)
     @Plugin.command('search', '[query:user|str...]', group='infractions', level=CommandLevels.MOD)
     @Plugin.command('recent', aliases=['latest'], group='infractions', level=CommandLevels.MOD)
     def infraction_search(self, event, query=None):
@@ -407,20 +408,15 @@ class AdminPlugin(Plugin):
         if query and (isinstance(query, int) or query.isdigit()):
             q &= (
                 (Infraction.id == int(query)) |
-                (Infraction.user_id == int(query)) |
-                (Infraction.actor_id == int(query)))
+                (Infraction.user_id == int(query)))
         elif query:
             q &= (Infraction.reason ** query)
 
         user = User.alias()
-        actor = User.alias()
 
-        infractions = Infraction.select(Infraction, user, actor).join(
+        infractions = Infraction.select(Infraction, user).join(
             user,
             on=((Infraction.user_id == user.user_id).alias('user'))
-        ).switch(Infraction).join(
-            actor,
-            on=((Infraction.actor_id == actor.user_id).alias('actor'))
         ).where(q).order_by(Infraction.created_at.desc()).limit(6)
 
         tbl = MessageTable()
@@ -441,10 +437,10 @@ class AdminPlugin(Plugin):
 
             tbl.add(
                 inf.id,
-                inf.created_at.isoformat(),
+                inf.created_at.strftime("%Y-%m-%d %H:%m:%S"),
                 str(type_),
                 unicode(inf.user),
-                unicode(inf.actor),
+                unicode(User.with_id(inf.actor_id)),
                 active,
                 clamp(reason, 128)
             )
@@ -746,6 +742,48 @@ class AdminPlugin(Plugin):
 
         raise CommandSuccess('Kicked {} users'.format(len(members)))
 
+    @Plugin.command('mban', parser=True, level=CommandLevels.MOD)
+    @Plugin.parser.add_argument('users', type=long, nargs='+')
+    @Plugin.parser.add_argument('-r', '--reason', default='', help='reason for modlog')
+    def mban(self, event, args):
+        members = []
+        for user_id in args.users:
+            member = event.guild.get_member(user_id)
+            if not member:
+                # TODO: this sucks, batch these
+                raise CommandFail('Failed to ban {}, user not found'.format(user_id))
+
+            if not self.can_act_on(event, member.id, throw=False):
+                raise CommandFail('Failed to ban {}, invalid permissions'.format(user_id))
+
+            members.append(member)
+
+        msg = event.msg.reply('Ok, ban {} users for `{}`?'.format(len(members), args.reason or 'no reason'))
+        msg.chain(False).\
+            add_reaction(GREEN_TICK_EMOJI).\
+            add_reaction(RED_TICK_EMOJI)
+
+        try:
+            mra_event = self.wait_for_event(
+                'MessageReactionAdd',
+                message_id=msg.id,
+                conditional=lambda e: (
+                    e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
+                    e.user_id == event.author.id
+                )).get(timeout=10)
+        except gevent.Timeout:
+            return
+        finally:
+            msg.delete()
+
+        if mra_event.emoji.id != GREEN_TICK_EMOJI_ID:
+            return
+
+        for member in members:
+            Infraction.ban(self, event, member, args.reason)
+
+        raise CommandSuccess('Banned {} users'.format(len(members)))
+
     @Plugin.command('ban', '<user:user|snowflake> [reason:str...]', level=CommandLevels.MOD)
     @Plugin.command('forceban', '<user:snowflake> [reason:str...]', level=CommandLevels.MOD)
     def ban(self, event, user, reason=None):
@@ -810,39 +848,6 @@ class AdminPlugin(Plugin):
 
     @Plugin.command('warn', '<user:user|snowflake> [reason:str...]', level=CommandLevels.MOD)
     def warn(self, event, user, reason=None):
-        member = event.guild.get_member(user)
-        if member:
-            self.can_act_on(event, member.id)
-            Infraction.warn(self, event, member, reason, guild=event.guild)
-        else:
-            raise CommandFail('Invalid user')
-
-        if event.config.confirm_actions:
-            event.msg.reply(maybe_string(
-                reason,
-                u':ok_hand: warned {u} (`{o}`)',
-                u':ok_hand: warned {u}',
-                u=member.user if member else user,
-            ))
-
-    @Plugin.command('here', '[size:int]', level=CommandLevels.MOD, context={'mode': 'all'}, group='archive')
-    @Plugin.command('all', '[size:int]', level=CommandLevels.MOD, context={'mode': 'all'}, group='archive')
-    @Plugin.command(
-        'user',
-        '<user:user|snowflake> [size:int]',
-        level=CommandLevels.MOD,
-        context={'mode': 'user'},
-        group='archive')
-    @Plugin.command(
-        'channel',
-        '<channel:channel|snowflake> [size:int]',
-        level=CommandLevels.MOD,
-        context={'mode': 'channel'},
-        group='archive')
-    def archive(self, event, size=50, mode=None, user=None, channel=None):
-        if size < 1 or size > 15000:
-            raise CommandFail('Too many messages must be between 1-15000')
-
         member = event.guild.get_member(user)
         if member:
             self.can_act_on(event, member.id)
@@ -1089,56 +1094,14 @@ class AdminPlugin(Plugin):
             reason=reason or 'no reason',
         )
 
-        if not role_obj:
-            raise CommandFail('Too many matches for that role, try something more exact or the role ID')
-
-        author_member = event.guild.get_member(event.author)
-        highest_role = sorted(
-            [event.guild.roles.get(r) for r in author_member.roles],
-            key=lambda i: i.position,
-            reverse=True)
-        if not author_member.owner and (not highest_role or highest_role[0].position <= role_obj.position):
-            raise CommandFail('You can only {} roles that are ranked lower than your highest role'.format(mode))
-
-        member = event.guild.get_member(user)
-        if not member:
-            raise CommandFail('Invalid member')
-
-        self.can_act_on(event, member.id)
-
-        if mode == 'add' and role_obj.id in member.roles:
-            raise CommandFail(u'{} already has the {} role'.format(member, role_obj.name))
-        elif mode == 'remove' and role_obj.id not in member.roles:
-            return CommandFail(u'{} doesn\'t have the {} role'.format(member, role_obj.name))
-
-        self.call(
-            'ModLogPlugin.create_debounce',
-            event,
-            ['GuildMemberUpdate'],
-            role_id=role_obj.id,
-        )
-
-        if mode == 'add':
-            member.add_role(role_obj.id)
-        else:
-            member.remove_role(role_obj.id)
-
-        self.call(
-            'ModLogPlugin.log_action_ext',
-            (Actions.MEMBER_ROLE_ADD if mode == 'add' else Actions.MEMBER_ROLE_REMOVE),
-            event.guild.id,
-            member=member,
-            role=role_obj,
-            actor=unicode(event.author),
-            reason=reason or 'no reason',
-        )
-
         raise CommandSuccess(u'{} role {} to {}'.format('added' if mode == 'add' else 'removed',
             role_obj.name,
             member))
 
-    @Plugin.command('stats', '<user:user>', level=CommandLevels.MOD)
-    def msgstats(self, event, user):
+    @Plugin.command('stats', '[user:user]', level=CommandLevels.MOD)
+    def msgstats(self, event, user=None):
+        if user is None:
+            user = event.author
         # Query for the basic aggregate message statistics
         message_stats = Message.select(
             fn.Count('*'),
@@ -1148,7 +1111,7 @@ class AdminPlugin(Plugin):
             fn.Sum(fn.array_length(Message.attachments, 1)),
         ).where(
             (Message.author_id == user.id)
-        ).tuples().async()
+        ).tuples()[0]
 
         reactions_given = Reaction.select(
             fn.Count('*'),
@@ -1161,7 +1124,7 @@ class AdminPlugin(Plugin):
             (Reaction.user_id == user.id)
         ).group_by(
             Reaction.emoji_id, Reaction.emoji_name
-        ).order_by(fn.Count('*').desc()).tuples().async()
+        ).order_by(fn.Count('*').desc()).tuples()
 
         # Query for most used emoji
         emojis = Message.raw('''
@@ -1175,31 +1138,27 @@ class AdminPlugin(Plugin):
             GROUP BY 1, 2
             ORDER BY 3 DESC
             LIMIT 1
-        ''', (user.id, )).tuples().async()
+        ''', (user.id, )).tuples()
 
         deleted = Message.select(
             fn.Count('*')
         ).where(
             (Message.author_id == user.id) &
             (Message.deleted == 1)
-        ).tuples().async()
+        ).tuples()[0]
 
-        wait_many(message_stats, reactions_given, emojis, deleted, timeout=10)
+        # wait_many(message_stats, reactions_given, emojis, deleted, timeout=10)
 
-        # If we hit an exception executing the core query, throw an exception
-        if message_stats.exception:
-            message_stats.get()
-
-        q = message_stats.value[0]
+        q = message_stats
         embed = MessageEmbed()
         embed.fields.append(
             MessageEmbedField(name='Total Messages Sent', value=q[0] or '0', inline=True))
         embed.fields.append(
             MessageEmbedField(name='Total Characters Sent', value=q[1] or '0', inline=True))
 
-        if deleted.value:
+        if deleted:
             embed.fields.append(
-                MessageEmbedField(name='Total Deleted Messages', value=deleted.value[0][0], inline=True))
+                MessageEmbedField(name='Total Deleted Messages', value=deleted[0], inline=True))
         embed.fields.append(
             MessageEmbedField(name='Total Custom Emojis', value=q[2] or '0', inline=True))
         embed.fields.append(
@@ -1207,11 +1166,9 @@ class AdminPlugin(Plugin):
         embed.fields.append(
             MessageEmbedField(name='Total Attachments', value=q[4] or '0', inline=True))
 
-        if reactions_given.value:
-            reactions_given = reactions_given.value
-
+        if len(reactions_given) > 0:
             embed.fields.append(
-                MessageEmbedField(name='Total Reactions', value=sum(i[0] for i in reactions_given), inline=True))
+                MessageEmbedField(name='Total Reactions', value=len(reactions_given), inline=True))
 
             emoji = (
                 reactions_given[0][2]
@@ -1224,8 +1181,8 @@ class AdminPlugin(Plugin):
                     reactions_given[0][0],
                 ), inline=True))
 
-        if emojis.value:
-            emojis = list(emojis.value)
+        if emojis:
+            emojis = list(emojis)
 
             if emojis:
                 embed.add_field(
@@ -1402,6 +1359,18 @@ class AdminPlugin(Plugin):
                 humanize.naturaldelta(session.ended_at - session.started_at) if session.ended_at else 'Active')
 
         event.msg.reply(tbl.compile())
+
+    @Plugin.command('kick', '<user:user|snowflake>', group='voice', level=CommandLevels.MOD)
+    def voice_kick(self, event, user):
+        member = event.guild.get_member(user)
+        if member:
+            if not member.get_voice_state():
+                raise CommandFail('Cannot kick from voice.')
+
+            member.disconnect()
+            raise CommandSuccess('Kicked {} from voice channel'.format(member.user))
+        else:
+            raise CommandFail('Invalid User')
 
     @Plugin.command('join', '<name:str>', aliases=['add', 'give'])
     def join_role(self, event, name):

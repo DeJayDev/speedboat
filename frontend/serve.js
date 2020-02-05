@@ -11,10 +11,26 @@ const app = express();
 let proxyURL = 'http://localhost:8686';
 
 if (process.env.NODE_ENV == 'docker') {
-	proxyURL = 'http://web:8686';
+  proxyURL = 'http://web:8686';
 }
 
-app.use('/api', proxy({ target: proxyURL }));
+var proxyOptions = {
+  target: proxyURL,
+  onProxyReq(proxyReq, req, res) {
+    if(!proxyReq.headers) return;
+    Object.keys(proxyReq.headers).forEach(header => {
+      req.setHeader(header, req.headers[header])
+    });
+  },
+  onProxyRes(proxyRes, req, res) {
+    if(!proxyRes.headers) return;
+    Object.keys(proxyRes.headers).forEach(header => {
+      res.append(header, proxyRes.headers[header])
+    });
+  }
+}
+
+app.use('/api', proxy(proxyOptions));
 
 app.use(bundler.middleware());
 

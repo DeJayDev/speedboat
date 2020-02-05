@@ -10,7 +10,6 @@ users = Blueprint('users', __name__, url_prefix='/api/users')
 def users_me():
     return jsonify(g.user.serialize(us=True))
 
-
 @users.route('/@me/guilds')
 @authed
 def users_me_guilds():

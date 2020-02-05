@@ -145,18 +145,21 @@ class SQLPlugin(Plugin):
                 start = time.time()
                 cur.execute(event.codeblock.format(e=event))
                 dur = time.time() - start
-                tbl.set_header(*[desc[0] for desc in cur.description])
+                if not cur.description:
+                    raise CommandSuccess('execution complete (had no return)') 
+                else: 
+                    tbl.set_header(*[desc[0] for desc in cur.description])
 
-                for row in cur.fetchall():
-                    tbl.add(*row)
+                    for row in cur.fetchall():
+                        tbl.add(*row)
 
-                result = tbl.compile()
-                if len(result) > 1900:
-                    return event.msg.reply(
-                        '_took {}ms_'.format(int(dur * 1000)),
-                        attachments=[('result.txt', result)])
+                    result = tbl.compile()
+                    if len(result) > 1900:
+                        return event.msg.reply(
+                            '_took {}ms_'.format(int(dur * 1000)),
+                            attachments=[('result.txt', result)])
 
-                event.msg.reply('```' + result + '```\n_took {}ms_\n'.format(int(dur * 1000)))
+                    event.msg.reply('```' + result + '```\n_took {}ms_\n'.format(int(dur * 1000)))
         except psycopg2.Error as e:
             event.msg.reply('```{}```'.format(e.pgerror))
 
