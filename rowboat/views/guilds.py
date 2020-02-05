@@ -19,7 +19,6 @@ def serialize_user(u):
         'discriminator': str(u.discriminator),
     }
 
-
 def with_guild(f=None):
     def deco(f):
         @authed
@@ -48,12 +47,10 @@ def with_guild(f=None):
 
     return deco
 
-
 @guilds.route('/<gid>')
 @with_guild
 def guild_get(guild):
     return jsonify(guild.serialize())
-
 
 @guilds.route('/<gid>/config')
 @with_guild
@@ -83,7 +80,6 @@ def guild_z_config_update(guild):
 
     role = data.get('web', {}).get(g.user.user_id) or data.get('web', {}).get(str(g.user.user_id))
     if guild.role != role and not g.user.admin:
-        print g.user.admin
         return 'Cannot change your own permissions', 400
 
     try:
@@ -94,10 +90,8 @@ def guild_z_config_update(guild):
     except Exception as e:
         return 'Invalid Data: %s' % e, 400
 
-
 CAN_FILTER = ['id', 'user_id', 'actor_id', 'type', 'reason']
 CAN_SORT = ['id', 'user_id', 'actor_id', 'created_at', 'expires_at', 'type']
-
 
 @guilds.route('/<gid>/infractions')
 @with_guild
