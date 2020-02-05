@@ -386,7 +386,8 @@ class CorePlugin(Plugin):
         commands.
         """
         # Ignore messages sent by bots
-        if event.message.author.bot:
+        # TODO: Add command to add channel to ignored_channels
+        if event.message.author.bot or rdb.sismember('ignored_channels', event.message.channel_id):
             return
 
         # If this is message for a guild, grab the guild object

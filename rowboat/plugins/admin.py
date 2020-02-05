@@ -1094,50 +1094,6 @@ class AdminPlugin(Plugin):
             reason=reason or 'no reason',
         )
 
-        if not role_obj:
-            raise CommandFail('Too many matches for that role, try something more exact or the role ID')
-
-        author_member = event.guild.get_member(event.author)
-        highest_role = sorted(
-            [event.guild.roles.get(r) for r in author_member.roles],
-            key=lambda i: i.position,
-            reverse=True)
-        if not author_member.owner and (not highest_role or highest_role[0].position <= role_obj.position):
-            raise CommandFail('You can only {} roles that are ranked lower than your highest role'.format(mode))
-
-        member = event.guild.get_member(user)
-        if not member:
-            raise CommandFail('Invalid member')
-
-        self.can_act_on(event, member.id)
-
-        if mode == 'add' and role_obj.id in member.roles:
-            raise CommandFail(u'{} already has the {} role'.format(member, role_obj.name))
-        elif mode == 'remove' and role_obj.id not in member.roles:
-            return CommandFail(u'{} doesn\'t have the {} role'.format(member, role_obj.name))
-
-        self.call(
-            'ModLogPlugin.create_debounce',
-            event,
-            ['GuildMemberUpdate'],
-            role_id=role_obj.id,
-        )
-
-        if mode == 'add':
-            member.add_role(role_obj.id)
-        else:
-            member.remove_role(role_obj.id)
-
-        self.call(
-            'ModLogPlugin.log_action_ext',
-            (Actions.MEMBER_ROLE_ADD if mode == 'add' else Actions.MEMBER_ROLE_REMOVE),
-            event.guild.id,
-            member=member,
-            role=role_obj,
-            actor=unicode(event.author),
-            reason=reason or 'no reason',
-        )
-
         raise CommandSuccess(u'{} role {} to {}'.format('added' if mode == 'add' else 'removed',
             role_obj.name,
             member))
