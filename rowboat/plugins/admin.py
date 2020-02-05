@@ -1360,6 +1360,18 @@ class AdminPlugin(Plugin):
 
         event.msg.reply(tbl.compile())
 
+    @Plugin.command('kick', '<user:user|snowflake>', group='voice', level=CommandLevels.MOD)
+    def voice_kick(self, event, user):
+        member = event.guild.get_member(user)
+        if member:
+            if not member.get_voice_state():
+                raise CommandFail('Cannot kick from voice.')
+
+            member.disconnect()
+            raise CommandSuccess('Kicked {} from voice channel'.format(member.user))
+        else:
+            raise CommandFail('Invalid User')
+
     @Plugin.command('join', '<name:str>', aliases=['add', 'give'])
     def join_role(self, event, name):
         if not event.config.group_roles:

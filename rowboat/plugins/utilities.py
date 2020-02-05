@@ -15,6 +15,7 @@ from disco.types.user import GameType, Status
 from disco.types.message import MessageEmbed
 from disco.util.snowflake import to_datetime
 from disco.util.sanitize import S
+from disco.api.http import APIException
 
 from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
 from rowboat.util.timing import Eventual
@@ -277,10 +278,30 @@ class UtilitiesPlugin(Plugin):
         embed.description = '\n'.join(content)
         event.msg.reply('', embed=embed)
 
-    @Plugin.command('info', '[user:user]')
+    @Plugin.command('info', '[user:user|snowflake]')
     def info(self, event, user=None):
         if user is None:
             user = event.author
+
+        user_id = 0
+        if isinstance(user, (int, long)):
+            user_id = user
+            user = self.state.users.get(user)
+
+        if user and not user_id:
+            user = self.state.users.get(user.id)
+
+        if not user:
+            if user_id:
+                try:
+                    user = self.client.api.users_get(user_id)
+                except APIException:
+                    raise CommandFail('Unknown User')
+                User.from_disco_user(user)
+            else:
+                raise CommandFail('Unknown User')
+
+        self.client.api.channels_typing(event.channel.id)
         
         content = []
         content.append(u'**\u276F User Information**')
@@ -290,24 +311,24 @@ class UtilitiesPlugin(Plugin):
         created_dt = to_datetime(user.id)
         content.append('Created: {} ({})'.format(
             humanize.naturaltime(datetime.utcnow() - created_dt),
-            created_dt.isoformat()
+            created_dt.strftime("%b %d %Y %H:%M:%S")
         ))
 
         member = event.guild.get_member(user.id) if event.guild else None
 
-        if member.user.presence: #I couldn't get this to work w/o it lol
+        if user.presence: #I couldn't get this to work w/o it lol
             emoji, status = get_status_emoji(user.presence)
             content.append('Online Status: {} <{}>'.format(status, emoji))
             if user.presence.game and user.presence.game.name:
                 if user.presence.game.type == GameType.DEFAULT:
-                    content.append(u'Status: {}'.format(user.presence.game.name))
+                    content.append(u'{}'.format(user.presence.game.name))
                 if user.presence.game.type == GameType.LISTENING:
                     content.append(u'Listening to Spotify')
                 else:
                     if user.presence.game.url:
                         content.append(u'Streaming: [{}]({})'.format(user.presence.game.name, user.presence.game.url))
                     else:
-                        content.append(u'Streaming: {}'.format(user.presence.game.name))
+                        content.append(u'{}'.format(user.presence.game.name))
 
         if member:
             content.append(u'\n**\u276F Member Information**')
@@ -317,7 +338,7 @@ class UtilitiesPlugin(Plugin):
 
             content.append('Joined: {} ago ({})'.format(
                 humanize.naturaldelta(datetime.utcnow() - member.joined_at),
-                member.joined_at.isoformat(),
+                member.joined_at.strftime("%b %d %Y %H:%M:%S"),
             ))
 
             if member.roles:
