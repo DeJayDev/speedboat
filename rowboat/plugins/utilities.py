@@ -352,6 +352,11 @@ class UtilitiesPlugin(Plugin):
             (Message.guild_id == event.guild.id)
         ).tuples()[0][0]
 
+        #Message.select(Message.id).where(
+        #   (Message.author_id == user.id) &
+        #   (Message.guild_id == event.guild.id)
+        #).order_by(Message.id.asc()).limit(1).tuples()[0][0]
+        
         oldest_msg = Message.select(fn.MIN(Message.id)).where(
             (Message.author_id == user.id) & 
             (Message.guild_id == event.guild.id)

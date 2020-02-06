@@ -525,3 +525,15 @@ class StarboardBlock(ModelBase):
         indexes = (
             (('guild_id', 'user_id'), True),
         )
+
+@ModelBase.register
+class XPBlock(ModelBase):
+    guild_id = BigIntegerField()
+    user_id = BigIntegerField()
+    actor_id = BigIntegerField()
+    reason = TextField(null=True)
+
+    class Meta:
+        indexes = (
+            (('guild_id', 'user_id'), True)
+        )

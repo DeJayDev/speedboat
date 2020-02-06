@@ -221,7 +221,7 @@ class StarboardPlugin(Plugin):
 
     @Plugin.command('unblock', '<user:user>', group='stars', level=CommandLevels.MOD)
     def stars_unblock(self, event, user):
-        count = StarboardBlock.delete().where(
+        StarboardBlock.delete().where(
             (StarboardBlock.guild_id == event.guild.id) &
             (StarboardBlock.user_id == user.id)
         ).execute()
