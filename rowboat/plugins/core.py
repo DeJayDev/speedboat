@@ -81,6 +81,7 @@ class CorePlugin(Plugin):
 
         fd = inotify.init()
         inotify.add_watch(fd, 'rowboat/plugins/', inotify.IN_MODIFY)
+        inotify.add_watch(fd, 'rowboat/plugins/modlog', inotify.IN_MODIFY)
         while True:
             events = inotify.get_events(fd)
             for event in events:
