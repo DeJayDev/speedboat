@@ -516,26 +516,26 @@ class AdminPlugin(Plugin):
         r = requests.get(url)
         try: 
             infs = json.load(r.content)
-                for inf in infs:
-                    if inf.server and inf.user and inf.actor and inf.type and inf.reason and inf.start and inf.end:
-                        Infraction.create(
-                            guild_id=inf.server,
-                            user_id=inf.user,
-                            actorid=inf.actor,
-                            type=inf.type,
-                            reason=inf.reason,
-                            created_at=datetime.fromtimestamp(inf.start),
-                            expires_at=datetime.fromtimestamp(inf.end)
-                        )
-                    elif inf.start: 
-                        Infraction.create(
-                            guild_id=inf.server,
-                            user_id=inf.user,
-                            actorid=inf.actor,
-                            type=inf.type,
-                            reason=inf.reason,
-                            created_at=datetime.fromtimestamp(inf.start)
-                        )
+            for inf in infs:
+                if inf.server and inf.user and inf.actor and inf.type and inf.reason and inf.start and inf.end:
+                    Infraction.create(
+                        guild_id=inf.server,
+                        user_id=inf.user,
+                        actorid=inf.actor,
+                        type=inf.type,
+                        reason=inf.reason,
+                        created_at=datetime.fromtimestamp(inf.start),
+                        expires_at=datetime.fromtimestamp(inf.end)
+                    )
+                elif inf.start: 
+                    Infraction.create(
+                        guild_id=inf.server,
+                        user_id=inf.user,
+                        actorid=inf.actor,
+                        type=inf.type,
+                        reason=inf.reason,
+                        created_at=datetime.fromtimestamp(inf.start)
+                    )
         except requests.exceptions.RequestException as e:  # This is the correct syntax
             raise CommandFail(e)
 
