@@ -29,7 +29,7 @@ def init_db(env):
         database.initialize(PostgresqlExtDatabase(
             'rowboat',
             host='db',
-            user='postgres',
+            user='rowboat',
             port=int(os.getenv('PG_PORT', 5432)),
             autorollback=True))
     else:

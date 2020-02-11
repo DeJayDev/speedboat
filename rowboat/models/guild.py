@@ -322,3 +322,53 @@ class GuildVoiceSession(ModelBase):
                 user_id=after.user_id,
                 started_at=datetime.utcnow(),
             ).returning(GuildVoiceSession.id).on_conflict_ignore().execute()
+
+
+@ModelBase.register
+class GuildMemberLevel(ModelBase):
+    user_id = BigIntegerField()
+    guild_id = BigIntegerField()
+
+    xp = BigIntegerField()
+
+    class Meta:
+        table_name = 'xp'
+        primary_key = CompositeKey('guild_id', 'user_id')
+    
+    @classmethod
+    def add_xp(cls, guild_id, user_id, xpamt):
+        cls.update(
+            xp=(cls.xp + xpamt)
+        ).where(
+            (cls.guild_id == self.guild_id) &
+            (cls.user_id == self.user_id)
+        ).execute()
+
+    @classmethod
+    def rmv_xp(cls, guild_id, user_id, xpamt):
+        cls.update(
+            xp=(cls.xp - xpamt)
+        ).where(
+            (cls.guild_id == self.guild_id) &
+            (cls.user_id == self.user_id)
+        ).execute()
+    
+    @classmethod
+    def reset_member(cls, guild_id, user_id):
+        cls.update(
+            xp= 0
+        ).where(
+            (cls.guild_id == self.guild_id) &
+            (cls.user_id == self.user_id)
+        ).execute()
+
+    @classmethod
+    def create_new(cls, member):
+        xpobj, created = cls.get_or_create(
+            user_id=member.user.id,
+            guild_id=member.guild_id,
+            defaults = {
+                'xp': 0
+            }
+        )
+    
