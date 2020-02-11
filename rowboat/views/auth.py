@@ -44,7 +44,7 @@ def auth_discord():
 @auth.route('/discord/callback')
 def auth_discord_callback():
     if request.values.get('error'):
-        return request.values['error']
+        return "whoops, try that again.", 500
 
     if 'state' not in session:
         return 'no state', 400
