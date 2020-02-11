@@ -216,7 +216,7 @@ class CensorPlugin(Plugin):
 
             if need_whitelist and not whitelisted:
                 raise Censorship(CensorReason.INVITE, event, ctx={
-                    'hit': 'whietlist',
+                    'hit': 'whitelist',
                     'invite': invite,
                     'guild': invite_info,
                 })
