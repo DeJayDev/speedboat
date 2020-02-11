@@ -777,15 +777,7 @@ class AdminPlugin(Plugin):
     def mban(self, event, args):
         members = []
         for user_id in args.users:
-            member = event.guild.get_member(user_id)
-            if not member:
-                # TODO: this sucks, batch these
-                raise CommandFail('Failed to ban {}, user not found'.format(user_id))
-
-            if not self.can_act_on(event, member.id, throw=False):
-                raise CommandFail('Failed to ban {}, invalid permissions'.format(user_id))
-
-            members.append(member)
+            members.append(user_id)
 
         msg = event.msg.reply('Ok, ban {} users for `{}`?'.format(len(members), args.reason or 'no reason'))
         msg.chain(False).\
@@ -809,7 +801,10 @@ class AdminPlugin(Plugin):
             return
 
         for member in members:
-            Infraction.ban(self, event, member, args.reason)
+            try:
+                Infraction.ban(self, event, member, args.reason, guild=event.guild)
+            except APIException as e:
+                raise CommandFail('Failed to ban {} ({})'.format(member, e.))
 
         raise CommandSuccess('Banned {} users'.format(len(members)))
 
@@ -1078,50 +1073,6 @@ class AdminPlugin(Plugin):
                         role_obj = rated[0][1]
                     elif rated[0][0] - rated[1][0] > 20:
                         role_obj = rated[0][1]
-
-        if not role_obj:
-            raise CommandFail('Too many matches for that role, try something more exact or the role ID')
-
-        author_member = event.guild.get_member(event.author)
-        highest_role = sorted(
-            [event.guild.roles.get(r) for r in author_member.roles],
-            key=lambda i: i.position,
-            reverse=True)
-        if not author_member.owner and (not highest_role or highest_role[0].position <= role_obj.position):
-            raise CommandFail('You can only {} roles that are ranked lower than your highest role'.format(mode))
-
-        member = event.guild.get_member(user)
-        if not member:
-            raise CommandFail('Invalid member')
-
-        self.can_act_on(event, member.id)
-
-        if mode == 'add' and role_obj.id in member.roles:
-            raise CommandFail(u'{} already has the {} role'.format(member, role_obj.name))
-        elif mode == 'remove' and role_obj.id not in member.roles:
-            return CommandFail(u'{} doesn\'t have the {} role'.format(member, role_obj.name))
-
-        self.call(
-            'ModLogPlugin.create_debounce',
-            event,
-            ['GuildMemberUpdate'],
-            role_id=role_obj.id,
-        )
-
-        if mode == 'add':
-            member.add_role(role_obj.id)
-        else:
-            member.remove_role(role_obj.id)
-
-        self.call(
-            'ModLogPlugin.log_action_ext',
-            (Actions.MEMBER_ROLE_ADD if mode == 'add' else Actions.MEMBER_ROLE_REMOVE),
-            event.guild.id,
-            member=member,
-            role=role_obj,
-            actor=unicode(event.author),
-            reason=reason or 'no reason',
-        )
 
         if not role_obj:
             raise CommandFail('Too many matches for that role, try something more exact or the role ID')
