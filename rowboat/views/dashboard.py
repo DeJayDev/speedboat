@@ -45,7 +45,7 @@ def archive(aid, fmt):
             (MessageArchive.expires_at > datetime.utcnow())
         ).get()
     except MessageArchive.DoesNotExist:
-        return 'Invalid or Expires Archive ID', 404
+        return 'Invalid or Expired Archive ID', 404
 
     mime_type = None
     if fmt == 'json':

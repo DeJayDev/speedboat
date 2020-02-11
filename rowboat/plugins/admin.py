@@ -748,15 +748,7 @@ class AdminPlugin(Plugin):
     def mban(self, event, args):
         members = []
         for user_id in args.users:
-            member = event.guild.get_member(user_id)
-            if not member:
-                # TODO: this sucks, batch these
-                raise CommandFail('Failed to ban {}, user not found'.format(user_id))
-
-            if not self.can_act_on(event, member.id, throw=False):
-                raise CommandFail('Failed to ban {}, invalid permissions'.format(user_id))
-
-            members.append(member)
+            members.append(user_id)
 
         msg = event.msg.reply('Ok, ban {} users for `{}`?'.format(len(members), args.reason or 'no reason'))
         msg.chain(False).\
@@ -780,7 +772,10 @@ class AdminPlugin(Plugin):
             return
 
         for member in members:
-            Infraction.ban(self, event, member, args.reason)
+            try:
+                Infraction.ban(self, event, member, args.reason, guild=event.guild)
+            except APIException as e:
+                raise CommandFail('Failed to ban {} ({})'.format(member, e.))
 
         raise CommandSuccess('Banned {} users'.format(len(members)))
 
