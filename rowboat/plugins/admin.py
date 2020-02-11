@@ -489,7 +489,7 @@ class AdminPlugin(Plugin):
                 inf.expires_at.isoformat()
             ))
 
-    @Plugin.command('reason', '<infraction:int> <reason:str...>', level=CommandLevels.MOD)
+    @Plugin.command('reason', '<infraction:int> <reason:str...>', group='infractions', level=CommandLevels.MOD)
     def reason(self, event, infraction, reason):
         try:
             inf = Infraction.get(id=infraction)
@@ -509,6 +509,35 @@ class AdminPlugin(Plugin):
         inf.save()
 
         raise CommandSuccess('I\'ve updated the reason for infraction #{}'.format(inf.id))
+
+    @Plugin.command('import', '<url:str>', group='infractions', level=-1)
+    def infraction_import(self, event, url):
+        import requests
+        r = requests.get(url)
+        try: 
+            infs = json.load(r.content)
+                for inf in infs:
+                    if inf.server and inf.user and inf.actor and inf.type and inf.reason and inf.start and inf.end:
+                        Infraction.create(
+                            guild_id=inf.server,
+                            user_id=inf.user,
+                            actorid=inf.actor,
+                            type=inf.type,
+                            reason=inf.reason,
+                            created_at=datetime.fromtimestamp(inf.start),
+                            expires_at=datetime.fromtimestamp(inf.end)
+                        )
+                    elif inf.start: 
+                        Infraction.create(
+                            guild_id=inf.server,
+                            user_id=inf.user,
+                            actorid=inf.actor,
+                            type=inf.type,
+                            reason=inf.reason,
+                            created_at=datetime.fromtimestamp(inf.start)
+                        )
+        except requests.exceptions.RequestException as e:  # This is the correct syntax
+            raise CommandFail(e)
 
     @Plugin.command('roles', level=CommandLevels.MOD)
     def roles(self, event):
