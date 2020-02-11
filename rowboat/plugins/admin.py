@@ -804,7 +804,7 @@ class AdminPlugin(Plugin):
             try:
                 Infraction.ban(self, event, member, args.reason, guild=event.guild)
             except APIException as e:
-                raise CommandFail('Failed to ban {} ({})'.format(member, e.))
+                raise CommandFail('Failed to ban {} ({})'.format(member, e))
 
         raise CommandSuccess('Banned {} users'.format(len(members)))
 
