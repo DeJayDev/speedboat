@@ -198,7 +198,7 @@ class AdminPlugin(Plugin):
 
     def restore_user(self, event, member):
         try:
-            backup = GuildMemberBackup.get(guild_id=event.guild_id, user_id=member.user.id)
+            backup = GuildMemberBackup.get(guild_id=event.guild.id, user_id=member.user.id)
         except GuildMemberBackup.DoesNotExist:
             return
 
