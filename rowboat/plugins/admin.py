@@ -1083,7 +1083,7 @@ class AdminPlugin(Plugin):
             [event.guild.roles.get(r) for r in author_member.roles],
             key=lambda i: i.position,
             reverse=True)
-        if not author_member.owner and (not highest_role or highest_role[0].position <= role_obj.position) and (type is not 'bypass'):
+        if not author_member.owner and (not highest_role or highest_role[0].position <= role_obj.position) and (type != 'bypass'):
             raise CommandFail('You can only {} roles that are ranked lower than your highest role'.format(mode))
 
         member = event.guild.get_member(user)
