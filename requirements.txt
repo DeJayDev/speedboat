@@ -64,3 +64,4 @@ python-Levenshtein==0.12.0
 peewee==3.13.1
 gevent_inotifyx==0.2
 datadog==0.31.0
+pynacl==1.3.0
