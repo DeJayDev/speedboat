@@ -87,7 +87,7 @@ class LevelPlugin(Plugin):
         if not member:
             raise CommandFail('Invalid member')
 
-        if not isinstance(amount, ((int),(long)):
+        if not isinstance(amount, (int,long)):
             raise CommandFail('Invalid amount')
 
         self.can_act_on(event, member.id)
@@ -112,16 +112,16 @@ class LevelPlugin(Plugin):
             ).execute()
 
             user.rmv_xp(amount)
-            
+
             raise CommandSuccess(u'Took {} XP from {}. (New Total: `{}`)'.format(
                 amount,
                 member.alias,
                 #Get Current Amount (do above and just pull as var w/ this amt+ added)
             ))
         else:
-            #Reset to 0
+            raise CommandSuccess(u'not done')
+	    #Reset to 0
             #Do the gevent confirm action
 
         #TODO: Modlog call :)
-
 
