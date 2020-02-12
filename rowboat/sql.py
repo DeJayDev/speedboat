@@ -40,7 +40,6 @@ def init_db(env):
             autorollback=True))
 
     for model in REGISTERED_MODELS:
-        print(model)
         model.create_table(True)
 
         if hasattr(model, 'SQL'):

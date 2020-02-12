@@ -555,6 +555,7 @@ class AdminPlugin(Plugin):
         member = event.guild.get_member(user)
         if member:
             self.restore_user(event, member)
+            raise CommandSuccess('Member {} restored'.format(member))
         else:
             raise CommandFail('Invalid user')
 
@@ -1025,7 +1026,7 @@ class AdminPlugin(Plugin):
 	    'addbypass',
         '<user:user> <role:str> [reason:str...]',
 	    level=-1,
-	    context={'mode': 'add'},
+	    context={'mode': 'add', 'type': 'bypass'},
 	    group='role')
     @Plugin.command(
         'add',
@@ -1037,7 +1038,7 @@ class AdminPlugin(Plugin):
 	    'rmbypass',
         '<user:user> <role:str> [reason:str...]',
 	    level=-1,
-	    context={'mode': 'remove'},
+	    context={'mode': 'remove', 'type': 'bypass'},
 	    group='role')
     @Plugin.command(
         'rmv',
@@ -1050,7 +1051,7 @@ class AdminPlugin(Plugin):
         level=CommandLevels.MOD,
         context={'mode': 'remove'},
         group='role')
-    def role_add(self, event, user, role, reason=None, mode=None):
+    def role_add(self, event, user, role, reason=None, mode=None, type=None):
         role_obj = None
 
         if role.isdigit() and int(role) in event.guild.roles.keys():
@@ -1082,7 +1083,7 @@ class AdminPlugin(Plugin):
             [event.guild.roles.get(r) for r in author_member.roles],
             key=lambda i: i.position,
             reverse=True)
-        if not author_member.owner and (not highest_role or highest_role[0].position <= role_obj.position):
+        if not author_member.owner and (not highest_role or highest_role[0].position <= role_obj.position) and (type is not 'bypass'):
             raise CommandFail('You can only {} roles that are ranked lower than your highest role'.format(mode))
 
         member = event.guild.get_member(user)
