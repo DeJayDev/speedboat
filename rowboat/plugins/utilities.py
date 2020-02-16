@@ -109,7 +109,9 @@ class UtilitiesPlugin(Plugin):
             if not url.endswith('.gif'):
                 break
         else:
-            return event.msg.reply(r.status_code + ' Cat not found :(')
+            return event.msg.reply('{} Cat not found :('.format(
+                r.status_code
+            ))
 
         r = requests.get(url)
         r.raise_for_status()
@@ -434,7 +436,7 @@ class UtilitiesPlugin(Plugin):
         msg = channel.send_message(u'<@{}> you asked me at {} ({}) to remind you about: {}'.format(
             message.author_id,
             reminder.created_at,
-            humanize.naturaltime(reminder.created_at - datetime.utcnow()),
+            humanize.naturaltime(datetime.utcnow() - reminder.created_at),
             S(reminder.content)
         ))
 

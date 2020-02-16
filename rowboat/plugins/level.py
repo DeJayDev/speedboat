@@ -45,7 +45,7 @@ class LevelPlugin(Plugin):
         else:
             raise CommandFail('Invalid user')
 
-        raise CommandSuccess(u'Blocked {} from gaining XP.'.format(name))
+        raise CommandSuccess(u'Blocked {} from gaining XP.'.format(member))
 
     @Plugin.command('unblock', '<user:user|snowflake> [reason:str...]', group='xp2', aliases=['unmute'], level=CommandLevels.MOD)
     def xp_unblock(self, event, user, reason):
@@ -64,7 +64,7 @@ class LevelPlugin(Plugin):
         else:
             raise CommandFail('Invalid user')
 
-        raise CommandSuccess(u'Unblocked {} from gaining XP.'.format(name))
+        raise CommandSuccess(u'Unblocked {} from gaining XP.'.format(member))
 
     @Plugin.command('reset', '<user:user|snowflake>',
     #aliases=[],
@@ -116,6 +116,7 @@ class LevelPlugin(Plugin):
             raise CommandSuccess(u'Took {} XP from {}. (New Total: `{}`)'.format(
                 amount,
                 member.alias,
+                'in dev'
                 #Get Current Amount (do above and just pull as var w/ this amt+ added)
             ))
         else:
