@@ -594,7 +594,7 @@ class CorePlugin(Plugin):
         embed = MessageEmbed()
         embed.set_author(name='Speedboat', icon_url=self.client.state.me.avatar_url, url='https://row.swvn.io/')
         embed.description = BOT_INFO
-        embed.add_field(name='Servers', value=str(Guild.select().count()), inline=True)
+        embed.add_field(name='Servers', value=str(len(self.state.guilds)), inline=True)
         embed.add_field(name='Uptime', value=humanize.naturaldelta(datetime.utcnow() - self.startup), inline=True)
         event.msg.reply(embed=embed)
 
