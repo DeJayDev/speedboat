@@ -34,7 +34,7 @@ class TagsPlugin(Plugin):
         if not created:
             raise CommandFail('A tag by that name already exists')
 
-        raise CommandSuccess(u'ok, your tag named `{}` has been created'.format(name))
+        raise CommandSuccess('ok, your tag named `{}` has been created'.format(name))
 
     @Plugin.command('tags', '<name:str>', aliases=['tag'], level=CommandLevels.TRUSTED)
     @Plugin.command('show', '<name:str>', group='tag', level=CommandLevels.TRUSTED)
@@ -55,7 +55,7 @@ class TagsPlugin(Plugin):
             (Tag.name == tag.name)
         ).execute()
 
-        event.msg.reply(u':information_source: {}'.format(
+        event.msg.reply(':information_source: {}'.format(
             tag.content
         ))
 
@@ -76,7 +76,7 @@ class TagsPlugin(Plugin):
                 raise CommandFail('You do not have the required permissions to remove other users tags')
 
         tag.delete_instance()
-        raise CommandSuccess(u'ok, deleted tag `{}`'.format(tag.name))
+        raise CommandSuccess('ok, deleted tag `{}`'.format(tag.name))
 
     @Plugin.command('info', '<name:str>', group='tag', level=CommandLevels.TRUSTED)
     def on_tags_info(self, event, name):
@@ -93,7 +93,7 @@ class TagsPlugin(Plugin):
         embed = MessageEmbed()
         embed.title = tag.name
         embed.description = tag.content
-        embed.add_field(name='Author', value=unicode(tag.author), inline=True)
+        embed.add_field(name='Author', value=str(tag.author), inline=True)
         embed.add_field(name='Times Used', value=str(tag.times_used), inline=True)
         embed.timestamp = tag.created_at.isoformat()
         event.msg.reply(embed=embed)

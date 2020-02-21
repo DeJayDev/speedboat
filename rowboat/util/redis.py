@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 
 import gevent
 
@@ -9,7 +9,7 @@ class RedisSet(object):
     def __init__(self, rdb, key_name):
         self.rdb = rdb
         self.key_name = key_name
-        self.update_key_name = u'redis-set:{}'.format(self.key_name)
+        self.update_key_name = 'redis-set:{}'.format(self.key_name)
 
         self._set = rdb.smembers(key_name)
         self._lock = Semaphore()
@@ -28,7 +28,7 @@ class RedisSet(object):
         with self._lock:
             self.rdb.sadd(self.key_name, key)
             self._set.add(key)
-            self.rdb.publish(self.update_key_name, u'A{}'.format(key))
+            self.rdb.publish(self.update_key_name, 'A{}'.format(key))
 
     def remove(self, key):
         if key not in self._set:
@@ -37,7 +37,7 @@ class RedisSet(object):
         with self._lock:
             self.rdb.srem(self.key_name, key)
             self._set.remove(key)
-            self.rdb.publish(self.update_key_name, u'R{}'.format(key))
+            self.rdb.publish(self.update_key_name, 'R{}'.format(key))
 
     def _listener(self):
         for item in self._ps.listen():

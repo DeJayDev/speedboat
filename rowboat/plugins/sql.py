@@ -2,9 +2,9 @@ import time
 import gevent
 import psycopg2
 import markovify
-import pygal
 import cairosvg
 
+from svg.charts import line
 from gevent.pool import Pool
 from holster.emitter import Priority
 from datetime import datetime
@@ -174,7 +174,7 @@ class SQLPlugin(Plugin):
 
         text = [msg.content for msg in q]
         self.models[entity.id] = markovify.NewlineText('\n'.join(text))
-        raise CommandSuccess(u'Created markov model for {} using {} messages'.format(entity, len(text)))
+        raise CommandSuccess('Created markov model for {} using {} messages'.format(entity, len(text)))
 
     @Plugin.command('one', '<entity:user|channel>', level=-1, group='markov', global_=True)
     def command_markov_one(self, event, entity):
@@ -185,7 +185,7 @@ class SQLPlugin(Plugin):
         if not sentence:
             raise CommandFail('Not enough data :(')
 
-        event.msg.reply(u'{}: {}'.format(entity, sentence))
+        event.msg.reply('{}: {}'.format(entity, sentence))
 
     @Plugin.command('many', '<entity:user|channel> [count|int]', level=-1, group='markov', global_=True)
     def command_markov_many(self, event, entity, count=5):
@@ -196,11 +196,11 @@ class SQLPlugin(Plugin):
             sentence = self.models[entity.id].make_sentence(max_overlap_total=500)
             if not sentence:
                 raise CommandFail('Not enough data :(')
-            event.msg.reply(u'{}: {}'.format(entity, sentence))
+            event.msg.reply('{}: {}'.format(entity, sentence))
 
     @Plugin.command('list', level=-1, group='markov', global_=True)
     def command_markov_list(self, event):
-        event.msg.reply(u'`{}`'.format(', '.join(map(str, self.models.keys()))))
+        event.msg.reply('`{}`'.format(', '.join(map(str, list(self.models.keys())))))
 
     @Plugin.command('delete', '<oid:snowflake>', level=-1, group='markov', global_=True)
     def command_markov_delete(self, event, oid):
@@ -323,13 +323,17 @@ class SQLPlugin(Plugin):
             unit,
             '{} {}'.format(amount, unit),
             event.guild.id,
-            '\s?{}\s?'.format(word),
+            '{}'.format(word),
             unit
         ).tuples())
         sql_duration = time.time() - start
 
         start = time.time()
-        chart = pygal.Line()
+        chart = line.Line()
+        options = dict(
+            scale_integers=True,
+            fields = []
+        )
         chart.title = 'Usage of {} Over {} {}'.format(
             word, amount, unit,
         )
@@ -368,7 +372,7 @@ class SQLPlugin(Plugin):
         else:
             raise Exception("You should not be here")
 
-        sql = """
+        sql = r"""
             SELECT word, count(*)
             FROM (
                 SELECT regexp_split_to_table(content, '\s') as word

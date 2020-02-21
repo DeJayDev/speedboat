@@ -26,8 +26,8 @@ def get_dominant_colors(img, n=3):
 
         points = get_points(img)
         clusters = kmeans(points, n, 1)
-        rgbs = [map(int, c.center.coords) for c in clusters]
-        return map(rtoh, rgbs)
+        rgbs = [list(map(int, c.center.coords)) for c in clusters]
+        return list(map(rtoh, rgbs))
     except:
         return [0x00000]
 

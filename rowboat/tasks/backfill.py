@@ -6,7 +6,7 @@ from disco.types.channel import MessageIterator
 @task(max_concurrent=1, max_queue_size=10, global_lock=lambda guild_id: guild_id)
 def backfill_guild(task, guild_id):
     client = get_client()
-    for channel in client.api.guilds_channels_list(guild_id).values():
+    for channel in list(client.api.guilds_channels_list(guild_id).values()):
         backfill_channel.queue(channel.id)
 
 

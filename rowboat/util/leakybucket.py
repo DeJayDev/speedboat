@@ -68,7 +68,7 @@ class LeakyBucket(object):
         return self.redis.zcount(self.key_fmt.format(key), '-inf', '+inf')
 
     def size(self, key):
-        res = map(int, self.redis.zrangebyscore(self.key_fmt.format(key), '-inf', '+inf'))
+        res = list(map(int, self.redis.zrangebyscore(self.key_fmt.format(key), '-inf', '+inf')))
         if len(res) <= 1:
             return 0
         return (res[-1] - res[0]) / 1000.0

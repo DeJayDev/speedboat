@@ -4,6 +4,7 @@ import operator
 from playhouse.migrate import PostgresqlMigrator, migrate
 from rowboat import ENV
 from rowboat.sql import database, init_db
+from functools import reduce
 
 COLUMN_EXISTS_SQL = '''
 SELECT 1
@@ -38,10 +39,10 @@ class Migrate(object):
         self.apply()
 
     def apply(self):
-        print 'Applying {} actions'.format(len(self.actions))
+        print('Applying {} actions'.format(len(self.actions)))
         migrate(*self.actions)
 
-        print 'Executing {} raw queries'.format(len(self.raw_actions))
+        print('Executing {} raw queries'.format(len(self.raw_actions)))
         conn = database.obj.connection()
         for query, args in self.raw_actions:
             with conn.cursor() as cur:
@@ -85,7 +86,7 @@ class Migrate(object):
                 idx += 1
 
                 if idx % 10000 == 0:
-                    print '[%ss] Backfilling %s %s/%s (wrote %s)' % (time.time() - start, str(table), idx, total, modified)
+                    print('[%ss] Backfilling %s %s/%s (wrote %s)' % (time.time() - start, str(table), idx, total, modified))
 
                 if modified % 1000:
                     txn.commit()
@@ -106,7 +107,7 @@ class Migrate(object):
                 ).execute()
 
         txn.commit()
-        print 'DONE, %s scanned %s written' % (idx, modified)
+        print('DONE, %s scanned %s written' % (idx, modified))
 
     @staticmethod
     def missing(table, field):

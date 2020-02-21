@@ -36,7 +36,7 @@ from rowboat.constants import (
     ROWBOAT_CONTROL_CHANNEL
 )
 
-PY_CODE_BLOCK = u'```py\n{}\n```'
+PY_CODE_BLOCK = '```py\n{}\n```'
 
 BOT_INFO = '''
 Speedboat is a modernized fork of rowboat, a moderation and utilitarian bot built for large Discord servers.
@@ -91,7 +91,7 @@ class CorePlugin(Plugin):
                     continue
 
                 plugin_name = '{}Plugin'.format(event.name.split('.', 1)[0].title())
-                plugin = next((v for k, v in self.bot.plugins.items() if k.lower() == plugin_name.lower()), None)
+                plugin = next((v for k, v in list(self.bot.plugins.items()) if k.lower() == plugin_name.lower()), None)
                 if plugin:
                     self.log.info('Detected change in %s, reloading...', plugin_name)
                     try:
@@ -110,11 +110,11 @@ class CorePlugin(Plugin):
             data = json.loads(item['data'])
             if data['type'] == 'GUILD_UPDATE' and data['id'] in self.guilds:
                 with self.send_control_message() as embed:
-                    embed.title = u'Reloaded config for {}'.format(
+                    embed.title = 'Reloaded config for {}'.format(
                         self.guilds[data['id']].name
                     )
 
-                self.log.info(u'Reloading guild %s', self.guilds[data['id']].name)
+                self.log.info('Reloading guild %s', self.guilds[data['id']].name)
 
                 # Refresh config, mostly to validate
                 try:
@@ -129,7 +129,7 @@ class CorePlugin(Plugin):
                     # Finally, emit the event
                     self.emitter.emit('GUILD_CONFIG_UPDATE', self.guilds[data['id']], config)
                 except:
-                    self.log.exception(u'Failed to reload config for guild %s', self.guilds[data['id']].name)
+                    self.log.exception('Failed to reload config for guild %s', self.guilds[data['id']].name)
                     continue
             elif data['type'] == 'RESTART':
                 self.log.info('Restart requested, signaling parent')
@@ -162,7 +162,7 @@ class CorePlugin(Plugin):
             if 'web' not in guild.config:
                 continue
 
-            for user_id in guild.config['web'].keys():
+            for user_id in list(guild.config['web'].keys()):
                 try:
                     users_who_should_have_access.add(int(user_id))
                 except:
@@ -170,7 +170,7 @@ class CorePlugin(Plugin):
 
         # TODO: sharding
         users_who_have_access = {
-            i.id for i in rb_guild.members.values()
+            i.id for i in list(rb_guild.members.values())
             if ROWBOAT_USER_ROLE_ID in i.roles
         }
 
@@ -469,15 +469,15 @@ class CorePlugin(Plugin):
                     self.log.exception('Command Error:')
 
                     with self.send_control_message() as embed:
-                        embed.title = u'Command Error: {}'.format(command.name)
+                        embed.title = 'Command Error: {}'.format(command.name)
                         embed.color = 0xff6961
                         embed.add_field(
-                            name='Author', value=u'({}) `{}`'.format(event.author, event.author.id), inline=True)
+                            name='Author', value='({}) `{}`'.format(event.author, event.author.id), inline=True)
                         embed.add_field(name='Channel', value='({}) `{}`'.format(
                             event.channel.name,
                             event.channel.id
                         ), inline=True)
-                        embed.description = '```{}```'.format(u'\n'.join(tracked.traceback.split('\n')[-8:]))
+                        embed.description = '```{}```'.format('\n'.join(tracked.traceback.split('\n')[-8:]))
 
                     return event.reply('<:{}> something went wrong, perhaps try again later'.format(RED_TICK_EMOJI))
 
@@ -523,12 +523,12 @@ class CorePlugin(Plugin):
     def nuke(self, event, user, reason):
         contents = []
 
-        for gid, guild in self.guilds.items():
+        for gid, guild in list(self.guilds.items()):
             guild = self.state.guilds[gid]
             perms = guild.get_permissions(self.state.me)
 
             if not perms.ban_members and not perms.administrator:
-                contents.append(u':x: {} - Could not Ban'.format(
+                contents.append(':x: {} - Could not Ban'.format(
                     guild.name
                 ))
                 continue
@@ -541,12 +541,12 @@ class CorePlugin(Plugin):
                     reason,
                     guild=guild)
             except:
-                contents.append(u':x: {} - Error'.format(
+                contents.append(':x: {} - Error'.format(
                     guild.name
                 ))
                 self.log.exception('Failed to force ban %s in %s', user, gid)
 
-            contents.append(u':white_check_mark: {} - :regional_indicator_f:'.format(
+            contents.append(':white_check_mark: {} - :regional_indicator_f:'.format(
                 guild.name
             ))
 
@@ -556,12 +556,12 @@ class CorePlugin(Plugin):
     def unnuke(self, event, user, reason):
         contents = []
 
-        for gid, guild in self.guilds.items():
+        for gid, guild in list(self.guilds.items()):
             guild = self.state.guilds[gid]
             perms = guild.get_permissions(self.state.me)
 
             if not perms.ban_members and not perms.administrator:
-                contents.append(u':x: {} - Could not Unban'.format(
+                contents.append(':x: {} - Could not Unban'.format(
                     guild.name
                 ))
                 continue
@@ -578,12 +578,12 @@ class CorePlugin(Plugin):
                 GuildBan.get(user_id=user, guild_id=guild.id)
                 guild.delete_ban(user)
             except:
-                contents.append(u':x: {} - Error'.format(
+                contents.append(':x: {} - Error'.format(
                     guild.name
                 ))
                 self.log.exception('Failed to remove ban for %s in %s', user, gid)
 
-            contents.append(u':white_check_mark: {} - Fixed :heart:'.format(
+            contents.append(':white_check_mark: {} - Fixed :heart:'.format(
                 guild.name
             ))
 
@@ -610,7 +610,7 @@ class CorePlugin(Plugin):
             if command.lower() in cmd.triggers:
                 break
         else:
-            raise CommandFail(u"Couldn't find command for `{}`".format(S(command, escape_codeblocks=True)))
+            raise CommandFail("Couldn't find command for `{}`".format(S(command, escape_codeblocks=True)))
             return
 
         code = cmd.func.__code__
@@ -638,7 +638,7 @@ class CorePlugin(Plugin):
         # Mulitline eval
         src = event.codeblock
         if src.count('\n'):
-            lines = filter(bool, src.split('\n'))
+            lines = list(filter(bool, src.split('\n')))
             if lines[-1] and 'return' not in lines[-1]:
                 lines[-1] = 'return ' + lines[-1]
             lines = '\n'.join('    ' + i for i in lines)
@@ -646,7 +646,7 @@ class CorePlugin(Plugin):
             local = {}
 
             try:
-                exec compile(code, '<eval>', 'exec') in ctx, local
+                exec(compile(code, '<eval>', 'exec'), ctx, local)
             except Exception as e:
                 event.msg.reply(PY_CODE_BLOCK.format(type(e).__name__ + ': ' + str(e)))
                 return
@@ -688,7 +688,7 @@ class CorePlugin(Plugin):
         if not guild:
             return event.msg.reply(':no_entry_sign: invalid or unknown guild ID')
 
-        msg = event.msg.reply(u'Ok, hold on while I get you setup with an invite link to {}'.format(
+        msg = event.msg.reply('Ok, hold on while I get you setup with an invite link to {}'.format(
             guild.name,
         ))
 
@@ -701,11 +701,11 @@ class CorePlugin(Plugin):
                 unique=True,
             )
         except:
-            return msg.edit(u':no_entry_sign: Hmmm, something went wrong creating an invite for {}'.format(
+            return msg.edit(':no_entry_sign: Hmmm, something went wrong creating an invite for {}'.format(
                 guild.name,
             ))
 
-        msg.edit(u'Ok, here is a temporary invite for you: discord.gg/{}'.format(
+        msg.edit('Ok, here is a temporary invite for you: discord.gg/{}'.format(
             invite.code,
         ))
 

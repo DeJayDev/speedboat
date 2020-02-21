@@ -77,7 +77,7 @@ class Message(ModelBase):
             to_update['emojis'] = list(map(int, EMOJI_RE.findall(obj.content)))
 
         if obj.attachments is not UNSET:
-            to_update['attachments'] = [i.url for i in obj.attachments.values()]
+            to_update['attachments'] = [i.url for i in list(obj.attachments.values())]
 
         if obj.embeds is not UNSET:
             to_update['embeds'] = [json.dumps(i.to_dict(), default=default_json) for i in obj.embeds]
@@ -98,17 +98,17 @@ class Message(ModelBase):
                 num_edits=(0 if not obj.edited_timestamp else 1),
                 mentions=list(obj.mentions.keys()),
                 emojis=list(map(int, EMOJI_RE.findall(obj.content))),
-                attachments=[i.url for i in obj.attachments.values()],
+                attachments=[i.url for i in list(obj.attachments.values())],
                 embeds=[json.dumps(i.to_dict(), default=default_json) for i in obj.embeds]))
 
-        for user in obj.mentions.values():
+        for user in list(obj.mentions.values()):
             User.from_disco_user(user)
 
         return created
 
     @classmethod
     def from_disco_message_many(cls, messages, safe=False):
-        q = cls.insert_many(map(cls.convert_message, messages)).returning(cls.id)
+        q = cls.insert_many(list(map(cls.convert_message, messages))).returning(cls.id)
 
         if safe:
             q = q.on_conflict_ignore()
@@ -128,7 +128,7 @@ class Message(ModelBase):
             'num_edits': (0 if not obj.edited_timestamp else 1),
             'mentions': list(obj.mentions.keys()),
             'emojis': list(map(int, EMOJI_RE.findall(obj.content))),
-            'attachments': [i.url for i in obj.attachments.values()],
+            'attachments': [i.url for i in list(obj.attachments.values())],
             'embeds': [json.dumps(i.to_dict(), default=default_json) for i in obj.embeds],
         }
 
@@ -222,25 +222,25 @@ class MessageArchive(ModelBase):
         )
 
         if fmt == 'txt':
-            return u'\n'.join(map(self.encode_message_text, q))
+            return '\n'.join(map(self.encode_message_text, q))
         elif fmt == 'csv':
-            return u'\n'.join([
+            return '\n'.join([
                 'id,channel_id,timestamp,author_id,author,content,deleted,attachments'
-            ] + map(self.encode_message_csv, q))
+            ] + list(map(self.encode_message_csv, q)))
         elif fmt == 'json':
             return json.dumps({
-                'messages': map(self.encode_message_json, q)
+                'messages': list(map(self.encode_message_json, q))
             })
 
     @staticmethod
     def encode_message_text(msg):
-        return u'{m.timestamp} ({m.id} / {m.channel_id} / {m.author.id}) {m.author}: {m.content} ({attach})'.format(
-            m=msg, attach=', '.join(map(unicode, msg.attachments or [])))
+        return '{m.timestamp} ({m.id} / {m.channel_id} / {m.author.id}) {m.author}: {m.content} ({attach})'.format(
+            m=msg, attach=', '.join(map(str, msg.attachments or [])))
 
     @staticmethod
     def encode_message_csv(msg):
         def wrap(i):
-            return u'"{}"'.format(six.text_type(i).replace('"', '""'))
+            return '"{}"'.format(six.text_type(i).replace('"', '""'))
 
         return ','.join(map(wrap, [
             msg.id,

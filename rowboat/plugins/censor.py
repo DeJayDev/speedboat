@@ -1,6 +1,6 @@
 import re
 import json
-import urlparse
+import urllib.parse
 
 from holster.enum import Enum
 from disco.types.base import cached_property
@@ -43,9 +43,9 @@ class CensorSubConfig(SlottedModel):
 
     @cached_property
     def blocked_re(self):
-        return re.compile(u'({})'.format(u'|'.join(
-            map(re.escape, self.blocked_tokens) +
-            map(lambda k: u'\\b{}\\b'.format(re.escape(k)), self.blocked_words)
+        return re.compile('({})'.format('|'.join(
+            list(map(re.escape, self.blocked_tokens)) +
+            ['\\b{}\\b'.format(re.escape(k)) for k in self.blocked_words]
         )), re.I)
 
 
@@ -66,22 +66,22 @@ class Censorship(Exception):
     def details(self):
         if self.reason is CensorReason.INVITE:
             if self.ctx['guild']:
-                return u'invite `{}` to {}'.format(
+                return 'invite `{}` to {}'.format(
                     self.ctx['invite'],
                     S(self.ctx['guild']['name'], escape_codeblocks=True)
                 )
             else:
-                return u'invite `{}`'.format(self.ctx['invite'])
+                return 'invite `{}`'.format(self.ctx['invite'])
         elif self.reason is CensorReason.DOMAIN:
             if self.ctx['hit'] == 'whitelist':
-                return u'domain `{}` is not in whitelist'.format(S(self.ctx['domain'], escape_codeblocks=True))
+                return 'domain `{}` is not in whitelist'.format(S(self.ctx['domain'], escape_codeblocks=True))
             else:
-                return u'domain `{}` is in blacklist'.format(S(self.ctx['domain'], escape_codeblocks=True))
+                return 'domain `{}` is in blacklist'.format(S(self.ctx['domain'], escape_codeblocks=True))
         elif self.reason is CensorReason.WORD:
-            return u'found blacklisted words `{}`'.format(
-                u', '.join([S(i, escape_codeblocks=True) for i in self.ctx['words']]))
+            return 'found blacklisted words `{}`'.format(
+                ', '.join([S(i, escape_codeblocks=True) for i in self.ctx['words']]))
         elif self.reason is CensorReason.ZALGO:
-            return u'found zalgo at position `{}` in text'.format(
+            return 'found zalgo at position `{}` in text'.format(
                 self.ctx['position']
             )
 
@@ -95,7 +95,7 @@ class CensorPlugin(Plugin):
         if event.config.levels:
             user_level = int(self.bot.plugins.get('CorePlugin').get_level(event.guild, author))
 
-            for level, config in event.config.levels.items():
+            for level, config in list(event.config.levels.items()):
                 if user_level <= level:
                     yield config
 
@@ -232,7 +232,7 @@ class CensorPlugin(Plugin):
 
         for url in urls:
             try:
-                parsed = urlparse.urlparse(url)
+                parsed = urllib.parse.urlparse(url)
             except:
                 continue
 

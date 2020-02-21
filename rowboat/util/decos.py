@@ -1,5 +1,5 @@
 from flask import g, jsonify
-from httplib import FORBIDDEN
+from http.client import FORBIDDEN
 
 import functools
 

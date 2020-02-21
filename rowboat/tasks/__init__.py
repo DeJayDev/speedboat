@@ -111,8 +111,8 @@ class TaskRunner(object):
 class TaskWorker(object):
     def __init__(self):
         self.load()
-        self.queues = ['task_queue:' + i for i in TASKS.keys()]
-        self.runners = {k: TaskRunner(k, v) for k, v in TASKS.items()}
+        self.queues = ['task_queue:' + i for i in list(TASKS.keys())]
+        self.runners = {k: TaskRunner(k, v) for k, v in list(TASKS.items())}
         self.active = True
 
     def load(self):

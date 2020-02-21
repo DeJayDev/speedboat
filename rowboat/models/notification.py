@@ -62,11 +62,11 @@ class Notification(ModelBase):
             data['title'] = self.metadata.get('title', 'Generic Notification')
             data['content'] = self.metadata.get('content', '').format(m=self.metadata)
         elif self.type_ == self.Types.CONNECT:
-            data['title'] = u'{} connected'.format(
+            data['title'] = '{} connected'.format(
                 'Production' if self.metadata['env'] == 'prod' else 'Testing')
             data['content'] = self.metadata.get('content', '').format(m=self.metadata)
         elif self.type_ == self.Types.RESUME:
-            data['title'] = u'{} resumed'.format(
+            data['title'] = '{} resumed'.format(
                 'Production' if self.metadata['env'] == 'prod' else 'Testing')
             data['content'] = self.metadata.get('content', '').format(m=self.metadata)
 
