@@ -23,7 +23,7 @@ def backfill_column(table, old_columns, new_columns):
             idx += 1
 
             if idx % 10000 == 0:
-                print '[%ss] Backfilling %s %s/%s (wrote %s)' % (time.time() - start, str(table), idx, total, modified)
+                print('[%ss] Backfilling %s %s/%s (wrote %s)' % (time.time() - start, str(table), idx, total, modified))
 
             if modified % 1000:
                 txn.commit()
@@ -38,7 +38,7 @@ def backfill_column(table, old_columns, new_columns):
             ).where(table._meta.primary_key == values[0]).execute()
 
     txn.commit()
-    print 'DONE, %s scanned %s written' % (idx, modified)
+    print('DONE, %s scanned %s written' % (idx, modified))
 
 
 @Migrate.only_if(Migrate.missing, Message, 'mentions_new')

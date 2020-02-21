@@ -9,6 +9,7 @@ from rowboat.util.decos import authed
 from rowboat.models.guild import Guild, GuildConfigChange
 from rowboat.models.user import User, Infraction
 from rowboat.models.message import Message
+from functools import reduce
 
 guilds = Blueprint('guilds', __name__, url_prefix='/api/guilds')
 
@@ -56,7 +57,7 @@ def guild_get(guild):
 @with_guild
 def guild_config(guild):
     return jsonify({
-        'contents': unicode(guild.config_raw) if guild.config_raw else yaml.safe_dump(guild.config),
+        'contents': str(guild.config_raw) if guild.config_raw else yaml.safe_dump(guild.config),
     })
 
 
@@ -72,8 +73,8 @@ def guild_z_config_update(guild):
     except:
         return 'Invalid YAML', 400
 
-    before = sorted(guild.config.get('web', {}).items(), key=lambda i: i[0])
-    after = sorted([(str(k), v) for k, v in data.get('web', {}).items()], key=lambda i: i[0])
+    before = sorted(list(guild.config.get('web', {}).items()), key=lambda i: i[0])
+    after = sorted([(str(k), v) for k, v in list(data.get('web', {}).items())], key=lambda i: i[0])
 
     if guild.role != 'admin' and before != after:
         return 'Invalid Access', 403
@@ -174,8 +175,8 @@ def guild_config_history(guild):
     def serialize(gcc):
         return {
             'user': serialize_user(gcc.user_id),
-            'before': unicode(gcc.before_raw),
-            'after': unicode(gcc.after_raw),
+            'before': str(gcc.before_raw),
+            'after': str(gcc.after_raw),
             'created_at': gcc.created_at.isoformat(),
         }
 
@@ -185,7 +186,7 @@ def guild_config_history(guild):
         GuildConfigChange.created_at.desc()
     ).paginate(int(request.values.get('page', 1)), 25)
 
-    return jsonify(map(serialize, q))
+    return jsonify(list(map(serialize, q)))
 
 
 @guilds.route('/<gid>/stats/messages', methods=['GET'])

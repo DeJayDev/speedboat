@@ -24,4 +24,4 @@ class TestRedisSet(unittest.TestCase):
 
         time.sleep(1)
 
-        self.assertEquals(s1._set, s2._set)
+        self.assertEqual(s1._set, s2._set)

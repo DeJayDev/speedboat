@@ -7,7 +7,7 @@ from datadog import statsd
 def to_tags(obj=None, **kwargs):
     if obj:
         kwargs.update(obj)
-    return ['{}:{}'.format(k, v) for k, v in kwargs.items()]
+    return ['{}:{}'.format(k, v) for k, v in list(kwargs.items())]
 
 
 @contextmanager

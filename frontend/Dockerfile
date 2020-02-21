@@ -1,4 +1,4 @@
-FROM node:8.17-slim
+FROM node:10-slim
 
 WORKDIR /opt/frontend
 

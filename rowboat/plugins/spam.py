@@ -18,6 +18,7 @@ from rowboat.types.plugin import PluginConfig
 from rowboat.types import SlottedModel, DictField, Field
 from rowboat.models.user import Infraction
 from rowboat.models.message import Message, EMOJI_RE
+from functools import reduce
 
 UPPER_RE = re.compile('[A-Z]')
 
@@ -101,7 +102,7 @@ class SpamConfig(PluginConfig):
                     yield self.roles[rname.name]
 
         if self.levels:
-            for lvl in self.levels.keys():
+            for lvl in list(self.levels.keys()):
                 if level <= lvl:
                     yield self.levels[lvl]
 
@@ -188,7 +189,7 @@ class SpamPlugin(Plugin):
                 for mid, chan in msgs:
                     channels[chan].append(mid)
 
-                for channel, messages in channels.items():
+                for channel, messages in list(channels.items()):
                     channel = self.state.channels.get(channel)
                     if not channel:
                         continue
@@ -220,7 +221,7 @@ class SpamPlugin(Plugin):
                 dupes[content] += 1
 
         # If any of them are above the max dupes count, trigger a violation
-        dupes = [v for k, v in dupes.items() if v > rule.max_duplicates.count]
+        dupes = [v for k, v in list(dupes.items()) if v > rule.max_duplicates.count]
         if dupes:
             raise Violation(
                 rule,

@@ -29,13 +29,13 @@ class BotSupervisor(object):
         signal.signal(signal.SIGUSR1, self.handle_sigusr1)
 
     def handle_sigusr1(self, signum, frame):
-        print 'SIGUSR1 - RESTARTING'
+        print('SIGUSR1 - RESTARTING')
         gevent.spawn(self.restart)
 
     def start(self):
         env = copy.deepcopy(os.environ)
         env.update(self.env)
-        self.proc = subprocess.Popen(['python', '-m', 'disco.cli', '--config', 'config.yaml'], env=env)
+        self.proc = subprocess.Popen(['python', '-m', 'disco.cli', '--encoder=etf' ,'--config', 'config.yaml'], env=env)
 
     def stop(self):
         self.proc.terminate()
@@ -110,7 +110,7 @@ def add_global_admin(user_id):
     init_db(ENV)
     rdb.sadd('global_admins', user_id)
     User.update(admin=True).where(User.user_id == user_id).execute()
-    print 'Ok, added {} as a global admin'.format(user_id)
+    print('Ok, added {} as a global admin'.format(user_id))
 
 @cli.command('wh-add')
 @click.argument('guild-id')
@@ -121,19 +121,19 @@ def add_whitelist(guild_id, flag):
 
     flag = Guild.WhitelistFlags.get(flag)
     if not flag:
-        print 'Invalid flag'
+        print('Invalid flag')
         return
 
     try:
         guild = Guild.get(guild_id=guild_id)
     except Guild.DoesNotExist:
-        print 'No guild exists with that id'
+        print('No guild exists with that id')
         return
 
     guild.whitelist.append(int(flag))
     guild.save()
     guild.emit_update()
-    print 'added flag'
+    print('added flag')
 
 
 @cli.command('wh-rmv')
@@ -145,19 +145,19 @@ def rmv_whitelist(guild_id, flag):
 
     flag = Guild.WhitelistFlags.get(flag)
     if not flag:
-        print 'Invalid flag'
+        print('Invalid flag')
         return
 
     try:
         guild = Guild.get(guild_id=guild_id)
     except Guild.DoesNotExist:
-        print 'No guild exists with that id'
+        print('No guild exists with that id')
         return
 
     guild.whitelist.remove(int(flag))
     guild.save()
     guild.emit_update()
-    print 'removed flag'
+    print('removed flag')
 
 
 if __name__ == '__main__':

@@ -7,7 +7,7 @@ from rowboat.plugins import RowboatPlugin as Plugin
 
 
 def to_tags(obj):
-    return [u'{}:{}'.format(k, v) for k, v in obj.items()]
+    return ['{}:{}'.format(k, v) for k, v in list(obj.items())]
 
 
 class StatsPlugin(Plugin):

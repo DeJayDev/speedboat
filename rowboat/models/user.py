@@ -101,7 +101,7 @@ class User(ModelBase):
         )
 
     def __unicode__(self):
-        return u'{}#{}'.format(self.username, str(self.discriminator).zfill(4))
+        return '{}#{}'.format(self.username, str(self.discriminator).zfill(4))
 
 
 @ModelBase.register
@@ -201,7 +201,7 @@ class Infraction(ModelBase):
         # TODO: Make these configurable.
         if member.user.bot is not False: 
             try:
-                member.user.open_dm().send_message(u':warning: You were **{}** from {} for "{}"'.format(
+                member.user.open_dm().send_message(':warning: You were **{}** from {} for "{}"'.format(
                     'kicked',
                     event.guild.name,
                     reason or 'no reason'
@@ -219,7 +219,7 @@ class Infraction(ModelBase):
             Actions.MEMBER_KICk,
             event.guild.id,
             member=member,
-            actor=unicode(event.author) if event.author.id != member.id else 'Automatic',
+            actor=str(event.author) if event.author.id != member.id else 'Automatic',
             reason=reason or 'no reason'
         )
 
@@ -247,7 +247,7 @@ class Infraction(ModelBase):
 
         if member.user.bot is not False: 
             try:
-                member.user.open_dm().send_message(u':warning: You were **{}** from {} for "{}"\n\nThis will be lifted in: {}'.format(
+                member.user.open_dm().send_message(':warning: You were **{}** from {} for "{}"\n\nThis will be lifted in: {}'.format(
                     'temporarily banned',
                     event.guild.name,
                     reason or 'no reason',
@@ -265,7 +265,7 @@ class Infraction(ModelBase):
             Actions.MEMBER_TEMPBAN,
             event.guild.id,
             member=member,
-            actor=unicode(event.author) if event.author.id != member.id else 'Automatic',
+            actor=str(event.author) if event.author.id != member.id else 'Automatic',
             reason=reason or 'no reason',
             expires=expires_at,
         )
@@ -299,7 +299,7 @@ class Infraction(ModelBase):
             Actions.MEMBER_SOFTBAN,
             event.guild.id,
             member=member,
-            actor=unicode(event.author) if event.author.id != member.id else 'Automatic',
+            actor=str(event.author) if event.author.id != member.id else 'Automatic',
             reason=reason or 'no reason'
         )
 
@@ -313,7 +313,7 @@ class Infraction(ModelBase):
     @classmethod
     def ban(cls, plugin, event, member, reason, guild):
         from rowboat.plugins.modlog import Actions
-        if isinstance(member, (int, long)):
+        if isinstance(member, int):
             user_id = member
             user_ob = User.with_id(user_id)
         else:
@@ -329,9 +329,9 @@ class Infraction(ModelBase):
 
         msg_status = False
 
-        if not isinstance(member, (int, long)) and user_ob is not False: 
+        if not isinstance(member, int) and user_ob is not False: 
             try:
-                member.user.open_dm().send_message(u':warning: You were **{}** from {} for "{}"'.format(
+                member.user.open_dm().send_message(':warning: You were **{}** from {} for "{}"'.format(
                     'banned',
                     event.guild.name,
                     reason or 'no reason'
@@ -347,9 +347,9 @@ class Infraction(ModelBase):
             'ModLogPlugin.log_action_ext',
             Actions.MEMBER_BAN,
             event.guild.id,
-            user=unicode(member),
+            user=str(member),
             user_id=user_id,
-            actor=unicode(event.author) if event.author.id != user_id else 'Automatic',
+            actor=str(event.author) if event.author.id != user_id else 'Automatic',
             reason=reason or 'no reason'
         )
 
@@ -371,7 +371,7 @@ class Infraction(ModelBase):
 
         if member.user.bot is not False: 
             try:
-                member.user.open_dm().send_message(u':warning: You were **{}** in {} for "{}"'.format(
+                member.user.open_dm().send_message(':warning: You were **{}** in {} for "{}"'.format(
                     'warned',
                     event.guild.name,
                     reason or 'no reason'
@@ -386,7 +386,7 @@ class Infraction(ModelBase):
             Actions.MEMBER_WARNED,
             event.guild.id,
             member=member,
-            actor=unicode(event.author) if event.author.id != member.id else 'Automatic',
+            actor=str(event.author) if event.author.id != member.id else 'Automatic',
             reason=reason or 'no reason'
         )
 
@@ -417,7 +417,7 @@ class Infraction(ModelBase):
 
         if member.user.bot is not False: 
             try:
-                member.user.open_dm().send_message(u':warning: You were **{}** in {} for "{}"'.format(
+                member.user.open_dm().send_message(':warning: You were **{}** in {} for "{}"'.format(
                     'muted',
                     event.guild.name,
                     reason or 'no reason'
@@ -432,7 +432,7 @@ class Infraction(ModelBase):
             Actions.MEMBER_MUTED,
             event.guild.id,
             member=member,
-            actor=unicode(event.author) if event.author.id != member.id else 'Automatic',
+            actor=str(event.author) if event.author.id != member.id else 'Automatic',
             reason=reason or 'no reason'
         )
 
@@ -468,7 +468,7 @@ class Infraction(ModelBase):
 
         if member.user.bot is not False: 
             try:
-                member.user.open_dm().send_message(u':warning: You were **{}** in {} for "{}"\n\nThis will be lifted in: {}'.format(
+                member.user.open_dm().send_message(':warning: You were **{}** in {} for "{}"\n\nThis will be lifted in: {}'.format(
                     'temporarily muted',
                     event.guild.name,
                     reason or 'no reason',
@@ -484,7 +484,7 @@ class Infraction(ModelBase):
             Actions.MEMBER_TEMP_MUTED,
             event.guild.id,
             member=member,
-            actor=unicode(event.author) if event.author.id != member.id else 'Automatic',
+            actor=str(event.author) if event.author.id != member.id else 'Automatic',
             reason=reason or 'no reason',
             expires=expires_at,
         )
