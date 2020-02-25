@@ -3,10 +3,10 @@ import gevent
 import psycopg2
 import markovify
 import cairosvg
+import pygal
 
-from svg.charts import line
 from gevent.pool import Pool
-from holster.emitter import Priority
+from disco.util.emitter import Priority
 from datetime import datetime
 
 from disco.types.base import UNSET
@@ -39,7 +39,7 @@ class SQLPlugin(Plugin):
         ctx['models'] = self.models
         super(SQLPlugin, self).unload(ctx)
 
-    @Plugin.listen('VoiceStateUpdate', priority=Priority.BEFORE)
+    @Plugin.listen('VoiceStateUpdate', priority=Priority.SEQUENTIAL)
     def on_voice_state_update(self, event):
         pre_state = self.state.voice_states.get(event.session_id)
         guild = self.guilds[event.guild_id]
