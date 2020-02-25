@@ -1,6 +1,6 @@
 import re
 import yaml
-from disco.types.user import GameType, Status
+from disco.types.user import ActivityTypes, Status
 
 # Emojis
 GREEN_TICK_EMOJI_ID = 318468935047446529
@@ -13,7 +13,7 @@ STATUS_EMOJI = {
     Status.IDLE: ':status_away:318468935387316234',
     Status.DND: ':status_dnd:318468935336984576',
     Status.OFFLINE: ':status_offline:318468935391641600',
-    GameType.STREAMING: ':status_streaming:318468935450099712',
+    ActivityTypes.STREAMING: ':status_streaming:318468935450099712',
 }
 SNOOZE_EMOJI = '\U0001f4a4'
 

@@ -4,14 +4,14 @@ import humanize
 import operator
 import gevent
 
-from six import BytesIO
+from io import BytesIO
 from PIL import Image
 from peewee import fn
 from gevent.pool import Pool
 from datetime import datetime, timedelta
 from collections import defaultdict
 
-from disco.types.user import GameType, Status
+from disco.types.user import ActivityTypes, Status
 from disco.types.message import MessageEmbed
 from disco.util.snowflake import to_datetime
 from disco.util.sanitize import S
@@ -35,8 +35,8 @@ from functools import reduce
 
 
 def get_status_emoji(presence):
-    if presence.game and presence.game.type == GameType.STREAMING:
-        return STATUS_EMOJI[GameType.STREAMING], 'Streaming'
+    if presence.game and presence.game.type == ActivityTypes.STREAMING:
+        return STATUS_EMOJI[ActivityTypes.STREAMING], 'Streaming'
     elif presence.status == Status.ONLINE:
         return STATUS_EMOJI[Status.ONLINE], 'Online'
     elif presence.status == Status.IDLE:
@@ -98,27 +98,15 @@ class UtilitiesPlugin(Plugin):
 
     @Plugin.command('cat', global_=True)
     def cat(self, event):
-        # Sometimes random.cat gives us gifs (smh)
-        for _ in range(3):
-            try:
-                r = requests.get('http://aws.random.cat/meow')
-                r.raise_for_status()
-            except:
-                continue
+        try:
+            r = requests.get('https://api.thecatspi.com/v1/images/search?format=src')
+            r.raise_for_status()
+            ext = r.headers['content-type'].split('/')[-1].split(';')[0]
+            event.msg.reply('', attachments=[('dog.{}'.format(ext), r.content)])
+        except:
+            return event.msg.reply(r.status_code + ' Dog not found :(')
 
-            url = r.json()['file']
-            if not url.endswith('.gif'):
-                break
-        else:
-            return event.msg.reply('{} Cat not found :('.format(
-                r.status_code
-            ))
-
-        r = requests.get(url)
-        r.raise_for_status()
-        event.msg.reply('', attachments=[('cat.jpg', r.content)])
-
-    @Plugin.command('dog', global_=True) #global_=True! what will he do?
+    @Plugin.command('dog', global_=True)
     def dog(self, event):
         try:
             r = requests.get('https://api.thedogapi.com/v1/images/search?format=src')
@@ -321,17 +309,16 @@ class UtilitiesPlugin(Plugin):
 
         if user.presence: #I couldn't get this to work w/o it lol
             emoji, status = get_status_emoji(user.presence)
-            content.append('Online Status: {} <{}>'.format(status, emoji))
+            content.append('Status: {} <{}>'.format(status, emoji))
             if user.presence.game and user.presence.game.name:
-                if user.presence.game.type == GameType.DEFAULT:
+                if user.presence.game.type == ActivityTypes.DEFAULT:
                     content.append('{}'.format(user.presence.game.name))
-                if user.presence.game.type == GameType.LISTENING:
+                if user.presence.game.type == ActivityTypes.CUSTOM:
+                    content.append('Custom Status: {}'.format(user.presence.game.state))
+                if user.presence.game.type == ActivityTypes.LISTENING:
                     content.append('Listening to Spotify')
-                else:
-                    if user.presence.game.url:
-                        content.append('Streaming: [{}]({})'.format(user.presence.game.name, user.presence.game.url))
-                    else:
-                        content.append('{}'.format(user.presence.game.name))
+                if user.presence.game.type == ActivityTypes.STREAMING:
+                    content.append('Streaming: [{}]({})'.format(user.presence.game.name, user.presence.game.url))
 
         if member:
             content.append('\n**\u276F Member Information**')

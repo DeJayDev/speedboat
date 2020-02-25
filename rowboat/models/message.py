@@ -1,5 +1,4 @@
 import re
-import six
 import json
 import uuid
 import traceback
@@ -240,7 +239,7 @@ class MessageArchive(ModelBase):
     @staticmethod
     def encode_message_csv(msg):
         def wrap(i):
-            return '"{}"'.format(six.text_type(i).replace('"', '""'))
+            return '"{}"'.format(str(i).replace('"', '""'))
 
         return ','.join(map(wrap, [
             msg.id,

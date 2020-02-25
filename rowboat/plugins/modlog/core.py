@@ -1,5 +1,4 @@
 import re
-import six
 import time
 import pytz
 import string
@@ -7,7 +6,7 @@ import operator
 import humanize
 
 from holster.enum import Enum
-from holster.emitter import Priority
+from disco.util.emitter import Priority
 from datetime import datetime
 from collections import defaultdict
 
@@ -271,7 +270,7 @@ class ModLogPlugin(Plugin):
                     info = config._custom[action]
 
             # Format contents and create the message with the given emoji
-            contents = self.fmt.format(six.text_type(info['format']), **details)
+            contents = self.fmt.format(str(info['format']), **details)
             msg = ':{}: {}'.format(info['emoji'], contents)
 
             if chan_config.timestamps:
@@ -560,7 +559,7 @@ class ModLogPlugin(Plugin):
         archive = MessageArchive.create_from_message_ids(event.ids)
         self.log_action(Actions.MESSAGE_DELETE_BULK, event, log=archive.url, channel=channel, count=len(event.ids))
 
-    @Plugin.listen('VoiceStateUpdate', priority=Priority.BEFORE)
+    @Plugin.listen('VoiceStateUpdate', priority=Priority.SEQUENTIAL)
     def on_voice_state_update(self, event):
         old_vs = self.state.voice_states.get(event.session_id)
 

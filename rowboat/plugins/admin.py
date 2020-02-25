@@ -7,7 +7,7 @@ import operator
 
 from io import StringIO
 from peewee import fn
-from holster.emitter import Priority
+from disco.util.emitter import Priority
 from fuzzywuzzy import fuzz
 
 from datetime import datetime, timedelta

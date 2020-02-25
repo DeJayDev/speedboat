@@ -9,7 +9,7 @@ import contextlib
 import time
 
 from datetime import datetime, timedelta
-from holster.emitter import Priority, Emitter
+from disco.util.emitter import Priority, Emitter
 from disco.bot import Bot
 from disco.types.message import MessageEmbed
 from disco.types.permissions import Permissions
@@ -280,7 +280,7 @@ class CorePlugin(Plugin):
     def send_control_message(self):
         embed = MessageEmbed()
         embed.set_footer(text='Speedboat {}'.format(
-            'Production' if ENV == 'prod' else 'Testing'
+            'Production' if ENV == 'docker' else 'Testing'
         ))
         embed.timestamp = datetime.utcnow().isoformat()
         embed.color = 0x779ecb
@@ -306,7 +306,7 @@ class CorePlugin(Plugin):
             embed.color = 0xffb347
             embed.add_field(name='Replayed Events', value=str(self.client.gw.replayed_events))
 
-    @Plugin.listen('Ready', priority=Priority.BEFORE)
+    @Plugin.listen('Ready', priority=Priority.SEQUENTIAL)
     def on_ready(self, event):
         reconnects = self.client.gw.reconnects
         self.log.info('Started session %s', event.session_id)
@@ -323,7 +323,7 @@ class CorePlugin(Plugin):
                 embed.title = 'Connected'
                 embed.color = 0x77dd77
 
-    @Plugin.listen('GuildCreate', priority=Priority.BEFORE, conditional=lambda e: not e.created)
+    @Plugin.listen('GuildCreate', priority=Priority.SEQUENTIAL, conditional=lambda e: not e.created)
     def on_guild_create(self, event):
         try:
             guild = Guild.with_id(event.id)

@@ -6,7 +6,7 @@ from gevent.lock import Semaphore
 from datetime import datetime, timedelta
 from collections import defaultdict
 from holster.enum import Enum
-from holster.emitter import Priority
+from disco.util.emitter import Priority
 
 from rowboat.plugins import RowboatPlugin as Plugin
 from rowboat.redis import rdb
