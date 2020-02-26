@@ -1,5 +1,26 @@
 # Changelog
 
+## V1.7.0
+
+Awesome, Python 3. The 1.7 branch of updates will all be counted as minors until the release of either LevelPlugin or XPPlugin.
+
+### Features
+
+- Moves away from the old Speedboat control guild
+- Updates any python container to python3
+- Updates to redis 5 (doing this slowly for compat reasons)
+- Updates to postgers 9.6.17
+- Updates to node 10
+- Update all frontend dependencies and fix the incompatitibilities
+- - This is all part of an effort to reduce server load, where most of it comes from node.
+- Updates all bot/web depdencies to something that supports python3 natively.
+
+### Bug Fixes
+
+- Properly uses Custom Status
+- Moves to thecatapi (rip random.cat)
+- 
+
 ## V1.6.1
 
 Hopefully this is how you do minor versions. This version fixes some things that I've observed to be broken and updates us to a newer version of peewee, for hopefully faster database queries.

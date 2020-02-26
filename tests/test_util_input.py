@@ -19,4 +19,4 @@ class TestRuleMatcher(unittest.TestCase):
         self.assertTrue(dt > (compare + timedelta(days=7)))
 
     def test_invalid_duration(self):
-        self.assertEquals(parse_duration('mmmmm', safe=True), None)
+        self.assertEqual(parse_duration('mmmmm', safe=True), None)

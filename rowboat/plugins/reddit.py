@@ -3,7 +3,6 @@ import emoji
 import requests
 
 from collections import defaultdict
-
 from holster.enum import Enum
 from disco.types.message import MessageEmbed
 
@@ -59,10 +58,10 @@ class RedditPlugin(Plugin):
         for gid, config in subs_raw:
             config = json.loads(config)
 
-            for k, v in config['subs'].items():
+            for k, v in list(config['subs'].items()):
                 subs[k].append((gid, SubRedditConfig(v)))
 
-        for sub, configs in subs.items():
+        for sub, configs in list(subs.items()):
             try:
                 self.update_subreddit(sub, configs)
             except requests.HTTPError:
@@ -70,7 +69,7 @@ class RedditPlugin(Plugin):
 
     def get_channel(self, guild, ref):
         # CLEAN THIS UP TO A RESOLVER
-        if isinstance(ref, (int, long)):
+        if isinstance(ref, int):
             return guild.channels.get(ref)
         else:
             return guild.channels.select_one(name=ref)
@@ -97,10 +96,10 @@ class RedditPlugin(Plugin):
             else:
                 embed.title = data['title']
 
-            embed.url = u'https://reddit.com{}'.format(data['permalink'])
+            embed.url = 'https://reddit.com{}'.format(data['permalink'])
             embed.set_author(
                 name=data['author'],
-                url=u'https://reddit.com/u/{}'.format(data['author'])
+                url='https://reddit.com/u/{}'.format(data['author'])
             )
 
             image = None
@@ -117,7 +116,7 @@ class RedditPlugin(Plugin):
                 sz = min(64, max(config.text_length, 1900))
                 embed.description = data['selftext'][:sz]
                 if len(data['selftext']) > sz:
-                    embed.description += u'...'
+                    embed.description += '...'
                 if image:
                     embed.set_thumbnail(url=image)
             elif image:
@@ -140,7 +139,7 @@ class RedditPlugin(Plugin):
         )
         r.raise_for_status()
 
-        data = list(reversed(map(lambda i: i['data'], r.json()['data']['children'])))
+        data = list(reversed([i['data'] for i in r.json()['data']['children']]))
 
         # TODO:
         #  1. instead of tracking per guild, just track globally per subreddit

@@ -5,9 +5,9 @@ import gevent
 import humanize
 import operator
 
-from StringIO import StringIO
+from io import StringIO
 from peewee import fn
-from holster.emitter import Priority
+from disco.util.emitter import Priority
 from fuzzywuzzy import fuzz
 
 from datetime import datetime, timedelta
@@ -35,6 +35,7 @@ from rowboat.models.message import Message, Reaction, MessageArchive
 from rowboat.constants import (
     GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID, GREEN_TICK_EMOJI, RED_TICK_EMOJI
 )
+from functools import reduce
 
 EMOJI_RE = re.compile(r'<:[a-zA-Z0-9_]+:([0-9]+)>')
 
@@ -84,10 +85,10 @@ class AdminConfig(PluginConfig):
     persist = Field(PersistConfig, default=None)
 
     # Aliases to roles, can be used in place of IDs in commands
-    role_aliases = DictField(unicode, snowflake)
+    role_aliases = DictField(str, snowflake)
 
     # Group roles can be joined/left by any user
-    group_roles = DictField(lambda value: unicode(value).lower(), snowflake)
+    group_roles = DictField(lambda value: str(value).lower(), snowflake)
     group_confirm_reactions = Field(bool, default=False)
 
     # Locked roles cannot be changed unless they are unlocked w/ command
@@ -155,7 +156,7 @@ class AdminPlugin(Plugin):
                     Actions.MEMBER_TEMPBAN_EXPIRE,
                     guild.id,
                     user_id=item.user_id,
-                    user=unicode(self.state.users.get(item.user_id) or item.user_id),
+                    user=str(self.state.users.get(item.user_id) or item.user_id),
                     inf=item
                 )
             elif type_ == Infraction.Types.TEMPMUTE or Infraction.Types.TEMPROLE:
@@ -343,11 +344,11 @@ class AdminPlugin(Plugin):
             w.writerow([
                 inf.id,
                 inf.user_id,
-                unicode(inf.user).encode('utf-8'),
+                str(inf.user).encode('utf-8'),
                 inf.actor_id,
-                unicode(inf.actor).encode('utf-8'),
-                unicode({i.index: i for i in Infraction.Types.attrs}[inf.type_]).encode('utf-8'),
-                unicode(inf.reason).encode('utf-8'),
+                str(inf.actor).encode('utf-8'),
+                str({i.index: i for i in Infraction.Types.attrs}[inf.type_]).encode('utf-8'),
+                str(inf.reason).encode('utf-8'),
             ])
 
         raise CommandSuccess('Ok, here is an archive of all infractions', attachments=[
@@ -385,8 +386,8 @@ class AdminPlugin(Plugin):
 
         embed.title = str(type_).title()
         embed.set_thumbnail(url=infraction.user.get_avatar_url())
-        embed.add_field(name='User', value=unicode(infraction.user), inline=True)
-        embed.add_field(name='Moderator', value=unicode(infraction.actor), inline=True)
+        embed.add_field(name='User', value=str(infraction.user), inline=True)
+        embed.add_field(name='Moderator', value=str(infraction.actor), inline=True)
         embed.add_field(name='Active', value='yes' if infraction.active else 'no', inline=False)
         if infraction.active and infraction.expires_at:
             embed.add_field(name='Expires', value=humanize.naturaldelta(infraction.expires_at - datetime.utcnow()))
@@ -439,8 +440,8 @@ class AdminPlugin(Plugin):
                 inf.id,
                 inf.created_at.strftime("%Y-%m-%d %H:%m:%S"),
                 str(type_),
-                unicode(inf.user),
-                unicode(User.with_id(inf.actor_id)),
+                str(inf.user),
+                str(User.with_id(inf.actor_id)),
                 active,
                 clamp(reason, 128)
             )
@@ -542,13 +543,13 @@ class AdminPlugin(Plugin):
     @Plugin.command('roles', level=CommandLevels.MOD)
     def roles(self, event):
         buff = ''
-        for role in event.guild.roles.values():
-            role = S(u'{} - {}\n'.format(role.id, role.name), escape_codeblocks=True)
+        for role in list(event.guild.roles.values()):
+            role = S('{} - {}\n'.format(role.id, role.name), escape_codeblocks=True)
             if len(role) + len(buff) > 1990:
-                event.msg.reply(u'```{}```'.format(buff))
+                event.msg.reply('```{}```'.format(buff))
                 buff = ''
             buff += role
-        return event.msg.reply(u'```{}```'.format(buff))
+        return event.msg.reply('```{}```'.format(buff))
 
     @Plugin.command('restore', '<user:user>', level=CommandLevels.MOD, group='backups')
     def restore(self, event, user):
@@ -606,7 +607,7 @@ class AdminPlugin(Plugin):
                 raise CommandFail('Mute is not properly setup on this server')
 
             if event.config.mute_role in member.roles:
-                raise CommandFail(u'{} is already muted'.format(member.user))
+                raise CommandFail('{} is already muted'.format(member.user))
 
             # If we have a duration set, this is a tempmute
             if duration:
@@ -617,8 +618,8 @@ class AdminPlugin(Plugin):
                 if event.config.confirm_actions:
                     event.msg.reply(maybe_string(
                         reason,
-                        u':ok_hand: {u} is now muted for {t} (`{o}`)',
-                        u':ok_hand: {u} is now muted for {t}',
+                        ':ok_hand: {u} is now muted for {t} (`{o}`)',
+                        ':ok_hand: {u} is now muted for {t}',
                         u=member.user,
                         t=humanize.naturaldelta(duration - datetime.utcnow()),
                     ))
@@ -631,16 +632,16 @@ class AdminPlugin(Plugin):
 
                     # The user is 100% muted and not tempmuted at this point, so lets bail
                     if not existed:
-                        raise CommandFail(u'{} is already muted'.format(member.user))
+                        raise CommandFail('{} is already muted'.format(member.user))
 
                 Infraction.mute(self, event, member, reason)
 
                 if event.config.confirm_actions:
-                    existed = u' [was temp-muted]' if existed else ''
+                    existed = ' [was temp-muted]' if existed else ''
                     event.msg.reply(maybe_string(
                         reason,
-                        u':ok_hand: {u} is now muted (`{o}`)' + existed,
-                        u':ok_hand: {u} is now muted' + existed,
+                        ':ok_hand: {u} is now muted (`{o}`)' + existed,
+                        ':ok_hand: {u} is now muted' + existed,
                         u=member.user,
                     ))
         else:
@@ -656,12 +657,12 @@ class AdminPlugin(Plugin):
             raise CommandFail('Invalid user')
 
         self.can_act_on(event, member.id)
-        role_id = role if isinstance(role, (int, long)) else event.config.role_aliases.get(role.lower())
+        role_id = role if isinstance(role, int) else event.config.role_aliases.get(role.lower())
         if not role_id or role_id not in event.guild.roles:
             raise CommandFail('Invalid or unknown role')
 
         if role_id in member.roles:
-            raise CommandFail(u'{} is already in that role'.format(member.user))
+            raise CommandFail('{} is already in that role'.format(member.user))
 
         expire_dt = parse_duration(duration)
         Infraction.temprole(self, event, member, role_id, reason, expire_dt)
@@ -670,8 +671,8 @@ class AdminPlugin(Plugin):
         if event.config.confirm_actions:
             event.msg.reply(maybe_string(
                 reason,
-                u':ok_hand: {u} is now in the {r} role for {t} (`{o}`)',
-                u':ok_hand: {u} is now in the {r} role for {t}',
+                ':ok_hand: {u} is now in the {r} role for {t} (`{o}`)',
+                ':ok_hand: {u} is now in the {r} role for {t}',
                 r=event.guild.roles[role_id].name,
                 u=member.user,
                 t=humanize.naturaldelta(expire_dt - datetime.utcnow()),
@@ -688,7 +689,7 @@ class AdminPlugin(Plugin):
                 raise CommandFail('Mute is not setup on this server')
 
             if event.config.mute_role not in member.roles:
-                raise CommandFail(u'{} is not muted'.format(member.user))
+                raise CommandFail('{} is not muted'.format(member.user))
 
             Infraction.clear_active(event, member.id, [Infraction.Types.MUTE, Infraction.Types.TEMPMUTE])
 
@@ -706,11 +707,11 @@ class AdminPlugin(Plugin):
                 Actions.MEMBER_UNMUTED,
                 event.guild.id,
                 member=member,
-                actor=unicode(event.author) if event.author.id != member.id else 'Automatic',
+                actor=str(event.author) if event.author.id != member.id else 'Automatic',
             )
 
             if event.config.confirm_actions:
-                raise CommandSuccess(u'{} is now unmuted'.format(member.user))
+                raise CommandSuccess('{} is now unmuted'.format(member.user))
         else:
             raise CommandFail('Invalid user')
 
@@ -723,15 +724,15 @@ class AdminPlugin(Plugin):
             if event.config.confirm_actions:
                 event.msg.reply(maybe_string(
                     reason,
-                    u':ok_hand: kicked {u} (`{o}`)',
-                    u':ok_hand: kicked {u}',
+                    ':ok_hand: kicked {u} (`{o}`)',
+                    ':ok_hand: kicked {u}',
                     u=member.user,
                 ))
         else:
             raise CommandFail('Invalid user')
 
     @Plugin.command('mkick', parser=True, level=CommandLevels.MOD)
-    @Plugin.parser.add_argument('users', type=long, nargs='+')
+    @Plugin.parser.add_argument('users', type=int, nargs='+')
     @Plugin.parser.add_argument('-r', '--reason', default='', help='reason for modlog')
     def mkick(self, event, args):
         members = []
@@ -773,7 +774,7 @@ class AdminPlugin(Plugin):
         raise CommandSuccess('Kicked {} users'.format(len(members)))
 
     @Plugin.command('mban', parser=True, level=CommandLevels.MOD)
-    @Plugin.parser.add_argument('users', type=long, nargs='+')
+    @Plugin.parser.add_argument('users', type=int, nargs='+')
     @Plugin.parser.add_argument('-r', '--reason', default='', help='reason for modlog')
     def mban(self, event, args):
         members = []
@@ -814,7 +815,7 @@ class AdminPlugin(Plugin):
     def ban(self, event, user, reason=None):
         member = None
 
-        if isinstance(user, (int, long)):
+        if isinstance(user, int):
             self.can_act_on(event, user)
             Infraction.ban(self, event, user, reason, guild=event.guild)
         else:
@@ -828,8 +829,8 @@ class AdminPlugin(Plugin):
         if event.config.confirm_actions:
             event.msg.reply(maybe_string(
                 reason,
-                u':ok_hand: banned {u} (`{o}`)',
-                u':ok_hand: banned {u}',
+                ':ok_hand: banned {u} (`{o}`)',
+                ':ok_hand: banned {u}',
                 u=member.user if member else user,
             ))
 
@@ -845,8 +846,8 @@ class AdminPlugin(Plugin):
             if event.config.confirm_actions:
                 event.msg.reply(maybe_string(
                     reason,
-                    u':ok_hand: soft-banned {u} (`{o}`)',
-                    u':ok_hand: soft-banned {u}',
+                    ':ok_hand: soft-banned {u} (`{o}`)',
+                    ':ok_hand: soft-banned {u}',
                     u=member.user,
                 ))
         else:
@@ -863,8 +864,8 @@ class AdminPlugin(Plugin):
             if event.config.confirm_actions:
                 event.msg.reply(maybe_string(
                     reason,
-                    u':ok_hand: temp-banned {u} for {t} (`{o}`)',
-                    u':ok_hand: temp-banned {u} for {t}',
+                    ':ok_hand: temp-banned {u} for {t} (`{o}`)',
+                    ':ok_hand: temp-banned {u} for {t}',
                     u=member.user,
                     t=humanize.naturaldelta(expires_dt - datetime.utcnow()),
                 ))
@@ -883,8 +884,8 @@ class AdminPlugin(Plugin):
         if event.config.confirm_actions:
             event.msg.reply(maybe_string(
                 reason,
-                u':ok_hand: warned {u} (`{o}`)',
-                u':ok_hand: warned {u}',
+                ':ok_hand: warned {u} (`{o}`)',
+                ':ok_hand: warned {u}',
                 u=member.user if member else user,
             ))
 
@@ -911,16 +912,16 @@ class AdminPlugin(Plugin):
         if mode in ('all', 'channel'):
             cid = event.channel.id
             if channel:
-                cid = channel if isinstance(channel, (int,long)) else channel.id
+                cid = channel if isinstance(channel, int) else channel.id
             channel = event.guild.channels.get(cid)
             if not channel:
               raise CommandFail('Channel not Found')
             perms = channel.get_permissions(event.author)
-            if not (perms.administrator or perms.read_messages):
+            if not (perms.administrator or perms.view_channel):
               raise CommandFail('Cannot access channel due to permissions')
             q = q.where(Message.channel_id == cid)
         else:
-            user_id = user if isinstance(user, (int, long)) else user.id
+            user_id = user if isinstance(user, int) else user.id
             if event.author.id != user_id:
                 self.can_act_on(event, user_id)
             q = q.where(
@@ -1054,19 +1055,19 @@ class AdminPlugin(Plugin):
     def role_add(self, event, user, role, reason=None, mode=None, type=None):
         role_obj = None
 
-        if role.isdigit() and int(role) in event.guild.roles.keys():
+        if role.isdigit() and int(role) in list(event.guild.roles.keys()):
             role_obj = event.guild.roles[int(role)]
         elif role.lower() in event.config.role_aliases:
             role_obj = event.guild.roles.get(event.config.role_aliases[role.lower()])
         else:
             # First try exact match
-            exact_matches = [i for i in event.guild.roles.values() if i.name.lower().replace(' ', '') == role.lower()]
+            exact_matches = [i for i in list(event.guild.roles.values()) if i.name.lower().replace(' ', '') == role.lower()]
             if len(exact_matches) == 1:
                 role_obj = exact_matches[0]
             else:
                 # Otherwise we fuzz it up
                 rated = sorted([
-                    (fuzz.partial_ratio(role, r.name.replace(' ', '')), r) for r in event.guild.roles.values()
+                    (fuzz.partial_ratio(role, r.name.replace(' ', '')), r) for r in list(event.guild.roles.values())
                 ], key=lambda i: i[0], reverse=True)
 
                 if rated[0][0] > 40:
@@ -1093,9 +1094,9 @@ class AdminPlugin(Plugin):
         self.can_act_on(event, member.id)
 
         if mode == 'add' and role_obj.id in member.roles:
-            raise CommandFail(u'{} already has the {} role'.format(member, role_obj.name))
+            raise CommandFail('{} already has the {} role'.format(member, role_obj.name))
         elif mode == 'remove' and role_obj.id not in member.roles:
-            return CommandFail(u'{} doesn\'t have the {} role'.format(member, role_obj.name))
+            return CommandFail('{} doesn\'t have the {} role'.format(member, role_obj.name))
 
         self.call(
             'ModLogPlugin.create_debounce',
@@ -1115,11 +1116,11 @@ class AdminPlugin(Plugin):
             event.guild.id,
             member=member,
             role=role_obj,
-            actor=unicode(event.author),
+            actor=str(event.author),
             reason=reason or 'no reason',
         )
 
-        raise CommandSuccess(u'{} role {} to {}'.format('added' if mode == 'add' else 'removed',
+        raise CommandSuccess('{} role {} to {}'.format('added' if mode == 'add' else 'removed',
             role_obj.name,
             member))
 
@@ -1201,7 +1202,7 @@ class AdminPlugin(Plugin):
                 '<:{}:{}>'.format(reactions_given[0][2], reactions_given[0][1])
             )
             embed.fields.append(
-                MessageEmbedField(name='Most Used Reaction', value=u'{} (used {} times)'.format(
+                MessageEmbedField(name='Most Used Reaction', value='{} (used {} times)'.format(
                     emoji,
                     reactions_given[0][0],
                 ), inline=True))
@@ -1212,7 +1213,7 @@ class AdminPlugin(Plugin):
             if emojis:
                 embed.add_field(
                     name='Most Used Emoji',
-                    value=u'<:{1}:{0}> (`{1}`, used {2} times)'.format(*emojis[0]))
+                    value='<:{1}:{0}> (`{1}`, used {2} times)'.format(*emojis[0]))
 
         embed.thumbnail = MessageEmbedThumbnail(url=user.avatar_url)
         embed.color = get_dominant_colors_user(user, User.from_disco_user(user).get_avatar_url())
@@ -1377,7 +1378,7 @@ class AdminPlugin(Plugin):
 
         for session in sessions:
             tbl.add(
-                unicode(self.state.channels.get(session.channel_id) or 'UNKNOWN'),
+                str(self.state.channels.get(session.channel_id) or 'UNKNOWN'),
                 '{} ({} ago)'.format(
                     session.started_at.isoformat(),
                     humanize.naturaldelta(datetime.utcnow() - session.started_at)),
@@ -1434,7 +1435,7 @@ class AdminPlugin(Plugin):
         if event.config.group_confirm_reactions:
             event.msg.add_reaction(GREEN_TICK_EMOJI)
             return
-        raise CommandSuccess(u'you have joined the {} group'.format(name))
+        raise CommandSuccess('you have joined the {} group'.format(name))
 
     @Plugin.command('leave', '<name:snowflake|str>', aliases=['remove', 'take'])
     def leave_role(self, event, name):
@@ -1453,7 +1454,7 @@ class AdminPlugin(Plugin):
         if event.config.group_confirm_reactions:
             event.msg.add_reaction(GREEN_TICK_EMOJI)
             return
-        raise CommandSuccess(u'you have left the {} group'.format(name))
+        raise CommandSuccess('you have left the {} group'.format(name))
 
     @Plugin.command('unlock', '<role_id:snowflake>', group='role', level=CommandLevels.ADMIN)
     def unlock_role(self, event, role_id):

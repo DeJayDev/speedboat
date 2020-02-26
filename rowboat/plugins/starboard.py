@@ -56,7 +56,7 @@ class StarboardConfig(PluginConfig):
         if channel_id in self.channels:
             return (None, None)
 
-        for starboard, config in self.channels.items():
+        for starboard, config in list(self.channels.items()):
             if not config.sources or channel_id in config.sources:
                 return (starboard, config)
         return (None, None)
@@ -192,7 +192,7 @@ class StarboardPlugin(Plugin):
             ).execute()
 
         self.queue_update(event.guild.id, event.config)
-        raise CommandSuccess(u'Forcing an update on message {}'.format(mid))
+        raise CommandSuccess('Forcing an update on message {}'.format(mid))
 
     @Plugin.command('block', '<user:user>', group='stars', level=CommandLevels.MOD)
     def stars_block(self, event, user):
@@ -204,7 +204,7 @@ class StarboardPlugin(Plugin):
             })
 
         if not created:
-            raise CommandFail(u'{} is already blocked from the starboard'.format(
+            raise CommandFail('{} is already blocked from the starboard'.format(
                 user,
             ))
             return
@@ -215,7 +215,7 @@ class StarboardPlugin(Plugin):
         # Finally, queue an update for the guild
         self.queue_update(event.guild.id, event.config)
 
-        raise CommandSuccess(u'Blocked {} from the starboard'.format(
+        raise CommandSuccess('Blocked {} from the starboard'.format(
             user,
         ))
 
@@ -227,7 +227,7 @@ class StarboardPlugin(Plugin):
         ).execute()
 
         if not count:
-            raise CommandFail(u'{} was not blocked from the starboard'.format(
+            raise CommandFail('{} was not blocked from the starboard'.format(
                 user,
             ))
 
@@ -237,7 +237,7 @@ class StarboardPlugin(Plugin):
         # Finally, queue an update for the guild
         self.queue_update(event.guild.id, event.config)
 
-        raise CommandSuccess(u'Unblocked {} from the starboard'.format(
+        raise CommandSuccess('Unblocked {} from the starboard'.format(
             user,
         ))
 
@@ -252,11 +252,11 @@ class StarboardPlugin(Plugin):
         ).execute()
 
         if not count:
-            raise CommandFail(u'No hidden starboard message with that ID')
+            raise CommandFail('No hidden starboard message with that ID')
             
 
         self.queue_update(event.guild.id, event.config)
-        raise CommandSuccess(u'Message {} has been unhidden from the starboard'.format(
+        raise CommandSuccess('Message {} has been unhidden from the starboard'.format(
             mid,
         ))
 
@@ -270,10 +270,10 @@ class StarboardPlugin(Plugin):
         ).execute()
 
         if not count:
-            raise CommandFail(u'No starred message with that ID')
+            raise CommandFail('No starred message with that ID')
 
         self.queue_update(event.guild.id, event.config)
-        raise CommandSuccess(u'Message {} has been hidden from the starboard'.format(
+        raise CommandSuccess('Message {} has been hidden from the starboard'.format(
             mid,
         ))
 

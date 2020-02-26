@@ -132,7 +132,7 @@ class Guild(ModelBase):
             (GuildBan.guild_id == guild.id)
         ).execute()
 
-        for ban in bans.values():
+        for ban in list(bans.values()):
             GuildBan.ensure(guild, ban.user, ban.reason)
 
     def serialize(self):
