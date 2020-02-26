@@ -24,6 +24,7 @@ from rowboat.models.guild import GuildEmoji, GuildVoiceSession
 from rowboat.models.channel import Channel
 from rowboat.models.message import Message, Reaction
 from rowboat.util.input import parse_duration
+from rowboat.util.reqaddons import DiscordStyle
 from rowboat.tasks.backfill import backfill_channel, backfill_guild
 
 
@@ -243,7 +244,7 @@ class SQLPlugin(Plugin):
             chlist = list(event.guild.channels.values())
         for gch in chlist:
             if int(self.state.channels[gch.id].type) == 0 or int(self.state.channels[gch.id].type) == 5:
-                if self.state.channels[gch.id].get_permissions(self.state.me).can(Permissions.READ_MESSAGES):
+                if self.state.channels[gch.id].get_permissions(self.state.me).can(Permissions.VIEW_CHANNEL):
                     channels.append(self.state.channels[gch.id])
 
         start_at = parse_duration(duration, negative=True)
@@ -329,12 +330,8 @@ class SQLPlugin(Plugin):
         sql_duration = time.time() - start
 
         start = time.time()
-        chart = line.Line()
-        options = dict(
-            scale_integers=True,
-            fields = []
-        )
-        chart.title = 'Usage of {} Over {} {}'.format(
+        chart = pygal.Line(style=DiscordStyle)
+        chart.title = 'Usage of "{}" over {} {}'.format(
             word, amount, unit,
         )
 

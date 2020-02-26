@@ -917,7 +917,7 @@ class AdminPlugin(Plugin):
             if not channel:
               raise CommandFail('Channel not Found')
             perms = channel.get_permissions(event.author)
-            if not (perms.administrator or perms.read_messages):
+            if not (perms.administrator or perms.view_channel):
               raise CommandFail('Cannot access channel due to permissions')
             q = q.where(Message.channel_id == cid)
         else:
