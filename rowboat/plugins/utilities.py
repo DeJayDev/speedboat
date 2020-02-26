@@ -4,14 +4,14 @@ import humanize
 import operator
 import gevent
 
-from six import BytesIO
+from io import BytesIO
 from PIL import Image
 from peewee import fn
 from gevent.pool import Pool
 from datetime import datetime, timedelta
 from collections import defaultdict
 
-from disco.types.user import GameType, Status
+from disco.types.user import ActivityTypes, Status
 from disco.types.message import MessageEmbed
 from disco.util.snowflake import to_datetime
 from disco.util.sanitize import S
@@ -31,11 +31,12 @@ from rowboat.constants import (
     STATUS_EMOJI, SNOOZE_EMOJI, GREEN_TICK_EMOJI, GREEN_TICK_EMOJI_ID,
     EMOJI_RE, USER_MENTION_RE, YEAR_IN_SEC, CDN_URL
 )
+from functools import reduce
 
 
 def get_status_emoji(presence):
-    if presence.game and presence.game.type == GameType.STREAMING:
-        return STATUS_EMOJI[GameType.STREAMING], 'Streaming'
+    if presence.game and presence.game.type == ActivityTypes.STREAMING:
+        return STATUS_EMOJI[ActivityTypes.STREAMING], 'Streaming'
     elif presence.status == Status.ONLINE:
         return STATUS_EMOJI[Status.ONLINE], 'Online'
     elif presence.status == Status.IDLE:
@@ -97,27 +98,15 @@ class UtilitiesPlugin(Plugin):
 
     @Plugin.command('cat', global_=True)
     def cat(self, event):
-        # Sometimes random.cat gives us gifs (smh)
-        for _ in range(3):
-            try:
-                r = requests.get('http://aws.random.cat/meow')
-                r.raise_for_status()
-            except:
-                continue
+        try:
+            r = requests.get('https://api.thecatspi.com/v1/images/search?format=src')
+            r.raise_for_status()
+            ext = r.headers['content-type'].split('/')[-1].split(';')[0]
+            event.msg.reply('', attachments=[('dog.{}'.format(ext), r.content)])
+        except:
+            return event.msg.reply(r.status_code + ' Dog not found :(')
 
-            url = r.json()['file']
-            if not url.endswith('.gif'):
-                break
-        else:
-            return event.msg.reply('{} Cat not found :('.format(
-                r.status_code
-            ))
-
-        r = requests.get(url)
-        r.raise_for_status()
-        event.msg.reply('', attachments=[('cat.jpg', r.content)])
-
-    @Plugin.command('dog', global_=True) #global_=True! what will he do?
+    @Plugin.command('dog', global_=True)
     def dog(self, event):
         try:
             r = requests.get('https://api.thedogapi.com/v1/images/search?format=src')
@@ -130,7 +119,7 @@ class UtilitiesPlugin(Plugin):
     @Plugin.command('emoji', '<emoji:str>', global_=True)
     def emoji(self, event, emoji):
         if not EMOJI_RE.match(emoji):
-            raise CommandFail(u'Unknown emoji: `{}`'.format(emoji))
+            raise CommandFail('Unknown emoji: `{}`'.format(emoji))
 
         fields = []
 
@@ -189,9 +178,9 @@ class UtilitiesPlugin(Plugin):
                 Message.author_id == user.id
             ).order_by(Message.timestamp.desc()).limit(1).get()
         except Message.DoesNotExist:
-            raise CommandFail(u"I've never seen {}".format(user))
+            raise CommandFail("I've never seen {}".format(user))
 
-        raise CommandSuccess(u'I last saw {} {} (at {})'.format(
+        raise CommandSuccess('I last saw {} {} (at {})'.format( #TODO: Prettify this timestamp response like in inf latest
             user,
             humanize.naturaltime(datetime.utcnow() - msg.timestamp),
             msg.timestamp
@@ -208,7 +197,7 @@ class UtilitiesPlugin(Plugin):
         if len(q) and q[0].isdigit():
             queries.append((User.user_id == q[0]))
         else:
-            queries.append((User.username ** u'%{}%'.format(query.replace('%', ''))))
+            queries.append((User.username ** '%{}%'.format(query.replace('%', ''))))
 
         if '#' in query:
             username, discrim = query.rsplit('#', 1)
@@ -219,14 +208,14 @@ class UtilitiesPlugin(Plugin):
 
         users = User.select().where(reduce(operator.or_, queries)).limit(10)
         if len(users) == 0:
-            raise CommandFail(u'No users found for query `{}`'.format(S(query, escape_codeblocks=True)))
+            raise CommandFail('No users found for query `{}`'.format(S(query, escape_codeblocks=True)))
 
         if len(users) == 1:
             if users[0].user_id in self.state.users:
                 return self.info(event, self.state.users.get(users[0].user_id))
 
-        raise CommandSuccess(u'Found the following users for your query: ```{}```'.format(
-            u'\n'.join(map(lambda i: u'{} ({})'.format(unicode(i), i.user_id), users[:25]))
+        raise CommandSuccess('Found the following users for your query: ```{}```'.format(
+            '\n'.join(['{} ({})'.format(str(i), i.user_id) for i in users[:25]])
         ))
 
     @Plugin.command('server', '[guild_id:snowflake]', global_=True)
@@ -236,36 +225,40 @@ class UtilitiesPlugin(Plugin):
             raise CommandFail('Invalid server')
 
         content = []
-        content.append(u'**\u276F Server Information**')
+        content.append('**\u276F Server Information**')
+        content.append('Owner: {} ({})'.format(
+            guild.owner,
+            guild.owner.id
+        ))
 
         created_at = to_datetime(guild.id)
-        content.append(u'Created: {} ({})'.format(
+        content.append('Created: {} ({})'.format(
             humanize.naturaltime(datetime.utcnow() - created_at),
             created_at.isoformat(),
         ))
         
-        content.append(u'Members: {:,}'.format(len(guild.members)))
+        content.append('Members: {:,}'.format(len(guild.members)))
         if guild.features:
-            content.append(u'Features: {}'.format(', '.join(guild.features)))
+            content.append('Features: {}'.format(', '.join(guild.features)))
 
-        content.append(u'\n**\u276F Counts**')
-        text_count = sum(1 for c in guild.channels.values() if not c.is_voice)
+        content.append('\n**\u276F Counts**')
+        text_count = sum(1 for c in list(guild.channels.values()) if not c.is_voice)
         voice_count = len(guild.channels) - text_count
-        content.append(u'Roles: {}'.format(len(guild.roles)))
-        content.append(u'Text: {}'.format(text_count))
-        content.append(u'Voice: {}'.format(voice_count))
+        content.append('Roles: {}'.format(len(guild.roles)))
+        content.append('Text: {}'.format(text_count))
+        content.append('Voice: {}'.format(voice_count))
 
-        content.append(u'\n**\u276F Members**')
+        content.append('\n**\u276F Members**')
         status_counts = defaultdict(int)
-        for member in guild.members.values():
+        for member in list(guild.members.values()):
             if not member.user.presence:
                 status = Status.OFFLINE
             else:
                 status = member.user.presence.status
             status_counts[status] += 1
 
-        for status, count in sorted(status_counts.items(), key=lambda i: str(i[0]), reverse=True):
-            content.append(u'<{}> - {}'.format(
+        for status, count in sorted(list(status_counts.items()), key=lambda i: str(i[0]), reverse=True):
+            content.append('<{}> - {}'.format(
                 STATUS_EMOJI[status], count
             ))
 
@@ -286,7 +279,7 @@ class UtilitiesPlugin(Plugin):
             user = event.author
 
         user_id = 0
-        if isinstance(user, (int, long)):
+        if isinstance(user, int):
             user_id = user
             user = self.state.users.get(user)
 
@@ -306,9 +299,9 @@ class UtilitiesPlugin(Plugin):
         self.client.api.channels_typing(event.channel.id)
         
         content = []
-        content.append(u'**\u276F User Information**')
-        content.append(u'ID: {}'.format(user.id))
-        content.append(u'Profile: <@{}>'.format(user.id))
+        content.append('**\u276F User Information**')
+        content.append('ID: {}'.format(user.id))
+        content.append('Profile: <@{}>'.format(user.id))
         
         created_dt = to_datetime(user.id)
         content.append('Created: {} ({})'.format(
@@ -320,23 +313,22 @@ class UtilitiesPlugin(Plugin):
 
         if user.presence: #I couldn't get this to work w/o it lol
             emoji, status = get_status_emoji(user.presence)
-            content.append('Online Status: {} <{}>'.format(status, emoji))
+            content.append('Status: {} <{}>'.format(status, emoji))
             if user.presence.game and user.presence.game.name:
-                if user.presence.game.type == GameType.DEFAULT:
-                    content.append(u'{}'.format(user.presence.game.name))
-                if user.presence.game.type == GameType.LISTENING:
-                    content.append(u'Listening to Spotify')
-                else:
-                    if user.presence.game.url:
-                        content.append(u'Streaming: [{}]({})'.format(user.presence.game.name, user.presence.game.url))
-                    else:
-                        content.append(u'{}'.format(user.presence.game.name))
+                if user.presence.game.type == ActivityTypes.DEFAULT:
+                    content.append('{}'.format(user.presence.game.name))
+                if user.presence.game.type == ActivityTypes.CUSTOM:
+                    content.append('Custom Status: {}'.format(user.presence.game.state))
+                if user.presence.game.type == ActivityTypes.LISTENING:
+                    content.append('Listening to Spotify')
+                if user.presence.game.type == ActivityTypes.STREAMING:
+                    content.append('Streaming: [{}]({})'.format(user.presence.game.name, user.presence.game.url))
 
         if member:
-            content.append(u'\n**\u276F Member Information**')
+            content.append('\n**\u276F Member Information**')
 
             if member.nick:
-                content.append(u'Nickname: {}'.format(member.nick))
+                content.append('Nickname: {}'.format(member.nick))
 
             content.append('Joined: {} ago ({})'.format(
                 humanize.naturaldelta(datetime.utcnow() - member.joined_at),
@@ -344,7 +336,7 @@ class UtilitiesPlugin(Plugin):
             ))
 
             if member.roles:
-                content.append(u'Roles: {}'.format(
+                content.append('Roles: {}'.format(
                     ', '.join((member.guild.roles.get(r).name for r in member.roles))
                 ))
 
@@ -373,7 +365,7 @@ class UtilitiesPlugin(Plugin):
             (Infraction.user_id == user.id) & (Infraction.guild_id == event.guild.id)).tuples()
 
         if newest_msg and oldest_msg:
-            content.append(u'\n **\u276F Activity**')
+            content.append('\n **\u276F Activity**')
             content.append('Last Message: {} ({})'.format(
                 humanize.naturaltime(datetime.utcnow() - to_datetime(newest_msg)),
                 to_datetime(newest_msg).strftime("%b %d %Y %H:%M:%S"),
@@ -384,12 +376,12 @@ class UtilitiesPlugin(Plugin):
             ))
 
         if len(infractions) > 0: 
-            content.append(u'\n**\u276F Infractions**')
+            content.append('\n**\u276F Infractions**')
             total = len(infractions)
             content.append('Total Infractions: **{:,}**'.format(total))
 
         if voice[0]:
-            content.append(u'\n**\u276F Voice**')
+            content.append('\n**\u276F Voice**')
             content.append('Sessions: `{:,}`'.format(voice[0]))
             content.append('Time: `{}`'.format(str(humanize.naturaldelta(
                 voice[1]
@@ -399,7 +391,7 @@ class UtilitiesPlugin(Plugin):
 
         avatar = User.with_id(user.id).get_avatar_url()
 
-        embed.set_author(name=u'{}#{}'.format(
+        embed.set_author(name='{}#{}'.format(
             user.username,
             user.discriminator,
         ), icon_url=avatar)
@@ -433,7 +425,7 @@ class UtilitiesPlugin(Plugin):
             reminder.delete_instance()
             return
 
-        msg = channel.send_message(u'<@{}> you asked me at {} ({}) to remind you about: {}'.format(
+        msg = channel.send_message('<@{}> you asked me at {} ({}) to remind you about: {}'.format(
             message.author_id,
             reminder.created_at,
             humanize.naturaltime(datetime.utcnow() - reminder.created_at),
@@ -464,7 +456,7 @@ class UtilitiesPlugin(Plugin):
         if mra_event.emoji.name == SNOOZE_EMOJI:
             reminder.remind_at = datetime.utcnow() + timedelta(minutes=20)
             reminder.save()
-            msg.edit(u'Ok, I\'ve snoozed that reminder for 20 minutes.')
+            msg.edit('Ok, I\'ve snoozed that reminder for 20 minutes.')
             return
 
         reminder.delete_instance()

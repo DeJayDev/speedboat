@@ -10,10 +10,19 @@ from rowboat.sql import init_db
 from rowboat.models.user import User
 from rowboat.types.guild import PluginsConfig
 
+from rowboat.views.auth import auth
+from rowboat.views.dashboard import dashboard
+from rowboat.views.guilds import guilds
+from rowboat.views.users import users
+
 from yaml import safe_load
 
 rowboat = Holster(Flask(__name__))
 logging.getLogger('peewee').setLevel(logging.DEBUG)
+rowboat.app.register_blueprint(auth)
+rowboat.app.register_blueprint(dashboard)
+rowboat.app.register_blueprint(guilds)
+rowboat.app.register_blueprint(users)
 
 
 @rowboat.app.before_first_request

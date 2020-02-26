@@ -2,11 +2,11 @@ import time
 import gevent
 import psycopg2
 import markovify
-import pygal
 import cairosvg
+import pygal
 
 from gevent.pool import Pool
-from holster.emitter import Priority
+from disco.util.emitter import Priority
 from datetime import datetime
 
 from disco.types.base import UNSET
@@ -24,6 +24,7 @@ from rowboat.models.guild import GuildEmoji, GuildVoiceSession
 from rowboat.models.channel import Channel
 from rowboat.models.message import Message, Reaction
 from rowboat.util.input import parse_duration
+from rowboat.util.reqaddons import DiscordStyle
 from rowboat.tasks.backfill import backfill_channel, backfill_guild
 
 
@@ -39,7 +40,7 @@ class SQLPlugin(Plugin):
         ctx['models'] = self.models
         super(SQLPlugin, self).unload(ctx)
 
-    @Plugin.listen('VoiceStateUpdate', priority=Priority.BEFORE)
+    @Plugin.listen('VoiceStateUpdate', priority=Priority.SEQUENTIAL)
     def on_voice_state_update(self, event):
         pre_state = self.state.voice_states.get(event.session_id)
         guild = self.guilds[event.guild_id]
@@ -174,7 +175,7 @@ class SQLPlugin(Plugin):
 
         text = [msg.content for msg in q]
         self.models[entity.id] = markovify.NewlineText('\n'.join(text))
-        raise CommandSuccess(u'Created markov model for {} using {} messages'.format(entity, len(text)))
+        raise CommandSuccess('Created markov model for {} using {} messages'.format(entity, len(text)))
 
     @Plugin.command('one', '<entity:user|channel>', level=-1, group='markov', global_=True)
     def command_markov_one(self, event, entity):
@@ -185,7 +186,7 @@ class SQLPlugin(Plugin):
         if not sentence:
             raise CommandFail('Not enough data :(')
 
-        event.msg.reply(u'{}: {}'.format(entity, sentence))
+        event.msg.reply('{}: {}'.format(entity, sentence))
 
     @Plugin.command('many', '<entity:user|channel> [count|int]', level=-1, group='markov', global_=True)
     def command_markov_many(self, event, entity, count=5):
@@ -196,11 +197,11 @@ class SQLPlugin(Plugin):
             sentence = self.models[entity.id].make_sentence(max_overlap_total=500)
             if not sentence:
                 raise CommandFail('Not enough data :(')
-            event.msg.reply(u'{}: {}'.format(entity, sentence))
+            event.msg.reply('{}: {}'.format(entity, sentence))
 
     @Plugin.command('list', level=-1, group='markov', global_=True)
     def command_markov_list(self, event):
-        event.msg.reply(u'`{}`'.format(', '.join(map(str, self.models.keys()))))
+        event.msg.reply('`{}`'.format(', '.join(map(str, list(self.models.keys())))))
 
     @Plugin.command('delete', '<oid:snowflake>', level=-1, group='markov', global_=True)
     def command_markov_delete(self, event, oid):
@@ -243,7 +244,7 @@ class SQLPlugin(Plugin):
             chlist = list(event.guild.channels.values())
         for gch in chlist:
             if int(self.state.channels[gch.id].type) == 0 or int(self.state.channels[gch.id].type) == 5:
-                if self.state.channels[gch.id].get_permissions(self.state.me).can(Permissions.READ_MESSAGES):
+                if self.state.channels[gch.id].get_permissions(self.state.me).can(Permissions.VIEW_CHANNEL):
                     channels.append(self.state.channels[gch.id])
 
         start_at = parse_duration(duration, negative=True)
@@ -323,14 +324,14 @@ class SQLPlugin(Plugin):
             unit,
             '{} {}'.format(amount, unit),
             event.guild.id,
-            '\s?{}\s?'.format(word),
+            '{}'.format(word),
             unit
         ).tuples())
         sql_duration = time.time() - start
 
         start = time.time()
-        chart = pygal.Line()
-        chart.title = 'Usage of {} Over {} {}'.format(
+        chart = pygal.Line(style=DiscordStyle)
+        chart.title = 'Usage of "{}" over {} {}'.format(
             word, amount, unit,
         )
 
@@ -368,7 +369,7 @@ class SQLPlugin(Plugin):
         else:
             raise Exception("You should not be here")
 
-        sql = """
+        sql = r"""
             SELECT word, count(*)
             FROM (
                 SELECT regexp_split_to_table(content, '\s') as word

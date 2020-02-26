@@ -26,8 +26,8 @@ def get_dominant_colors(img, n=3):
 
         points = get_points(img)
         clusters = kmeans(points, n, 1)
-        rgbs = [map(int, c.center.coords) for c in clusters]
-        return map(rtoh, rgbs)
+        rgbs = [list(map(int, c.center.coords)) for c in clusters]
+        return list(map(rtoh, rgbs))
     except:
         return [0x00000]
 
@@ -36,7 +36,7 @@ def get_dominant_colors_user(user, url=None):
     import requests
     from rowboat.redis import rdb
     from PIL import Image
-    from six import BytesIO
+    from io import BytesIO
 
     key = 'avatar:color:{}'.format(user.avatar)
     if rdb.exists(key):
@@ -56,7 +56,7 @@ def get_dominant_colors_guild(guild):
     import requests
     from rowboat.redis import rdb
     from PIL import Image
-    from six import BytesIO
+    from io import BytesIO
 
     key = 'guild:color:{}'.format(guild.icon)
     if rdb.exists(key):

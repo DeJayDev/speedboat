@@ -39,13 +39,13 @@ class LevelPlugin(Plugin):
                 })
             
             if not created:
-                raise CommandFail(u'{} is already blocked from gaining XP'.format(
+                raise CommandFail('{} is already blocked from gaining XP'.format(
                     user,
                 ))
         else:
             raise CommandFail('Invalid user')
 
-        raise CommandSuccess(u'Blocked {} from gaining XP.'.format(member))
+        raise CommandSuccess('Blocked {} from gaining XP.'.format(member))
 
     @Plugin.command('unblock', '<user:user|snowflake> [reason:str...]', group='xp2', aliases=['unmute'], level=CommandLevels.MOD)
     def xp_unblock(self, event, user, reason):
@@ -58,13 +58,13 @@ class LevelPlugin(Plugin):
             ).execute()
             
             if not success:
-                raise CommandFail(u'{} was not blocked from gaining XP'.format(
+                raise CommandFail('{} was not blocked from gaining XP'.format(
                     user,
                 ))
         else:
             raise CommandFail('Invalid user')
 
-        raise CommandSuccess(u'Unblocked {} from gaining XP.'.format(member))
+        raise CommandSuccess('Unblocked {} from gaining XP.'.format(member))
 
     @Plugin.command('reset', '<user:user|snowflake>',
     #aliases=[],
@@ -87,7 +87,7 @@ class LevelPlugin(Plugin):
         if not member:
             raise CommandFail('Invalid member')
 
-        if not isinstance(amount, (int,long)):
+        if not isinstance(amount, int):
             raise CommandFail('Invalid amount')
 
         self.can_act_on(event, member.id)
@@ -100,7 +100,7 @@ class LevelPlugin(Plugin):
 
             user.add_xp(amount)
 
-            raise CommandSuccess(u'{} was given {} XP. (New Total: `{}`)'.format(
+            raise CommandSuccess('{} was given {} XP. (New Total: `{}`)'.format(
                 member.alias,
                 amount,
                 'in dev' #Get Current Amount (do above and just pull as var w/ this amt+ added)
@@ -113,14 +113,14 @@ class LevelPlugin(Plugin):
 
             user.rmv_xp(amount)
 
-            raise CommandSuccess(u'Took {} XP from {}. (New Total: `{}`)'.format(
+            raise CommandSuccess('Took {} XP from {}. (New Total: `{}`)'.format(
                 amount,
                 member.alias,
                 'in dev'
                 #Get Current Amount (do above and just pull as var w/ this amt+ added)
             ))
         else:
-            raise CommandSuccess(u'not done')
+            raise CommandSuccess('not done')
 	    #Reset to 0
             #Do the gevent confirm action
 

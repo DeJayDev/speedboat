@@ -1,5 +1,4 @@
 import re
-import six
 import time
 import pytz
 import string
@@ -7,7 +6,7 @@ import operator
 import humanize
 
 from holster.enum import Enum
-from holster.emitter import Priority
+from disco.util.emitter import Priority
 from datetime import datetime
 from collections import defaultdict
 
@@ -24,6 +23,7 @@ from rowboat.models.guild import Guild
 from rowboat.util import ordered_load, MetaException
 
 from .pump import ModLogPump
+from functools import reduce
 
 
 # Dynamically updated by the plugin
@@ -79,14 +79,14 @@ class ModLogConfig(PluginConfig):
 
     @cached_property
     def subscribed(self):
-        return reduce(operator.or_, (i.subscribed for i in self.channels.values())) if self.channels else set()
+        return reduce(operator.or_, (i.subscribed for i in list(self.channels.values()))) if self.channels else set()
 
 
 class Formatter(string.Formatter):
     def convert_field(self, value, conversion):
         if conversion in ('z', 's'):
-            return S(unicode(value), escape_codeblocks=True)
-        return unicode(value)
+            return S(str(value), escape_codeblocks=True)
+        return str(value)
 
 
 class Debounce(object):
@@ -109,8 +109,8 @@ class DebouncesCollection(object):
         self._data = defaultdict(lambda: defaultdict(list))
 
     def __iter__(self):
-        for top in self._data.values():
-            for bot in top.values():
+        for top in list(self._data.values()):
+            for bot in list(top.values()):
                 for obj in bot:
                     yield obj
 
@@ -133,7 +133,7 @@ class DebouncesCollection(object):
                 obj.remove()
                 continue
 
-            for k, v in kwargs.items():
+            for k, v in list(kwargs.items()):
                 if obj.selector.get(k) != v:
                     continue
 
@@ -153,7 +153,7 @@ class ModLogPlugin(Plugin):
             with open('data/actions_simple.yaml') as f:
                 simple = ordered_load(f.read())
 
-            for k, v in simple.items():
+            for k, v in list(simple.items()):
                 self.register_action(k, v)
         else:
             self.action_simple = ctx['action_simple']
@@ -169,7 +169,7 @@ class ModLogPlugin(Plugin):
         super(ModLogPlugin, self).load(ctx)
 
     def create_debounce(self, event, events, **kwargs):
-        if isinstance(event, (int, long)):
+        if isinstance(event, int):
             guild_id = event
         else:
             guild_id = event.guild_id if hasattr(event, 'guild_id') else event.guild.id
@@ -188,7 +188,7 @@ class ModLogPlugin(Plugin):
             guild.name)
 
         channels = {}
-        for key, channel in config.channels.items():
+        for key, channel in list(config.channels.items()):
             if isinstance(key, int):
                 chan = guild.channels.select_one(id=key)
             else:
@@ -197,10 +197,10 @@ class ModLogPlugin(Plugin):
             if not chan:
                 raise MetaException('Failed to ModLog.resolve_channels', {
                     'guild_name': guild.name,
-                    'guild_id': unicode(guild.id),
-                    'key': unicode(key),
-                    'config_channels': list(unicode(i) for i in config.channels.keys()),
-                    'guild_channels': list(unicode(i) for i in guild.channels.keys()),
+                    'guild_id': str(guild.id),
+                    'key': str(key),
+                    'config_channels': list(str(i) for i in list(config.channels.keys())),
+                    'guild_channels': list(str(i) for i in list(guild.channels.keys())),
                 })
             channels[chan.id] = channel
 
@@ -219,7 +219,7 @@ class ModLogPlugin(Plugin):
             rowboat_guild = self.call('CorePlugin.get_guild', guild.id)
             if rowboat_guild and rowboat_guild.is_whitelisted(Guild.WhitelistFlags.MODLOG_CUSTOM_FORMAT):
                 custom = {}
-                for action, override in config.custom.items():
+                for action, override in list(config.custom.items()):
                     action = Actions.get(action)
                     if not action:
                         continue
@@ -270,8 +270,8 @@ class ModLogPlugin(Plugin):
                     info = config._custom[action]
 
             # Format contents and create the message with the given emoji
-            contents = self.fmt.format(six.text_type(info['format']), **details)
-            msg = u':{}: {}'.format(info['emoji'], contents)
+            contents = self.fmt.format(str(info['format']), **details)
+            msg = ':{}: {}'.format(info['emoji'], contents)
 
             if chan_config.timestamps:
                 ts = pytz.utc.localize(datetime.utcnow()).astimezone(chan_config.tz)
@@ -282,7 +282,7 @@ class ModLogPlugin(Plugin):
 
             return msg
 
-        for channel_id, chan_config in config._channels.items():
+        for channel_id, chan_config in list(config._channels.items()):
             if channel_id not in guild.channels:
                 self.log.error('guild %s has outdated modlog channels (%s)', guild.id, channel_id)
                 config._channels = []
@@ -417,7 +417,7 @@ class ModLogPlugin(Plugin):
             removed = pre_roles - post_roles
 
             # Log all instances of a role getting added
-            for role in filter(bool, map(event.guild.roles.get, added)):
+            for role in filter(bool, list(map(event.guild.roles.get, added))):
                 debounce = self.debounces.find(
                     event,
                     user_id=event.user.id,
@@ -428,7 +428,7 @@ class ModLogPlugin(Plugin):
 
                 self.log_action(Actions.GUILD_MEMBER_ROLES_ADD, event, role=role)
 
-            for role in filter(bool, map(event.guild.roles.get, removed)):
+            for role in filter(bool, list(map(event.guild.roles.get, removed))):
                 debounce = self.debounces.find(
                     event,
                     user_id=event.user.id,
@@ -444,7 +444,7 @@ class ModLogPlugin(Plugin):
 
         subscribed_guilds = defaultdict(list)
 
-        for guild_id, config in plugin.guilds.items():
+        for guild_id, config in list(plugin.guilds.items()):
             guild = self.state.guilds.get(guild_id)
             if not guild:
                 continue
@@ -466,7 +466,7 @@ class ModLogPlugin(Plugin):
             return
 
         pre_user = self.state.users.get(event.user.id)
-        before = unicode(pre_user)
+        before = str(pre_user)
 
         if Actions.CHANGE_USERNAME in subscribed_guilds:
             if event.user.username is not UNSET and event.user.username != pre_user.username:
@@ -476,7 +476,7 @@ class ModLogPlugin(Plugin):
                         guild,
                         config.plugins.modlog,
                         before=before,
-                        after=unicode(event.user),
+                        after=str(event.user),
                         e=event)
 
     @Plugin.listen('MessageUpdate', priority=Priority.BEFORE)
@@ -535,7 +535,7 @@ class ModLogPlugin(Plugin):
         # Truncate/limit the size of contents
         contents = filter_urls(msg.content)
         if len(contents) > 1750:
-            contents = contents[:1750] + u'... ({} more characters)'.format(
+            contents = contents[:1750] + '... ({} more characters)'.format(
                 len(contents) - 1750
             )
 
@@ -544,8 +544,8 @@ class ModLogPlugin(Plugin):
                 author_id=msg.author.id,
                 channel=channel,
                 msg=contents,
-                attachments='' if not msg.attachments else u'({})'.format(
-                    ', '.join(u'<{}>'.format(i) for i in msg.attachments)))
+                attachments='' if not msg.attachments else '({})'.format(
+                    ', '.join('<{}>'.format(i) for i in msg.attachments)))
 
     @Plugin.listen('MessageDeleteBulk')
     def on_message_delete_bulk(self, event):
@@ -559,7 +559,7 @@ class ModLogPlugin(Plugin):
         archive = MessageArchive.create_from_message_ids(event.ids)
         self.log_action(Actions.MESSAGE_DELETE_BULK, event, log=archive.url, channel=channel, count=len(event.ids))
 
-    @Plugin.listen('VoiceStateUpdate', priority=Priority.BEFORE)
+    @Plugin.listen('VoiceStateUpdate', priority=Priority.SEQUENTIAL)
     def on_voice_state_update(self, event):
         old_vs = self.state.voice_states.get(event.session_id)
 
