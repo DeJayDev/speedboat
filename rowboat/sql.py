@@ -44,7 +44,7 @@ def init_db(env):
 
         if hasattr(model, 'SQL'):
             database.execute_sql(model.SQL)
-
+            
 def reset_db():
     init_db()
 

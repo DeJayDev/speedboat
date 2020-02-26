@@ -180,7 +180,7 @@ class UtilitiesPlugin(Plugin):
         except Message.DoesNotExist:
             raise CommandFail("I've never seen {}".format(user))
 
-        raise CommandSuccess('I last saw {} {} (at {})'.format(
+        raise CommandSuccess('I last saw {} {} (at {})'.format( #TODO: Prettify this timestamp response like in inf latest
             user,
             humanize.naturaltime(datetime.utcnow() - msg.timestamp),
             msg.timestamp
@@ -226,6 +226,10 @@ class UtilitiesPlugin(Plugin):
 
         content = []
         content.append('**\u276F Server Information**')
+        content.append('Owner: {} ({})'.format(
+            guild.owner,
+            guild.owner.id
+        ))
 
         created_at = to_datetime(guild.id)
         content.append('Created: {} ({})'.format(
