@@ -98,6 +98,7 @@ class UtilitiesPlugin(Plugin):
 
     @Plugin.command('cat', global_=True)
     def cat(self, event):
+        r = None
         try:
             r = requests.get('https://api.thecatspi.com/v1/images/search?format=src')
             r.raise_for_status()
@@ -108,6 +109,7 @@ class UtilitiesPlugin(Plugin):
 
     @Plugin.command('dog', global_=True)
     def dog(self, event):
+        r = None
         try:
             r = requests.get('https://api.thedogapi.com/v1/images/search?format=src')
             r.raise_for_status()
