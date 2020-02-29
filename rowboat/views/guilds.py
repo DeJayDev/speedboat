@@ -57,7 +57,7 @@ def guild_get(guild):
 @with_guild
 def guild_config(guild):
     return jsonify({
-        'contents': str(guild.config_raw) if guild.config_raw else yaml.safe_dump(guild.config),
+        'contents': guild.config_raw.tobytes().decode("utf-8") if guild.config_raw else yaml.safe_dump(guild.config),
     })
 
 
