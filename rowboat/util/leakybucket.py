@@ -4,8 +4,11 @@ import time
 def get_ms_time():
     return int(time.time() * 1000)
 
+
 # function(keys=[rl_key], args=[time.time() - (time_period * max_actions), time.time()]
 INCR_SCRIPT = '''
+local key = KEYS[1]
+
 -- Clear out expired water drops
 redis.call("ZREMRANGEBYSCORE", KEYS[1], "-inf", ARGV[2])
 
@@ -20,6 +23,8 @@ return redis.call("ZCOUNT", KEYS[1], "-inf", "+inf")
 '''
 
 GET_SCRIPT = '''
+local key = KEYS[1]
+
 -- Clear out expired water drops
 redis.call("ZREMRANGEBYSCORE", KEYS[1], "-inf", ARGV[1])
 
@@ -39,14 +44,14 @@ class LeakyBucket(object):
 
     def incr(self, key, amount=1):
         key = self.key_fmt.format(key)
-        return int(self._incr_script(
+        return self._incr_script(
             keys=[key],
             args=[
                 amount,
                 get_ms_time() - self.time_period,
                 get_ms_time(),
-                (self.time_period * 2) / 1000,
-            ]))
+                int((self.time_period * 2) / 1000),
+                ])
 
     def check(self, key, amount=1):
         count = self.incr(key, amount)
