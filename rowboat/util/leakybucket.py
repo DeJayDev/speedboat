@@ -6,8 +6,6 @@ def get_ms_time():
 
 # function(keys=[rl_key], args=[time.time() - (time_period * max_actions), time.time()]
 INCR_SCRIPT = '''
-local key = KEYS[1]
-
 -- Clear out expired water drops
 redis.call("ZREMRANGEBYSCORE", KEYS[1], "-inf", ARGV[2])
 
@@ -22,8 +20,6 @@ return redis.call("ZCOUNT", KEYS[1], "-inf", "+inf")
 '''
 
 GET_SCRIPT = '''
-local key = KEYS[1]
-
 -- Clear out expired water drops
 redis.call("ZREMRANGEBYSCORE", KEYS[1], "-inf", ARGV[1])
 
