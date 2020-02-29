@@ -5,8 +5,8 @@ ENV ENV docker
 
 RUN mkdir /opt/rowboat
 
-ADD requirements.txt /opt/rowboat/
+COPY requirements.txt /opt/rowboat/
 RUN pip install -r /opt/rowboat/requirements.txt
 
-ADD . /opt/rowboat/
+COPY [^.]* /opt/rowboat/
 WORKDIR /opt/rowboat

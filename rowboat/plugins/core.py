@@ -454,6 +454,9 @@ class CorePlugin(Plugin):
 
                 level = overrides.get('level', level)
 
+                if level is None:
+                    level = 0
+
             if not global_admin and event.user_level < level:
                 continue
 
@@ -591,12 +594,13 @@ class CorePlugin(Plugin):
 
     @Plugin.command('about')
     def command_about(self, event):
+        import subprocess
         embed = MessageEmbed()
         embed.set_author(name='Speedboat', icon_url=self.client.state.me.avatar_url, url='https://row.swvn.io/')
         embed.description = BOT_INFO
         embed.add_field(name='Servers', value=str(len(self.state.guilds)), inline=True)
         embed.add_field(name='Uptime', value=humanize.naturaldelta(datetime.utcnow() - self.startup), inline=True)
-        #embed.add_field(name='Version', value='soon', inline=True)
+        embed.add_field(name='Version', value=subprocess.check_output(["git", "describe", "--always"]).strip(), inline=True)
         event.msg.reply(embed=embed)
 
     @Plugin.command('uptime', level=-1)

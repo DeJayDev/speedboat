@@ -35,7 +35,7 @@ class BotSupervisor(object):
     def start(self):
         env = copy.deepcopy(os.environ)
         env.update(self.env)
-        self.proc = subprocess.Popen(['python', '-m', 'disco.cli', '--encoder=etf' ,'--config', 'config.yaml'], env=env)
+        self.proc = subprocess.Popen(['python', '-m', 'disco.cli', '--config', 'config.yaml'], env=env)
 
     def stop(self):
         self.proc.terminate()
