@@ -98,25 +98,23 @@ class UtilitiesPlugin(Plugin):
 
     @Plugin.command('cat', global_=True)
     def cat(self, event):
-        r = None
         try:
-            r = requests.get('https://api.thecatspi.com/v1/images/search?format=src')
+            r = requests.get('https://api.thecatapi.com/v1/images/search?format=src')
             r.raise_for_status()
             ext = r.headers['content-type'].split('/')[-1].split(';')[0]
-            event.msg.reply('', attachments=[('dog.{}'.format(ext), r.content)])
+            event.msg.reply('', attachments=[('cat.{}'.format(ext), r.content)])
         except:
-            return event.msg.reply(r.status_code + ' Dog not found :(')
+            return event.msg.reply(r.status_code + ' Cat not found :(')
 
     @Plugin.command('dog', global_=True)
     def dog(self, event):
-        r = None
         try:
             r = requests.get('https://api.thedogapi.com/v1/images/search?format=src')
             r.raise_for_status()
             ext = r.headers['content-type'].split('/')[-1].split(';')[0]
             event.msg.reply('', attachments=[('dog.{}'.format(ext), r.content)])
-        except:
-            return event.msg.reply(r.status_code + ' Dog not found :(')
+        except Exception as e:
+            return event.msg.reply(e.with_traceback + ' Dog not found :(')
 
     @Plugin.command('emoji', '<emoji:str>', global_=True)
     def emoji(self, event, emoji):
