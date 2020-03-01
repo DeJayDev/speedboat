@@ -454,8 +454,8 @@ class CorePlugin(Plugin):
 
                 level = overrides.get('level', level)
 
-                if level is None:
-                    level = 0
+            if level is None:
+                level = 0
 
             if not global_admin and event.user_level < level:
                 continue
