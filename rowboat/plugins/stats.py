@@ -15,10 +15,10 @@ class StatsPlugin(Plugin):
 
     def load(self, ctx):
         super(StatsPlugin, self).load(ctx)
-        #if ENV == 'docker':
-            #initialize(statsd_host='statsd', statsd_port=8125)
-        #else:
-        #    initialize(statsd_host='localhost', statsd_port=8125)
+        if ENV == 'docker':
+            initialize(statsd_host='statsd', statsd_port=8125)
+        else:
+            initialize(statsd_host='localhost', statsd_port=8125)
 
         self.nonce = 0
         self.nonces = {}
