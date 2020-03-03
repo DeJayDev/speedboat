@@ -622,7 +622,7 @@ class CorePlugin(Plugin):
         lines, firstlineno = inspect.getsourcelines(code)
 
         event.msg.reply('<https://github.com/SethBots/speedboat/blob/master/{}#L{}-{}>'.format(
-            code.co_filename,
+            code.co_filename.replace('/opt/rowboat/', ''),
             firstlineno,
             firstlineno + len(lines)
         ))
