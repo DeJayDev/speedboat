@@ -8,6 +8,7 @@ DSN: ''
 web:
     CLIENT_SECRET: ''
     SECRET_KEY: ''
+    TWITCH_CLIENT_ID: ''
     DISCORD_CLIENT_ID: ''
     DISCORD_CLIENT_SECRET: ''
     DISCORD_API_BASE_URL: 'https://discordapp.com/api' #Leave this

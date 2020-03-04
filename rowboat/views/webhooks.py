@@ -1,19 +1,35 @@
+import hashlib
+import hmac
+import twitch as twitch_api
 import yaml
 
-from flask import Blueprint, g, jsonify
+from flask import Blueprint, g, request, jsonify, current_app
 
 from rowboat.models.guild import Guild
 from rowboat.util.decos import authed
 
-webhooks = Blueprint('users', __name__, url_prefix='/api/webhooks')
+webhooks = Blueprint('webhooks', __name__, url_prefix='/api/webhooks')
 
 #TODO: General twitch reminder, store when we subscribed to a topic
 #      topics "expire" on twitches end after 10 days
 
 @webhooks.route('/twitch')
 def twitch():
+    helix = twitch_api.Helix(current_app.config['TWITCH_CLIENT_ID'])
+    secret = current_app.config['SECRET_KEY']
+    
+    expected = request.headers.get('x-hub-signature')
+    calculated = hmac.new(bytes(secret, "utf-8"), request.data, digestmod=hashlib.sha256)
+
+    if calculated is not expected:
+        return 'no'
+
     req = yaml.safe_load(request.json['data'])[0]
-    game = #TODO: GET https://api.twitch.tv/helix/games?id= req.i
+    game = None
+    try:
+        game = helix.game(req.i).name
+    except:
+        game = "Unknown Game"
 
     #TODO: Nullcheck for empty data array. That means stream went offline.
     """
@@ -31,20 +47,3 @@ def twitch():
 @webhooks.route('/twitch/callback')
 def twitch_callback():
     return request.values.get('hub.challenge')
-
-@webhooks.route('/@me/guilds')
-@authed
-def users_me_guilds():
-    if g.user.admin:
-        guilds = list(Guild.select())
-    else:
-        guilds = list(Guild.select(
-            Guild,
-            Guild.config['web'][str(g.user.user_id)].alias('role')
-        ).where(
-            (~(Guild.config['web'][str(g.user.user_id)] >> None))
-        ))
-
-    return jsonify([
-        guild.serialize() for guild in guilds
-    ])
