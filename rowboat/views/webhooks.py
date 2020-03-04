@@ -25,23 +25,27 @@ def twitch():
         return 'no'
 
     req = yaml.safe_load(request.json['data'])[0]
+
+    if req is None:
+        msg = json.dumps({
+            'type': "STREAM_OFFLINE" #TODO: Read this object more, 
+            # I need to know WHO went offline.
+        })
+
     game = None
     try:
         game = helix.game(req.i).name
     except:
         game = "Unknown Game"
 
-    #TODO: Nullcheck for empty data array. That means stream went offline.
-    """
-    Send to Redis: 
-    {
-        "user": req.user_name, 
-        "title": req.title,
-        "game": game,
-        "started_at": req.started_at,
-        "thumbnail: req.thumbnail_url
-    }
-    """
+    rdb.publish('media', json.dumps({
+        'type': "STREAM_ONLINE",
+        'user': req.user_name, 
+        'title': req.title,
+        'game': game,
+        'started_at': req.started_at,
+        'thumbnail': req.thumbnail_url
+    }))
     return 'ok'
 
 @webhooks.route('/twitch/callback')

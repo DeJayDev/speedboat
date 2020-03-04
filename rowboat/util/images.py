@@ -18,7 +18,6 @@ def get_points(img):
 def rtoh(rgb):
     return '%s' % ''.join(('%02x' % p for p in rgb))
 
-
 def get_dominant_colors(img, n=3):
     try:
         img.thumbnail((1024, 1024))
@@ -29,8 +28,7 @@ def get_dominant_colors(img, n=3):
         rgbs = [list(map(int, c.center.coords)) for c in clusters]
         return list(map(rtoh, rgbs))
     except:
-        return [0x00000]
-
+        return [0x7289DA]
 
 def get_dominant_colors_user(user, url=None):
     import requests
@@ -47,12 +45,14 @@ def get_dominant_colors_user(user, url=None):
             r.raise_for_status()
         except:
             return 0
-        color = int(get_dominant_colors(Image.open(BytesIO(r.content)))[0], 16)
-        rdb.set(key, color)
+        try:
+            color = int(get_dominant_colors(Image.open(BytesIO(r.content)))[0], 16)
+            rdb.set(key, color)
+        except:
+            color = 0x7289DA
         return color
 
-
-def get_dominant_colors_guild(guild):
+def get_dominant_colors_guild(guild, url=None):
     import requests
     from rowboat.redis import rdb
     from PIL import Image
@@ -62,13 +62,16 @@ def get_dominant_colors_guild(guild):
     if rdb.exists(key):
         return int(rdb.get(key))
     else:
-        r = requests.get(guild.icon_url)
+        r = requests.get(url or guild.icon_url)
         try:
             r.raise_for_status()
         except:
             return 0
-        color = int(get_dominant_colors(Image.open(BytesIO(r.content)))[0], 16)
-        rdb.set(key, color)
+        try:
+            color = int(get_dominant_colors(Image.open(BytesIO(r.content)))[0], 16)
+            rdb.set(key, color)
+        except:
+            color = 0x7289DA
         return color
 
 

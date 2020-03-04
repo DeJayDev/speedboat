@@ -372,3 +372,10 @@ class GuildMemberLevel(ModelBase):
             }
         )
     
+@ModelBase.register
+class GuildStreamSubscriptions(ModelBase):
+    guild_id = BigIntegerField(primary_key=True)
+    streamers = ArrayField(TextField, default=[], null=True)
+
+    class Meta:
+        table_name = 'guild_stream_subs'

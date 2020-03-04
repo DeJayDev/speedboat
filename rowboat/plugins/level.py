@@ -1,4 +1,3 @@
-
 from disco.bot import CommandLevels
 from disco.util.sanitize import S
 from disco.types.message import MessageEmbed
@@ -10,14 +9,13 @@ from rowboat.models.tags import Tag
 from rowboat.models.user import User, XPBlock
 from rowboat.models.guild import GuildMemberLevel
 
-class LevelPluginConfig(PluginConfig):
-    when_ur_a = 'a'
-    is_it_a = True
-    is_she_thicc = True
-    is_he_thicc = None
+class LevelConfig(PluginConfig):
+    pass
 
-@Plugin.with_config(LevelPluginConfig)
+@Plugin.with_config(LevelConfig)
 class LevelPlugin(Plugin):
+
+    #TODO: Do message event stuff lulw
 
     def can_act_on(self, event, victim_id, throw=True):
         if event.author.id == victim_id:
@@ -25,6 +23,7 @@ class LevelPlugin(Plugin):
                 return False
             raise CommandFail('Cannot execute that action on yourself')
     
+    #confirmed
     @Plugin.command('block', '<user:user|snowflake> [reason:str...]', group='xp2', aliases=['mute', 'stfu'], level=CommandLevels.MOD)
     def xp_block(self, event, user, reason):
         member = event.guild.get_member(user)
@@ -47,8 +46,9 @@ class LevelPlugin(Plugin):
 
         raise CommandSuccess('Blocked {} from gaining XP.'.format(member))
 
+    #confirmed
     @Plugin.command('unblock', '<user:user|snowflake> [reason:str...]', group='xp2', aliases=['unmute'], level=CommandLevels.MOD)
-    def xp_unblock(self, event, user, reason):
+    def xp_unblock(self, event, user, reason=None):
         member = event.guild.get_member(user)
         if member:
             self.can_act_on(event, member.id)
@@ -87,17 +87,22 @@ class LevelPlugin(Plugin):
         if not member:
             raise CommandFail('Invalid member')
 
-        if not isinstance(amount, int):
+        if amount is not None and not isinstance(amount, int):
             raise CommandFail('Invalid amount')
 
         self.can_act_on(event, member.id)
 
-        if action == 'give':
+        user = None
+
+        try: 
             user = GuildMemberLevel.get().where(
                 (GuildMemberLevel.user_id == member.id) &
                 (GuildMemberLevel.guild_id == member.guild_id)
             ).execute()
+        except:
+            raise CommandFail('No level data, have they sent a message?')
 
+        if action == 'give':
             user.add_xp(amount)
 
             raise CommandSuccess('{} was given {} XP. (New Total: `{}`)'.format(
@@ -106,11 +111,6 @@ class LevelPlugin(Plugin):
                 'in dev' #Get Current Amount (do above and just pull as var w/ this amt+ added)
             ))
         elif action == 'take':
-            user = GuildMemberLevel.get().where(
-                (GuildMemberLevel.user_id == member.id) &
-                (GuildMemberLevel.guild_id == member.guild_id)
-            ).execute()
-
             user.rmv_xp(amount)
 
             raise CommandSuccess('Took {} XP from {}. (New Total: `{}`)'.format(
