@@ -47,3 +47,16 @@ def twitch():
 @webhooks.route('/twitch/callback')
 def twitch_callback():
     return request.values.get('hub.challenge')
+
+@webhooks.route('/mixer')
+def mixer():
+    secret = current_app.config['SECRET_KEY']
+
+    expected = request.headers.get('x-hub-signature')
+    calculated = hmac.new(bytes(secret, "utf-8"), request.data, digestmod=hashlib.sha384)
+
+    if calculated is not expected:
+        return 'no'
+
+    req = yaml.safe_load(request.json['data'])[0]
+    return 'hey microsoft :)'
