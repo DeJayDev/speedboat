@@ -14,6 +14,7 @@ from rowboat.views.auth import auth
 from rowboat.views.dashboard import dashboard
 from rowboat.views.guilds import guilds
 from rowboat.views.users import users
+from rowboat.views.webhooks import webhooks
 
 from yaml import safe_load
 
@@ -23,6 +24,7 @@ rowboat.app.register_blueprint(auth)
 rowboat.app.register_blueprint(dashboard)
 rowboat.app.register_blueprint(guilds)
 rowboat.app.register_blueprint(users)
+rowboat.app.register_blueprint(webhooks)
 
 
 @rowboat.app.before_first_request
