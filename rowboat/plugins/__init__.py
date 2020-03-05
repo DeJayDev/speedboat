@@ -87,7 +87,7 @@ class RowboatPlugin(SentryPlugin, Plugin):
     A plugin which wraps events to load guild configuration.
     """
     global_plugin = False
-
+    
     def get_safe_plugin(self, name):
         return SafePluginInterface(self.bot.plugins.get(name))
 
