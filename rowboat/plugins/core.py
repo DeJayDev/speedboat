@@ -238,6 +238,9 @@ class CorePlugin(Plugin):
         # Externally Used
         return self.guilds[guild_id]
 
+    def crab(self):
+        return 'crab'
+
     def _attach_local_event_data(self, event, plugin_name, guild_id):
         if not hasattr(event, 'config'):
             event.config = LocalProxy()
@@ -637,7 +640,8 @@ class CorePlugin(Plugin):
             'msg': event.msg,
             'guild': event.msg.guild,
             'channel': event.msg.channel,
-            'author': event.msg.author
+            'author': event.msg.author,
+            'crab': '🦀'
         }
 
         # Mulitline eval
