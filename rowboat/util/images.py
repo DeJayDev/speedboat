@@ -40,14 +40,14 @@ def get_dominant_colors_user(user, url=None):
 
     key = 'avatar:color:{}'.format(user.avatar)
     if rdb.exists(key):
-        return int(rdb.get(key))
+        return rdb.get(key)
     else:
         r = requests.get(url or user.get_avatar_url())
         try:
             r.raise_for_status()
         except:
             return 0
-        color = get_dominant_colors(Image.open(BytesIO(r.content)))[0]
+        color = hex(int(get_dominant_colors(Image.open(BytesIO(r.content)))[0], 16))
         rdb.set(key, color)
         return color
 
@@ -60,14 +60,14 @@ def get_dominant_colors_guild(guild):
 
     key = 'guild:color:{}'.format(guild.icon)
     if rdb.exists(key):
-        return int(rdb.get(key))
+        return rdb.get(key)
     else:
         r = requests.get(guild.icon_url)
         try:
             r.raise_for_status()
         except:
             return 0
-        color = get_dominant_colors(Image.open(BytesIO(r.content)))[0]
+        color = hex(int(get_dominant_colors(Image.open(BytesIO(r.content)))[0], 16))
         rdb.set(key, color)
         return color
 
