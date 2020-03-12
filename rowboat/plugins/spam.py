@@ -256,7 +256,7 @@ class SpamPlugin(Plugin):
         if rule.max_duplicates and rule.max_duplicates.interval and rule.max_duplicates.count:
             self.check_duplicate_messages(event, member, rule)
 
-    @Plugin.listen('MessageCreate', priority=Priority.BEFORE)
+    @Plugin.listen('MessageCreate', priority=Priority.SEQUENTIAL)
     def on_message_create(self, event):
         if event.author.id == self.state.me.id:
             return

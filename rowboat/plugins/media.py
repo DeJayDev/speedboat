@@ -12,10 +12,6 @@ from rowboat.models.guild import GuildStreamSubscriptions
 
 class MediaConfig(PluginConfig):
     pass
-#    when_ur_a = 'a'
-#    is_it_a = True
-#    is_she_thicc = True
-#    is_he_thicc = None
 
 @Plugin.with_config(MediaConfig)
 class MediaPlugin(Plugin):
@@ -29,10 +25,17 @@ class MediaPlugin(Plugin):
                 continue
             
             data = json.loads(item['data'])
+
+            self.state.channels[686962489820315689].send_message(data)
             
             #TODO: if offline, send the object
             # else format the embed and find out where it goes
 
     @Plugin.command('streams', aliases=['media'], level=-1)
-    def xp_block(self, event, user):
-        raise CommandSuccess('Blocked {} from gaining XP.'.format(member))
+    def streams_list(self, event):
+        #Use the MessageTable, it'll be cute
+        raise CommandSuccess('indev.')
+
+    @Plugin.command('add', '<streamer:str...>' aliases=['follow'], level=CommandLevels.ADMIN)
+    def streams_add(self, event, streamer):
+        raise CommandSuccess('ok')

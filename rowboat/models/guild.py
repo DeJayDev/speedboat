@@ -336,21 +336,21 @@ class GuildMemberLevel(ModelBase):
         primary_key = CompositeKey('guild_id', 'user_id')
     
     @classmethod
-    def add_xp(cls, guild_id, user_id, xpamt):
+    def add_xp(cls, xpamt):
         cls.update(
             xp=(cls.xp + xpamt)
         ).where(
-            (cls.guild_id == self.guild_id) &
-            (cls.user_id == self.user_id)
+            (cls.guild_id == cls.guild_id) &
+            (cls.user_id == cls.user_id)
         ).execute()
 
     @classmethod
-    def rmv_xp(cls, guild_id, user_id, xpamt):
+    def rmv_xp(cls, xpamt):
         cls.update(
             xp=(cls.xp - xpamt)
         ).where(
-            (cls.guild_id == self.guild_id) &
-            (cls.user_id == self.user_id)
+            (cls.guild_id == cls.guild_id) &
+            (cls.user_id == cls.user_id)
         ).execute()
     
     @classmethod
@@ -358,8 +358,8 @@ class GuildMemberLevel(ModelBase):
         cls.update(
             xp= 0
         ).where(
-            (cls.guild_id == self.guild_id) &
-            (cls.user_id == self.user_id)
+            (cls.guild_id == guild_id) &
+            (cls.user_id == user_id)
         ).execute()
 
     @classmethod

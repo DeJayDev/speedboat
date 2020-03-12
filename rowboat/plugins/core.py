@@ -389,10 +389,10 @@ class CorePlugin(Plugin):
         """
         # Ignore messages sent by bots
         # TODO: Add command to add channel to ignored_channels
-        if event.message.author.bot or rdb.sismember('ignored_channels', event.message.channel_id):
+        if event.author.bot or rdb.sismember('ignored_channels', event.channel_id):
             return
         if not event.channel.type == 1:
-            if not event.message.channel.get_permissions(self.state.me).can(Permissions.SEND_MESSAGES):
+            if not event.channel.get_permissions(self.state.me).can(Permissions.SEND_MESSAGES):
                 return
 
         # If this is message for a guild, grab the guild object
