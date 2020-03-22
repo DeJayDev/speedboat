@@ -8,7 +8,7 @@ import operator
 from io import StringIO
 from peewee import fn
 from disco.util.emitter import Priority
-from fuzzywuzzy import fuzz
+from rapidfuzz import fuzz
 
 from datetime import datetime, timedelta
 

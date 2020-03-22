@@ -49,9 +49,8 @@ urllib3==1.22
 Werkzeug==1.0.0
 wheel==0.34.2
 xxhash==1.4.3
-fuzzywuzzy==0.18.0
+rapidfuzz==0.2.0
 pytest==5.3.5
-python-Levenshtein==0.12.0
 peewee==3.13.1
 gevent==1.4.0
 gevent_inotifyx==0.2
