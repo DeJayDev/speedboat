@@ -15,6 +15,19 @@ STATUS_EMOJI = {
     Status.OFFLINE: ':status_offline:318468935391641600',
     ActivityTypes.STREAMING: ':status_streaming:318468935450099712',
 }
+BADGE_EMOJI = {
+    'discord_employee': ':staff:699078007192551444',
+    'discord_partner': ':partner:699078007184425040',
+    'hypesquad_events': ':hypesquad_events:699078007326900265',
+    'house_bravery': ':hypesquad_bravery:699078006764732458',
+    'house_brilliance': ':hypesquad_brilliance:699078006936961126',
+    'house_balance': ':hypesquad_balance:699078006915727442',
+    'early_supporter': ':early_supporter:699078007133962280',
+    'bug_hunter_one': ':bughunter1:699078007087824916',
+    'bug_hunter_two': ':bughunter2:699078007179968613',
+    'verified_dev': ':verified_developer:699078007150739486'
+}
+
 SNOOZE_EMOJI = '\U0001f4a4'
 
 # Regexes

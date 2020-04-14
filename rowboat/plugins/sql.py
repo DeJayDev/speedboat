@@ -47,7 +47,7 @@ class SQLPlugin(Plugin):
         if guild.afk_channel_id is not event.channel_id:
             GuildVoiceSession.create_or_update(pre_state, event.state)
 
-    @Plugin.listen('PresenceUpdate')
+    @Plugin.listen('GuildMemberUpdate')
     def on_presence_update(self, event):
         updates = {}
 

@@ -7,6 +7,7 @@ from flask import Blueprint, request, g, jsonify
 
 from rowboat.util.decos import authed
 from rowboat.models.guild import Guild, GuildConfigChange
+from rowboat.models.channel import Channel
 from rowboat.models.user import User, Infraction
 from rowboat.models.message import Message
 from functools import reduce
@@ -82,6 +83,20 @@ def guild_z_config_update(guild):
     role = data.get('web', {}).get(g.user.user_id) or data.get('web', {}).get(str(g.user.user_id))
     if guild.role != role and not g.user.admin:
         return 'Cannot change your own permissions', 400
+
+    if data.get('modlog', {}):
+        for modlog in data.get('modlog', {}).get('channels'):
+            try:
+                _mod = Channel.get(channel_id=modlog, guild_id=guild.guild_id)
+            except Channel.DoesNotExist:
+                return 'No modlog exists with id {}'.format(modlog), 400
+
+    if data.get('starboard', {}):
+        for starboard in data.get('starboard', {}).get('channels'):
+            try:
+                _starboard = Channel.get(channel_id=channel, guild_id=guild.guild_id)
+            except Channel.DoesNotExist:
+                return u'No channel exists with id {}'.format(channel), 400
 
     try:
         guild.update_config(g.user.user_id, request.json['config'])

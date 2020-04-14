@@ -8,4 +8,4 @@ services:
 python:
   - '3.8'
 
-script: 'py.test tests'
+script: 'pytest tests'

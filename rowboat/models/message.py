@@ -135,6 +135,13 @@ class Message(ModelBase):
     def for_channel(cls, channel):
         return cls.select().where(cls.channel_id == channel.id)
 
+    @classmethod
+    def create_message_link(self):
+        return 'https://discordapp.com/channels/{}/{}/{}'.format(
+            self.guild_id,
+            self.channel_id,
+            self.id
+        )
 
 @ModelBase.register
 class Reaction(ModelBase):

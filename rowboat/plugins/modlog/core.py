@@ -15,7 +15,7 @@ from disco.types.base import UNSET, cached_property
 from disco.util.snowflake import to_unix, to_datetime
 from disco.util.sanitize import S
 
-from rowboat.plugins import RowboatPlugin as Plugin
+from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
 from rowboat.types import SlottedModel, Field, ListField, DictField, ChannelField, snowflake
 from rowboat.types.plugin import PluginConfig
 from rowboat.models.message import Message, MessageArchive

@@ -110,7 +110,7 @@ def add_global_admin(user_id):
     init_db(ENV)
     rdb.sadd('global_admins', user_id)
     User.update(admin=True).where(User.user_id == user_id).execute()
-    print('Ok, added {} as a global admin'.format(user_id))
+    print('Ok, added {} as a global admin'.format(user_id)) # TODO: Show username#discrim
 
 @cli.command('wh-add')
 @click.argument('guild-id')
@@ -121,7 +121,7 @@ def add_whitelist(guild_id, flag):
 
     flag = Guild.WhitelistFlags.get(flag)
     if not flag:
-        print('Invalid flag')
+        print('Flag not found')
         return
 
     try:
@@ -133,7 +133,7 @@ def add_whitelist(guild_id, flag):
     guild.whitelist.append(int(flag))
     guild.save()
     guild.emit_update()
-    print('added flag')
+    print('Added flag')
 
 
 @cli.command('wh-rmv')
@@ -145,7 +145,7 @@ def rmv_whitelist(guild_id, flag):
 
     flag = Guild.WhitelistFlags.get(flag)
     if not flag:
-        print('Invalid flag')
+        print('Flag not found')
         return
 
     try:
@@ -157,7 +157,7 @@ def rmv_whitelist(guild_id, flag):
     guild.whitelist.remove(int(flag))
     guild.save()
     guild.emit_update()
-    print('removed flag')
+    print('Removed flag')
 
 
 if __name__ == '__main__':

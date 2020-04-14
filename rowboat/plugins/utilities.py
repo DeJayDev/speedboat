@@ -27,8 +27,9 @@ from rowboat.models.guild import GuildVoiceSession
 from rowboat.models.user import User, Infraction
 from rowboat.models.message import Message, Reminder
 from rowboat.util.images import get_dominant_colors_user, get_dominant_colors_guild
+from rowboat.util.badges import UserFlags
 from rowboat.constants import (
-    STATUS_EMOJI, SNOOZE_EMOJI, GREEN_TICK_EMOJI, GREEN_TICK_EMOJI_ID,
+    STATUS_EMOJI, BADGE_EMOJI, SNOOZE_EMOJI, GREEN_TICK_EMOJI, GREEN_TICK_EMOJI_ID,
     EMOJI_RE, USER_MENTION_RE, YEAR_IN_SEC, CDN_URL
 )
 from functools import reduce
@@ -278,29 +279,22 @@ class UtilitiesPlugin(Plugin):
         if user is None:
             user = event.author
 
-        user_id = 0
         if isinstance(user, int):
-            user_id = user
             user = self.state.users.get(user)
-
-        if user and not user_id:
+        else:
             user = self.state.users.get(user.id)
 
         if not user:
-            if user_id:
-                try:
-                    user = self.client.api.users_get(user_id)
-                except APIException:
-                    raise CommandFail('Unknown User')
+            try:
+                user = self.client.api.users_get(user_id)
                 User.from_disco_user(user)
-            else:
+            except APIException:
                 raise CommandFail('Unknown User')
 
         self.client.api.channels_typing(event.channel.id)
         
         content = []
         content.append('**\u276F User Information**')
-        content.append('ID: {}'.format(user.id))
         content.append('Profile: <@{}>'.format(user.id))
         
         created_dt = to_datetime(user.id)
@@ -313,16 +307,25 @@ class UtilitiesPlugin(Plugin):
 
         if user.presence: #I couldn't get this to work w/o it lol
             emoji, status = get_status_emoji(user.presence)
-            content.append('Status: {} <{}>'.format(status, emoji))
+            content.append('Status: <{}> {}'.format(emoji, status))
             if user.presence.game and user.presence.game.name:
                 if user.presence.game.type == ActivityTypes.DEFAULT:
                     content.append('{}'.format(user.presence.game.name))
                 if user.presence.game.type == ActivityTypes.CUSTOM:
                     content.append('Custom Status: {}'.format(user.presence.game.state))
                 if user.presence.game.type == ActivityTypes.LISTENING:
-                    content.append('Listening to Spotify')
+                    content.append('Listening to {} on Spotify'.format(user.presence.game.details)) #In the embed, details is the songname.
                 if user.presence.game.type == ActivityTypes.STREAMING:
                     content.append('Streaming: [{}]({})'.format(user.presence.game.name, user.presence.game.url))
+
+        user = self.client.api.users_get(user_id)
+        if user.public_flags:
+            badges = ''
+            user_badges = list(UserFlags(user.public_flags))
+            for badge in user_badges:
+                badges += '<{}> '.format(BADGE_EMOJI[badge])
+                
+            content.append('Badges: {}'.format(badges))
 
         if member:
             content.append('\n**\u276F Member Information**')
@@ -337,7 +340,7 @@ class UtilitiesPlugin(Plugin):
 
             if member.roles:
                 content.append('Roles: {}'.format(
-                    ', '.join((member.guild.roles.get(r).name for r in member.roles))
+                    ', '.join(('<@&{}>'.format(member.guild.roles.get(r).id) for r in member.roles))
                 ))
 
         # Execute a bunch of queries
@@ -345,11 +348,6 @@ class UtilitiesPlugin(Plugin):
             (Message.author_id == user.id) & 
             (Message.guild_id == event.guild.id)
         ).tuples()[0][0]
-
-        #Message.select(Message.id).where(
-        #   (Message.author_id == user.id) &
-        #   (Message.guild_id == event.guild.id)
-        #).order_by(Message.id.asc()).limit(1).tuples()[0][0]
         
         oldest_msg = Message.select(fn.MIN(Message.id)).where(
             (Message.author_id == user.id) & 
@@ -382,18 +380,22 @@ class UtilitiesPlugin(Plugin):
 
         if voice[0]:
             content.append('\n**\u276F Voice**')
-            content.append('Sessions: `{:,}`'.format(voice[0]))
-            content.append('Time: `{}`'.format(str(humanize.naturaldelta(
+            content.append('Sessions: {:,}'.format(voice[0]))
+            content.append('Time: {}'.format(str(humanize.naturaldelta(
                 voice[1]
             )).title()))
 
         embed = MessageEmbed()
 
-        avatar = User.with_id(user.id).get_avatar_url()
+        try:
+            avatar = User.with_id(user.id).get_avatar_url()
+        except:
+            avatar = user.get_avatar_url() # This fails if the user has never been seen by speedboat.
 
-        embed.set_author(name='{}#{}'.format(
+        embed.set_author(name='{}#{} ({})'.format(
             user.username,
             user.discriminator,
+            user.id,
         ), icon_url=avatar)
 
         embed.set_thumbnail(url=avatar)

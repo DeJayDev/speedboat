@@ -100,9 +100,8 @@ class User(ModelBase):
             size
         )
 
-    def __unicode__(self):
+    def __str__(self):
         return '{}#{}'.format(self.username, str(self.discriminator).zfill(4))
-
 
 @ModelBase.register
 class Infraction(ModelBase):
@@ -513,7 +512,6 @@ class Infraction(ModelBase):
             (cls.type_ << types) &
             (cls.active == 1)
         ).execute() >= 1
-
 
 @ModelBase.register
 class StarboardBlock(ModelBase):

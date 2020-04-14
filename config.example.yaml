@@ -1,5 +1,7 @@
 token: ''
 
+intents: 14335 # https://ziad87.me/intents/
+
 manhole_enable: true
 manhole_bind: 127.0.0.1:7171
 
