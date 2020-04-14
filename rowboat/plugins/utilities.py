@@ -287,9 +287,9 @@ class UtilitiesPlugin(Plugin):
         if not user:
             try:
                 user = self.client.api.users_get(user_id)
+                User.from_disco_user(user)
             except APIException:
                 raise CommandFail('Unknown User')
-            User.from_disco_user(user)
 
         self.client.api.channels_typing(event.channel.id)
         
@@ -389,7 +389,7 @@ class UtilitiesPlugin(Plugin):
         try:
             avatar = User.with_id(user.id).get_avatar_url()
         except:
-            avatar = user.get_avatar_url() # This fails if the user has never been seen
+            avatar = user.get_avatar_url() # This fails if the user has never been seen by speedboat.
 
         embed.set_author(name='{}#{} ({})'.format(
             user.username,
