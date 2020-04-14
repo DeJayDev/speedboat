@@ -286,13 +286,10 @@ class UtilitiesPlugin(Plugin):
 
         if not user:
             try:
-                if isinstance(user, int):
-                    user = self.client.api.users_get(user)
-                else:
-                    user = self.state.users.get(user.id)
-                User.from_disco_user(user)
+                user = self.client.api.users_get(user_id)
             except APIException:
                 raise CommandFail('Unknown User')
+            User.from_disco_user(user)
 
         self.client.api.channels_typing(event.channel.id)
         
@@ -321,7 +318,6 @@ class UtilitiesPlugin(Plugin):
                 if user.presence.game.type == ActivityTypes.STREAMING:
                     content.append('Streaming: [{}]({})'.format(user.presence.game.name, user.presence.game.url))
 
-        user = self.client.api.users_get(user_id)
         if user.public_flags:
             badges = ''
             user_badges = list(UserFlags(user.public_flags))
@@ -383,8 +379,8 @@ class UtilitiesPlugin(Plugin):
 
         if voice[0]:
             content.append('\n**\u276F Voice**')
-            content.append('Sessions: {:,}'.format(voice[0]))
-            content.append('Time: {}'.format(str(humanize.naturaldelta(
+            content.append('Sessions: `{:,}`'.format(voice[0]))
+            content.append('Time: `{}`'.format(str(humanize.naturaldelta(
                 voice[1]
             )).title()))
 
@@ -393,7 +389,7 @@ class UtilitiesPlugin(Plugin):
         try:
             avatar = User.with_id(user.id).get_avatar_url()
         except:
-            avatar = user.get_avatar_url() # This fails if the user has never been seen by speedboat.
+            avatar = user.get_avatar_url() # This fails if the user has never been seen
 
         embed.set_author(name='{}#{} ({})'.format(
             user.username,
