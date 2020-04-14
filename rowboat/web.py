@@ -29,7 +29,7 @@ rowboat.app.register_blueprint(users)
 def before_first_request():
     init_db(ENV)
 
-    PluginsConfig.force_load_plugin_configs()
+    #PluginsConfig.force_load_plugin_configs()
 
     with open('config.yaml', 'r') as f:
         data = safe_load(f)

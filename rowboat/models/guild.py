@@ -1,9 +1,7 @@
 import yaml
 import logging
 
-from peewee import (
-    BigIntegerField, CharField, TextField, BooleanField, DateTimeField, CompositeKey, BlobField
-)
+from peewee import (BigIntegerField, CharField, TextField, BooleanField, DateTimeField, CompositeKey, BlobField)
 from holster.enum import Enum
 from datetime import datetime
 from playhouse.postgres_ext import BinaryJSONField, ArrayField

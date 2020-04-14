@@ -221,7 +221,7 @@ class StarboardPlugin(Plugin):
 
     @Plugin.command('unblock', '<user:user>', group='stars', level=CommandLevels.MOD)
     def stars_unblock(self, event, user):
-        StarboardBlock.delete().where(
+        count = StarboardBlock.delete().where(
             (StarboardBlock.guild_id == event.guild.id) &
             (StarboardBlock.user_id == user.id)
         ).execute()
@@ -473,9 +473,12 @@ class StarboardPlugin(Plugin):
             return
 
         # If either the reaction or message author is blocked, prevent this action
-        if msg.starboardblock.user_id:
-            event.delete()
-            return
+        try:
+            if msg.starboardblock.user_id:
+                event.delete()
+                return
+        except AttributeError:
+            pass # /shrug
 
         # Check if the board prevents self stars
         sb_id, board = event.config.get_board(event.channel_id)

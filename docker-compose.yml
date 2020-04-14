@@ -1,7 +1,7 @@
-version: '3.2'
+version: '3.7'
 services:
   db:
-    build: ./docker/database/
+    build: ./docker/
     volumes:
       - ./.data:/var/lib/postgresql/data
     environment:
@@ -49,4 +49,3 @@ services:
       - .:/opt/rowboat
     depends_on:
       - web
-

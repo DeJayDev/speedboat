@@ -283,7 +283,7 @@ class CorePlugin(Plugin):
     def send_control_message(self):
         embed = MessageEmbed()
         embed.set_footer(text='Speedboat {}'.format(
-            'Production' if ENV == 'docker' else 'Testing'
+            'Production' if ENV == 'prod' else 'Testing'
         ))
         embed.timestamp = datetime.utcnow().isoformat()
         embed.color = 0x779ecb
@@ -334,7 +334,7 @@ class CorePlugin(Plugin):
             # If the guild is not awaiting setup, leave it now
             if not rdb.sismember(GUILDS_WAITING_SETUP_KEY, str(event.id)) and event.id != ROWBOAT_GUILD_ID:
                 self.log.warning(
-                    'I am in guild %s (%s), and it\'s not within the  setup list',
+                    'I am in guild %s (%s), and it\'s not within the setup list',
                     event.id, event.name
                 )
                 #event.guild.leave()
@@ -351,7 +351,7 @@ class CorePlugin(Plugin):
         self.log.info('Requesting Guild: %s (%s)', event.guild.name, event.guild.id)
         guild.sync(event.guild)
         
-#        guild.request_guild_members()
+#       guild.request_guild_members()
 
         self.guilds[event.id] = guild
 
@@ -599,11 +599,11 @@ class CorePlugin(Plugin):
     def command_about(self, event):
         import subprocess
         embed = MessageEmbed()
-        embed.set_author(name='Speedboat', icon_url=self.client.state.me.avatar_url, url='https://row.swvn.io/')
+        embed.set_author(name='Speedboat', icon_url=self.client.state.me.avatar_url, url='http://row.swvn.io/')
         embed.description = BOT_INFO
         embed.add_field(name='Servers', value=str(len(self.state.guilds)), inline=True)
         embed.add_field(name='Uptime', value=humanize.naturaldelta(datetime.utcnow() - self.startup), inline=True)
-        embed.add_field(name='Version', value=subprocess.check_output(["git", "describe", "--always"]).strip(), inline=True)
+        embed.add_field(name='Version', value=subprocess.check_output(["git", "describe", "--always"]).strip().decode("utf-8"), inline=True)
         event.msg.reply(embed=embed)
 
     @Plugin.command('uptime', level=-1)
@@ -633,13 +633,16 @@ class CorePlugin(Plugin):
     @Plugin.command('eval', level=-1)
     def command_eval(self, event):
         ctx = {
+            'self': self,
             'bot': self.bot,
             'client': self.bot.client,
+            'api': self.bot.client.api,
             'state': self.bot.client.state,
             'event': event,
             'msg': event.msg,
             'guild': event.msg.guild,
             'channel': event.msg.channel,
+            'member': event.msg.member,
             'author': event.msg.author,
             'crab': '🦀'
         }
