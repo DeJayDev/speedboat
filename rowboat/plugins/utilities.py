@@ -276,20 +276,21 @@ class UtilitiesPlugin(Plugin):
 
     @Plugin.command('info', '[user:user|snowflake]')
     def info(self, event, user=None):
-        if user is None:
-            user = event.author
-
-        if isinstance(user, int):
-            user = self.state.users.get(user)
-        else:
-            user = self.state.users.get(user.id)
 
         if not user:
-            try:
-                user = self.client.api.users_get(user_id)
-            except APIException:
-                raise CommandFail('Unknown User')
-            User.from_disco_user(user)
+            user = event.author
+        else:
+            if not isinstance(user, DiscoUser):
+                try:
+                    user = self.state.guilds[event.guild.id].members[user].user
+                except KeyError:
+                    try:
+                        user = self.state.users[user]
+                    except KeyError:
+                        try:
+                            user = self.bot.client.api.users_get(user)
+                        except APIException:
+                            return event.msg.reply('User not found :eyes:').after(3).delete()
 
         self.client.api.channels_typing(event.channel.id)
         
@@ -389,7 +390,7 @@ class UtilitiesPlugin(Plugin):
         try:
             avatar = User.with_id(user.id).get_avatar_url()
         except:
-            avatar = user.get_avatar_url() # This fails if the user has never been seen
+            avatar = user.get_avatar_url() # This fails if the user has never been seen by speedboat.
 
         embed.set_author(name='{}#{} ({})'.format(
             user.username,
