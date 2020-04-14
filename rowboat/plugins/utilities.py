@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 
 from disco.types.user import ActivityTypes, Status
+from disco.types.user import User as DiscoUser
 from disco.types.message import MessageEmbed
 from disco.util.snowflake import to_datetime
 from disco.util.sanitize import S
