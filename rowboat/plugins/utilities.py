@@ -286,7 +286,10 @@ class UtilitiesPlugin(Plugin):
 
         if not user:
             try:
-                user = self.client.api.users_get(user_id)
+                if isinstance(user, int):
+                    user = self.client.api.users_get(user)
+                else:
+                    user = self.state.users.get(user.id)
                 User.from_disco_user(user)
             except APIException:
                 raise CommandFail('Unknown User')
