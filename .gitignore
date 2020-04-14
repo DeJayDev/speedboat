@@ -4,7 +4,6 @@ config.yaml
 .venv/
 *.log
 .data
-Dockerfile
 docker-compose.yml
 rowboat/constants.py
 src/
