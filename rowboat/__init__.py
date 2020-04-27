@@ -6,8 +6,11 @@ import sentry_sdk as sentry
 from disco.util.logging import LOG_FORMAT
 from sentry_sdk.integrations.redis import RedisIntegration
 
-ENV = os.getenv('ENV', 'local')
-DSN = os.getenv('DSN')
+with open('config.yaml', 'r') as f:
+    config = safe_load(f)
+
+ENV = config['ENV']
+DSN = config['ENV']
 REV = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip()
 
 VERSION = '1.5.0'
