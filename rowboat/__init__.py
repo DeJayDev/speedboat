@@ -11,10 +11,10 @@ with open('config.yaml', 'r') as f:
     config = safe_load(f)
 
 ENV = config['ENV']
-DSN = config['ENV']
+DSN = config['DSN']
 REV = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip()
 
-VERSION = '1.5.0'
+VERSION = '1.6.1'
 
 sentry.init(
     dsn=DSN,
