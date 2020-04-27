@@ -25,7 +25,8 @@ BADGE_EMOJI = {
     'early_supporter': ':early_supporter:699078007133962280',
     'bug_hunter_one': ':bughunter1:699078007087824916',
     'bug_hunter_two': ':bughunter2:699078007179968613',
-    'verified_dev': ':verified_developer:699078007150739486'
+    'verified_dev': ':verified_developer:699078007150739486',
+    'verified_bot': ':verified_developer:699078007150739486'
 }
 
 SNOOZE_EMOJI = '\U0001f4a4'
