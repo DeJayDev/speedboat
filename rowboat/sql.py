@@ -25,19 +25,12 @@ class ModelBase(Model):
         return cls
 
 def init_db(env):
-    if env == 'docker':
-        database.initialize(PostgresqlExtDatabase(
-            'rowboat',
-            host='db',
-            user='rowboat',
-            port=int(os.getenv('PG_PORT', 5432)),
-            autorollback=True))
-    else:
-        database.initialize(PostgresqlExtDatabase(
-            'rowboat',
-            user='rowboat',
-            port=int(os.getenv('PG_PORT', 5432)),
-            autorollback=True))
+    database.initialize(PostgresqlExtDatabase(
+        'rowboat',
+        host='db',
+        user='rowboat',
+        port=int(os.getenv('PG_PORT', 5432)),
+        autorollback=True))
 
     for model in REGISTERED_MODELS:
         model.create_table(True)
