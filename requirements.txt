@@ -13,7 +13,7 @@ emoji==0.5.4
 Earl-ETF==2.1.2
 Flask==1.1.1
 greenlet==0.4.15
-httplib2==0.17.0
+httplib2==0.18.0
 humanize==2.3.0
 inflection==0.4.0
 itsdangerous==1.1.0
