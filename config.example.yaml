@@ -1,5 +1,7 @@
 token: ''
 
+intents: 14047
+
 manhole_enable: true
 manhole_bind: 127.0.0.1:7171
 

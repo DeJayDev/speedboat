@@ -9,3 +9,4 @@ docker-compose.yml
 rowboat/constants.py
 src/
 .vscode
+*/*.DS_Store

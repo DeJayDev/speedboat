@@ -19,14 +19,14 @@ Speedboat development is focused on the requirements of the servers looking to m
 
 ### Can I Contribute?
 
-Maybe. Feel free to submit PRs, but unless they are explicitly bug fixes that have good documentation and clean code, I likely won't merge. Features will not be accepted through PR unless stated elsewhere. Do not submit feedback on this repository, have your server administrator contact me. PRs focused around the frontend and web panel are more likely to be accepted.
+It depends. Feel free to submit PRs, but unless they are explicitly bug fixes that have good documentation and clean code, I likely won't merge. Features must be completely tested to be accepted, however I will take suggestions sent to me through your server administrator. Please do not submit feedback on this repository, have your server administrator contact me. PRs focused around the frontend and web panel are more likely to be accepted.
 
 ### How Do I Contribute?
 
 To get a local version of rowboat running, you will need [docker-compose](https://docs.docker.com/compose/) setup locally. Once installed, you can simply run `docker-compose up` and in theory your dependencies should be setup. You may have to rerun the command after your first setup because of the way Postgres tables are created. To give yourself global administrator, run `docker-compose exec web ./manage.py add-global-admin USER_ID_HERE`. Finally, you must make sure to copy the example configuration and properly replace the values within.
 
-## Can You Add Speedboat To My Server?
+## Can I Use Speedboat?
 
-Maybe. If you are interested in using Speedboat in your server, please message me and provide an invite alongside some general information. Speedboat is only added to larger (1-2k+ average CCU) servers that have more complex moderation requirements. 
+It depends. If you are interested in using Speedboat in your server, please message me and provide an invite alongside some general information about the server. At this time, Speedboat is only being added to larger (1-2k+ average CCU) servers that have more complex moderation requirements as we scale up to support more bots/become "public" (Google Forms application for the bot)
 
 I am happy to add Speedboat to larger servers within the Minecraft community no questions asked.  

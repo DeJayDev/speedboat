@@ -12,12 +12,6 @@ services:
     command: redis-server --appendonly yes
     volumes:
       - ./.data:/data
-  statsd:
-    image: python:3.8
-    volumes:
-      - .:/opt/rowboat
-    command: python /opt/rowboat/docker/nulld.py
-    stop_signal: SIGKILL
   web:
     build: .
     command: python manage.py serve -r
@@ -28,7 +22,6 @@ services:
     depends_on:
       - db
       - redis
-      - statsd
   frontend:
     build: ./frontend/
     environment:
