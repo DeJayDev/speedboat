@@ -491,7 +491,7 @@ class AdminPlugin(Plugin):
             ))
 
     @Plugin.command('reason', '<infraction:int> <reason:str...>', group='infractions', level=CommandLevels.MOD)
-    def reason(self, event, infraction, reason):
+    def infraction_reason(self, event, infraction, reason):
         try:
             inf = Infraction.get(id=infraction)
         except Infraction.DoesNotExist:
@@ -647,10 +647,7 @@ class AdminPlugin(Plugin):
         else:
             raise CommandFail('Invalid user')
 
-    @Plugin.command(
-        'temprole',
-        '<user:user|snowflake> <role:snowflake|str> <duration:str> [reason:str...]',
-        level=CommandLevels.MOD)
+    @Plugin.command('temprole', '<user:user|snowflake> <role:snowflake|str> <duration:str> [reason:str...]', level=CommandLevels.MOD)
     def temprole(self, event, user, role, duration, reason=None):
         member = event.guild.get_member(user)
         if not member:
@@ -891,18 +888,8 @@ class AdminPlugin(Plugin):
 
     @Plugin.command('here', '[size:int]', level=CommandLevels.MOD, context={'mode': 'all'}, group='archive')
     @Plugin.command('all', '[size:int]', level=CommandLevels.MOD, context={'mode': 'all'}, group='archive')
-    @Plugin.command(
-        'user',
-        '<user:user|snowflake> [size:int]',
-        level=CommandLevels.MOD,
-        context={'mode': 'user'},
-        group='archive')
-    @Plugin.command(
-        'channel',
-        '<channel:channel|snowflake> [size:int]',
-        level=CommandLevels.MOD,
-        context={'mode': 'channel'},
-        group='archive')
+    @Plugin.command('user', '<user:user|snowflake> [size:int]', level=CommandLevels.MOD, context={'mode': 'user'}, group='archive')
+    @Plugin.command('channel', '<channel:channel|snowflake> [size:int]', level=CommandLevels.MOD, context={'mode': 'channel'}, group='archive')
     def archive(self, event, size=50, mode=None, user=None, channel=None):
         if size < 1 or size > 15000:
             raise CommandFail('Too many messages must be between 1-15000')

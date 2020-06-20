@@ -59,6 +59,9 @@ class SQLPlugin(Plugin):
 
         if event.user.discriminator != UNSET:
             updates['discriminator'] = int(event.user.discriminator)
+            
+        if event.user.bot or (event.user.discriminator == '0000'):
+            return
 
         if not updates:
             return
@@ -67,6 +70,8 @@ class SQLPlugin(Plugin):
 
     @Plugin.listen('MessageCreate')
     def on_message_create(self, event):
+        if event.message.author.bot or (event.message.author.discriminator == '0000'):
+            return
         Message.from_disco_message(event.message)
 
     @Plugin.listen('MessageUpdate')

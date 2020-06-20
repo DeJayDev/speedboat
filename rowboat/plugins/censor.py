@@ -140,8 +140,9 @@ class CensorPlugin(Plugin):
         if author.id == self.state.me.id:
             return
 
-        if event.message.author.bot or rdb.sismember('ignored_channels', event.message.channel_id):
+        if event.message.author.bot or (event.message.author.discriminator == '0000'):
             return
+
         if not event.channel.type == 1:
             if not event.message.channel.get_permissions(self.state.me).can(Permissions.SEND_MESSAGES):
                 return

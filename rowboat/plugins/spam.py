@@ -261,7 +261,7 @@ class SpamPlugin(Plugin):
         if event.author.id == self.state.me.id:
             return
 
-        if event.webhook_id:
+        if event.message.author.bot or (event.message.author.discriminator == '0000'):
             return
 
         # Lineralize events by guild ID to prevent spamming events

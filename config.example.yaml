@@ -2,6 +2,8 @@ token: ''
 
 intents: 14335 # https://ziad87.me/intents/
 
+max_reconnects: 0
+
 manhole_enable: true
 manhole_bind: 127.0.0.1:7171
 
@@ -12,15 +14,15 @@ web:
     SECRET_KEY: ''
     DISCORD_CLIENT_ID: ''
     DISCORD_CLIENT_SECRET: ''
-    DISCORD_API_BASE_URL: 'https://discordapp.com/api' #Leave this
-    DISCORD_TOKEN_URL: 'https://discordapp.com/api/oauth2/token' #Leave this
-    DISCORD_AUTH_URL: 'https://discordapp.com/oauth2/authorize' #Leave this
+    DISCORD_API_BASE_URL: 'https://discord.com/api' #Leave this
+    DISCORD_TOKEN_URL: 'https://discord.com/api/oauth2/token' #Leave this
+    DISCORD_AUTH_URL: 'https://discord.com/oauth2/authorize' #Leave this
     DISCORD_REDIRECT_URI: ''
 
 state:
   sync_guild_members: true
 
-ENV: 'docker'
+ENV: 'docker' # Set to 'prod' when prod
 
 bot:
   commands_enabled: false
@@ -35,5 +37,6 @@ bot:
     - rowboat.plugins.utilities
     - rowboat.plugins.sql
     - rowboat.plugins.internal
-    - rowboat.plugins.stats
+    #- rowboat.plugins.stats
+    - rowboat.plugins.level
     - rowboat.plugins.tags

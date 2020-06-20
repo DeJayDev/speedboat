@@ -1,3 +1,6 @@
+import gevent
+
+from random import randint
 
 from disco.bot import CommandLevels
 from disco.util.sanitize import S
@@ -10,11 +13,12 @@ from rowboat.models.tags import Tag
 from rowboat.models.user import User, XPBlock
 from rowboat.models.guild import GuildMemberLevel
 
+from rowboat.constants import (
+    GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID, GREEN_TICK_EMOJI, RED_TICK_EMOJI
+)
+
 class LevelPluginConfig(PluginConfig):
-    when_ur_a = 'a'
-    is_it_a = True
-    is_she_thicc = True
-    is_he_thicc = None
+    pass
 
 @Plugin.with_config(LevelPluginConfig)
 class LevelPlugin(Plugin):
@@ -24,6 +28,45 @@ class LevelPlugin(Plugin):
             if not throw:
                 return False
             raise CommandFail('Cannot execute that action on yourself')
+    
+    def getLevelFromExp(self, exp):
+        def getLevelExp(level):
+            return (5*(level**2)+50*level+100)
+
+        level = 0;
+
+        while exp >= getLevelExp(level):
+            exp -= getLevelExp(level)
+            level += 1
+
+        return level
+
+    @Plugin.listen('MessageCreate')
+    def xp_message_send(self, event):
+        if event.author.bot or (event.author.discriminator == '0000'):
+            return
+
+        config = self.call('CorePlugin.get_config', event.guild.id)
+
+        if config and config.commands:
+            commands = list(self.bot.get_commands_for_message(
+                config.commands.mention,
+                {},
+                config.commands.prefix,
+                event.message))
+        
+        if commands:
+            return # No XP for commands
+
+        try:
+            user = GuildMemberLevel.select().where(
+                (GuildMemberLevel.user_id == event.author.id) &
+                (GuildMemberLevel.guild_id == event.guild.id)
+            ).get()
+        except GuildMemberLevel.DoesNotExist:
+            user = GuildMemberLevel.create_new(event.guild.get_member(event.author.id)) # lol
+
+        user.add_xp(event.guild.id, event.author.id, randint(15, 25))
     
     @Plugin.command('block', '<user:user|snowflake> [reason:str...]', group='xp2', aliases=['mute', 'stfu'], level=CommandLevels.MOD)
     def xp_block(self, event, user, reason):
@@ -66,6 +109,20 @@ class LevelPlugin(Plugin):
 
         raise CommandSuccess('Unblocked {} from gaining XP.'.format(member))
 
+    @Plugin.command('xp2', '[user:user|snowflake]')
+    def xp(self, event, user=None):
+        member = user if user else event.author
+
+        try:
+            gml = GuildMemberLevel.select().where(
+                (GuildMemberLevel.user_id == member.id) &
+                (GuildMemberLevel.guild_id == event.guild.id)
+            ).get()
+        except GuildMemberLevel.DoesNotExist:
+            raise CommandFail('That user does not have any XP (Have they sent a message?)')
+
+        raise CommandSuccess('{} has {} xp'.format(member, gml.xp))
+
     @Plugin.command('reset', '<user:user|snowflake>',
     #aliases=[],
     context={'action': 'reset'},
@@ -87,42 +144,77 @@ class LevelPlugin(Plugin):
         if not member:
             raise CommandFail('Invalid member')
 
-        if not isinstance(amount, int):
+        if not isinstance(amount, int) and action != "reset":
             raise CommandFail('Invalid amount')
 
-        self.can_act_on(event, member.id)
+        #self.can_act_on(event, member.id)
 
         if action == 'give':
-            user = GuildMemberLevel.get().where(
-                (GuildMemberLevel.user_id == member.id) &
-                (GuildMemberLevel.guild_id == member.guild_id)
-            ).execute()
+            try:
+                user = GuildMemberLevel.select().where(
+                    (GuildMemberLevel.user_id == member.id) &
+                    (GuildMemberLevel.guild_id == member.guild_id)
+                ).get()
+            except GuildMemberLevel.DoesNotExist:
+                user = GuildMemberLevel.create_new(member)
 
-            user.add_xp(amount)
+            user.add_xp(member.guild_id, member.id, amount)
 
             raise CommandSuccess('{} was given {} XP. (New Total: `{}`)'.format(
-                member.alias,
+                member.user,
                 amount,
-                'in dev' #Get Current Amount (do above and just pull as var w/ this amt+ added)
+                (user.xp + amount)
             ))
         elif action == 'take':
-            user = GuildMemberLevel.get().where(
-                (GuildMemberLevel.user_id == member.id) &
-                (GuildMemberLevel.guild_id == member.guild_id)
-            ).execute()
+            try:
+                user = GuildMemberLevel.select().where(
+                    (GuildMemberLevel.user_id == member.id) &
+                    (GuildMemberLevel.guild_id == member.guild_id)
+                ).get()
+            except GuildMemberLevel.DoesNotExist:
+                user = GuildMemberLevel.create_new(member)
+                event.channel.send_message('You\'re a monster. Negative XP? Give them a chance.')
 
-            user.rmv_xp(amount)
+            user.rmv_xp(member.guild_id, member.id, amount)
 
             raise CommandSuccess('Took {} XP from {}. (New Total: `{}`)'.format(
                 amount,
-                member.alias,
-                'in dev'
-                #Get Current Amount (do above and just pull as var w/ this amt+ added)
+                member.user,
+                (user.xp - amount)
             ))
         else:
-            raise CommandSuccess('not done')
-	    #Reset to 0
-            #Do the gevent confirm action
+            try:
+                user = GuildMemberLevel.select().where(
+                    (GuildMemberLevel.user_id == member.id) &
+                    (GuildMemberLevel.guild_id == member.guild_id)
+                ).get()
+            except GuildMemberLevel.DoesNotExist:
+                raise CommandFail('This user cannot be reset. (No XP)')
+
+            msg = event.msg.reply('Really reset `{}`?'.format(member))
+
+            msg.chain(False).\
+                add_reaction(GREEN_TICK_EMOJI).\
+                add_reaction(RED_TICK_EMOJI)
+
+            try:
+                mra_event = self.wait_for_event(
+                    'MessageReactionAdd',
+                    message_id=msg.id,
+                    conditional=lambda e: (
+                        e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
+                        e.user_id == event.author.id
+                    )).get(timeout=10)
+            except gevent.Timeout:
+                return
+            finally:
+                msg.delete()
+
+            if mra_event.emoji.id != GREEN_TICK_EMOJI_ID:
+                return
+
+            user.reset_member(event.guild.id, member.id)
+            raise CommandSuccess('{} has been reset.'.format(member))
 
         #TODO: Modlog call :)
 

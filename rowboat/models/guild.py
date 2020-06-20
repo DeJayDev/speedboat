@@ -333,31 +333,30 @@ class GuildMemberLevel(ModelBase):
         table_name = 'xp'
         primary_key = CompositeKey('guild_id', 'user_id')
     
-    @classmethod
     def add_xp(cls, guild_id, user_id, xpamt):
-        cls.update(
-            xp=(cls.xp + xpamt)
+        GuildMemberLevel.update(
+            xp=(GuildMemberLevel.xp + xpamt)
         ).where(
-            (cls.guild_id == self.guild_id) &
-            (cls.user_id == self.user_id)
+            (GuildMemberLevel.guild_id == guild_id) &
+            (GuildMemberLevel.user_id == user_id)
         ).execute()
 
     @classmethod
     def rmv_xp(cls, guild_id, user_id, xpamt):
-        cls.update(
-            xp=(cls.xp - xpamt)
+        GuildMemberLevel.update(
+            xp=(GuildMemberLevel.xp - xpamt)
         ).where(
-            (cls.guild_id == self.guild_id) &
-            (cls.user_id == self.user_id)
+            (GuildMemberLevel.guild_id == guild_id) &
+            (GuildMemberLevel.user_id == user_id)
         ).execute()
     
     @classmethod
     def reset_member(cls, guild_id, user_id):
-        cls.update(
-            xp= 0
+        GuildMemberLevel.update(
+            xp = 0
         ).where(
-            (cls.guild_id == self.guild_id) &
-            (cls.user_id == self.user_id)
+            (GuildMemberLevel.guild_id == guild_id) &
+            (GuildMemberLevel.user_id == user_id)
         ).execute()
 
     @classmethod
@@ -369,4 +368,6 @@ class GuildMemberLevel(ModelBase):
                 'xp': 0
             }
         )
+
+        return xpobj
     

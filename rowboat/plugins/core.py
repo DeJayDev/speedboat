@@ -390,10 +390,9 @@ class CorePlugin(Plugin):
         This monstrosity of a function handles the parsing and dispatching of
         commands.
         """
-        # Ignore messages sent by bots
-        # TODO: Add command to add channel to ignored_channels
-        if event.message.author.bot or rdb.sismember('ignored_channels', event.message.channel_id):
+        if event.message.author.bot or (event.message.author.discriminator == '0000'):
             return
+
         if not event.channel.type == 1:
             if not event.message.channel.get_permissions(self.state.me).can(Permissions.SEND_MESSAGES):
                 return
@@ -640,6 +639,7 @@ class CorePlugin(Plugin):
             'state': self.bot.client.state,
             'event': event,
             'msg': event.msg,
+            'message': event.msg,
             'guild': event.msg.guild,
             'channel': event.msg.channel,
             'member': event.msg.member,

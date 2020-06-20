@@ -106,3 +106,25 @@ class StatsPlugin(Plugin):
             'emoji_id': event.emoji.id,
             'emoji_name': event.emoji.name,
         }))
+
+    @Plugin.listen('GuildMemberAdd')
+    def on_guild_member_add(self, event): 
+        if(event.member.user.bot):
+            return
+        
+        statsd.increment('guild.members.add')
+
+    @Plugin.listen('GuildMemberRemove')
+    def on_guild_member_remove(self, event): 
+        if(event.user.bot):
+            return
+        
+        statsd.increment('guild.members.remove')
+
+    @Plugin.listen('GuildBanAdd')
+    def on_guild_ban_add(self, event):
+        statsd.increment('guild.bans.add')
+
+    @Plugin.listen('GuildBanRemove')
+    def on_guild_ban_remove(self, event):
+        statsd.increment('guild.ban.remove')
