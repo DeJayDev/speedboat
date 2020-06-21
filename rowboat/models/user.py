@@ -195,19 +195,20 @@ class Infraction(ModelBase):
             user_id=member.user.id
         )
 
-        msg_status = False
+        msg_status = None
 
-        # TODO: Make these configurable.
-        if member.user.bot is not False: 
+        if not member.user.bot:
             try:
-                member.user.open_dm().send_message(':warning: You were **{}** from {} for "{}"'.format(
+                member.user.open_dm().send_message(':boot: You were **{}** from {}'.format(
                     'kicked',
                     event.guild.name,
-                    reason or 'no reason'
+                    ('for: ' + reason) or ''
                 ))
+                                
+                msg_status = True
             except APIException as err:
-                if err.status_code != 50007:
-                    msg_status = True
+                if err.status_code == 50007:
+                    msg_status = False
                 plugin.log.warning('Could not DM member %s', member.id)
 
         member.kick(reason=reason)
@@ -242,19 +243,20 @@ class Infraction(ModelBase):
             user_id=member.user.id
         )
 
-        msg_status = False
+        msg_status = None
 
-        if member.user.bot is not False: 
+        if not member.user.bot:
             try:
-                member.user.open_dm().send_message(':warning: You were **{}** from {} for "{}"\n\nThis will be lifted in: {}'.format(
+                member.user.open_dm().send_message(':timer: You were **{}** from {}'.format(
                     'temporarily banned',
                     event.guild.name,
-                    reason or 'no reason',
-                    humanize.naturaldelta(expires_at - datetime.utcnow())
+                    ('for: ' + reason) or ''
                 ))
+                                
+                msg_status = True
             except APIException as err:
-                if err.status_code != 50007:
-                    msg_status = True
+                if err.status_code == 50007:
+                    msg_status = False
                 plugin.log.warning('Could not DM member %s', member.id)
 
         member.ban(reason=reason)
@@ -289,6 +291,22 @@ class Infraction(ModelBase):
             ['GuildMemberRemove', 'GuildBanAdd', 'GuildBanRemove'],
             user_id=member.user.id
         )
+
+        msg_status = None
+
+        if not member.user.bot:
+            try:
+                member.user.open_dm().send_message(':hammer: You were **{}** from {}'.format(
+                    '_softbanned_',
+                    event.guild.name,
+                    ('for: ' + reason) or ''
+                ))
+                                
+                msg_status = True
+            except APIException as err:
+                if err.status_code == 50007:
+                    msg_status = False
+                plugin.log.warning('Could not DM member %s', member.id)
 
         member.ban(delete_message_days=7, reason=reason)
         member.unban(reason=reason)
@@ -326,18 +344,20 @@ class Infraction(ModelBase):
             user_id=user_id,
         )
 
-        msg_status = False
+        msg_status = None
 
-        if not isinstance(member, int) and user_ob is not False: 
+        if not member.user.bot:
             try:
-                member.user.open_dm().send_message(':warning: You were **{}** from {} for "{}"'.format(
+                member.user.open_dm().send_message(':hammer: You were **{}** from {}'.format(
                     'banned',
                     event.guild.name,
-                    reason or 'no reason'
+                    ('for: ' + reason) or ''
                 ))
+                                
+                msg_status = True
             except APIException as err:
-                if err.status_code != 50007:
-                    msg_status = True
+                if err.status_code == 50007:
+                    msg_status = False
                 plugin.log.warning('Could not DM member %s', member.id)
 
         guild.create_ban(user_id, reason=reason)
@@ -366,18 +386,20 @@ class Infraction(ModelBase):
         User.from_disco_user(member.user)
         user_id = member.user.id
 
-        msg_status = False
+        msg_status = None
 
-        if member.user.bot is not False: 
+        if not member.user.bot:
             try:
-                member.user.open_dm().send_message(':warning: You were **{}** in {} for "{}"'.format(
+                member.user.open_dm().send_message(':warning: You were **{}** in {}'.format(
                     'warned',
                     event.guild.name,
-                    reason or 'no reason'
+                    ('for: ' + reason) or ''
                 ))
+
+                msg_status = True
             except APIException as err:
-                if err.status_code != 50007:
-                    msg_status = True
+                if err.status_code == 50007:
+                    msg_status = False
                 plugin.log.warning('Could not DM member %s', member.id)
 
         plugin.call(
@@ -412,18 +434,19 @@ class Infraction(ModelBase):
 
         member.add_role(admin_config.mute_role, reason=reason)
 
-        msg_status = False
+        msg_status = None
 
-        if member.user.bot is not False: 
+        if not member.user.bot:
             try:
-                member.user.open_dm().send_message(':warning: You were **{}** in {} for "{}"'.format(
+                member.user.open_dm().send_message(':speak_no_evil: You were **{}** in {}'.format(
                     'muted',
                     event.guild.name,
-                    reason or 'no reason'
+                    ('for: ' + reason) or ''
                 ))
+                msg_status = True
             except APIException as err:
-                if err.status_code != 50007:
-                    msg_status = True
+                if err.status_code == 50007:
+                    msg_status = False
                 plugin.log.warning('Could not DM member %s', member.id)
         
         plugin.call(
@@ -463,19 +486,19 @@ class Infraction(ModelBase):
 
         member.add_role(admin_config.mute_role, reason=reason)
 
-        msg_status = False
+        msg_status = None
 
-        if member.user.bot is not False: 
+        if not member.user.bot:
             try:
-                member.user.open_dm().send_message(':warning: You were **{}** in {} for "{}"\n\nThis will be lifted in: {}'.format(
+                member.user.open_dm().send_message(':speak_no_evil: You were **{}** in {}'.format(
                     'temporarily muted',
                     event.guild.name,
-                    reason or 'no reason',
-                    humanize.naturaldelta(expires_at - datetime.utcnow())
+                    ('for: ' + reason) or ''
                 ))
+                msg_status = True
             except APIException as err:
-                if err.status_code != 50007:
-                    msg_status = True
+                if err.status_code == 50007:
+                    msg_status = False
                 plugin.log.warning('Could not DM member %s', member.id)
 
         plugin.call(
