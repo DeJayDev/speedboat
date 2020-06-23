@@ -15,6 +15,7 @@ from rowboat import REV
 from rowboat.util import default_json
 from rowboat.models.user import User
 from rowboat.sql import ModelBase
+from rowboat.constants import WEB_URL
 
 EMOJI_RE = re.compile(r'<:.+:([0-9]+)>')
 
@@ -204,8 +205,7 @@ class MessageArchive(ModelBase):
 
     @property
     def url(self):
-        # TODO: use web endpoint here
-        return 'http://row.swvn.io/api/archive/{}.txt'.format(self.archive_id)
+        return '{}/api/archive/{}.txt'.format(WEB_URL, self.archive_id)
 
     def encode(self, fmt='txt'):
         from rowboat.models.user import User

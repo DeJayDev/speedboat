@@ -33,7 +33,7 @@ from rowboat.models.notification import Notification
 from rowboat.plugins.modlog import Actions
 from rowboat.constants import (
     GREEN_TICK_EMOJI, RED_TICK_EMOJI, ROWBOAT_GUILD_ID, ROWBOAT_USER_ROLE_ID,
-    ROWBOAT_CONTROL_CHANNEL
+    ROWBOAT_CONTROL_CHANNEL, WEB_URL
 )
 
 PY_CODE_BLOCK = '```py\n{}\n```'
@@ -598,7 +598,7 @@ class CorePlugin(Plugin):
     def command_about(self, event):
         import subprocess
         embed = MessageEmbed()
-        embed.set_author(name='Speedboat', icon_url=self.client.state.me.avatar_url, url='http://row.swvn.io/')
+        embed.set_author(name='Speedboat', icon_url=self.client.state.me.avatar_url, url=WEB_URL)
         embed.description = BOT_INFO
         embed.add_field(name='Servers', value=str(len(self.state.guilds)), inline=True)
         embed.add_field(name='Uptime', value=humanize.naturaldelta(datetime.utcnow() - self.startup), inline=True)
@@ -694,7 +694,7 @@ class CorePlugin(Plugin):
         raise CommandSuccess('Closing connection')
         self.client.gw.ws.close()
 
-    @Plugin.command('invite', '<guild:snowflake>', group='guilds', level=-1)
+    @Plugin.command('invite', '<guild:snowflake>', aliases=['inv'], group='guilds', level=-1)
     def guild_join(self, event, guild):
         guild = self.state.guilds.get(guild)
         if not guild:

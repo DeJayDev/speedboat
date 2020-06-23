@@ -47,7 +47,8 @@ ERR_UNKNOWN_MESSAGE = 10008
 
 # Etc
 YEAR_IN_SEC = 60 * 60 * 24 * 365
-CDN_URL = 'https://twemoji.maxcdn.com/2/72x72/{}.png'
+CDN_URL = 'https://twemoji.maxcdn.com/v/latest/72x72/{}.png'
+WEB_URL = 'http://row.swvn.io'
 
 # Loaded from files
 with open('data/badwords.txt', 'r') as f:

@@ -926,8 +926,6 @@ class AdminPlugin(Plugin):
         except MessageArchive.DoesNotExist:
             raise CommandFail('Invalid message archive id')
 
-        archive.expires_at = parse_duration(duration)
-
         MessageArchive.update(
             expires_at=parse_duration(duration)
         ).where(

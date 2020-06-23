@@ -187,7 +187,7 @@ class CensorPlugin(Plugin):
                         event.guild.id,
                         e=event,
                         c=c)
-                except APIException:
+                except:
                     self.log.exception('Failed to delete censored message: ')
 
     def filter_zalgo(self, event, config):

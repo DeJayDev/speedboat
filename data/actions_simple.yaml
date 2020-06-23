@@ -38,6 +38,14 @@ GUILD_MEMBER_ROLES_RMV:
   emoji: key
   format: "{e.user!s} (`{e.user.id}`) role removed **{role.name}**"
 
+GUILD_MEMBER_TEMP_ROLES_ADD:
+  emoji: key
+  format: "{e.user!s} (`{e.user.id}`) role added **{role.name}** until {expires}"
+  
+GUILD_MEMBER_TEMP_ROLES_RMV:
+  emoji: key
+  format: "{e.user!s} (`{e.user.id}`) role **{role.name}** automatically removed."
+
 GUILD_ROLE_CREATE:
   emoji: pen_ballpoint
   format: 'role {e.role} was created'
@@ -153,3 +161,11 @@ MEMBER_TEMPBAN_EXPIRE:
 MEMBER_KICK:
   emoji: boot
   format: '{member!s} (`{member.id}`) was kicked by **{actor!s}**: `{reason!s}`'
+
+PERMISSION_ERROR:
+  emoji: warning
+  format: 'I do not have permission to {permission}!'
+
+API_ERROR:
+  emoji: warning
+  format: 'An action failed, DIscord returned: {statuscode} when trying to {}.'

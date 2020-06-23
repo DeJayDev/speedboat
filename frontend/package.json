@@ -27,7 +27,7 @@
   },
   "scripts": {
     "serve": "node serve.js",
-    "build": "NODE_ENV=production parcel build src/index.html --no-cache",
+    "build": "NODE_ENV=production parcel build src/index.html",
     "dev": "NODE_ENV=development npm run serve"
   }
 }

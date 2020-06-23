@@ -31,7 +31,7 @@ from rowboat.util.images import get_dominant_colors_user, get_dominant_colors_gu
 from rowboat.util.badges import UserFlags
 from rowboat.constants import (
     STATUS_EMOJI, BADGE_EMOJI, SNOOZE_EMOJI, GREEN_TICK_EMOJI, GREEN_TICK_EMOJI_ID,
-    EMOJI_RE, USER_MENTION_RE, YEAR_IN_SEC, CDN_URL
+    EMOJI_RE, USER_MENTION_RE, YEAR_IN_SEC, CDN_URL, WEB_URL
 )
 from functools import reduce
 
@@ -277,7 +277,6 @@ class UtilitiesPlugin(Plugin):
 
     @Plugin.command('info', '[user:user|snowflake]')
     def info(self, event, user=None):
-
         if not user:
             user = event.author
         else:
@@ -404,6 +403,10 @@ class UtilitiesPlugin(Plugin):
         embed.description = '\n'.join(content)
         embed.color = get_dominant_colors_user(user, avatar)
         event.msg.reply('', embed=embed)
+
+    @Plugin.command('config')
+    def config_cmd(self, event):
+        raise CommandSuccess('{}/guilds/{}}/config'.format(WEB_URL, event.guild.id))
 
     def trigger_reminders(self):
         reminders = Reminder.with_message_join().where(

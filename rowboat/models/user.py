@@ -170,8 +170,21 @@ class Infraction(ModelBase):
         User.from_disco_user(member.user)
 
         # TODO: modlog
+        # RE Above: yeah holy fuck the modlog plugin sucks, i understand its for queueing but shit
+        # I'll do it later.
 
-        member.add_role(role_id, reason=reason)
+        try:
+            member.add_role(role_id, reason=reason)
+        except APIException as err:
+            if err.status_code == 50013:
+                plugin.call(
+                    'ModLogPlugin.log_action_ext',
+                    Actions.PERMISSION_ERROR,
+                    event.guild.id,
+                    permission='add roles',
+                )
+                event.channel.send_message('I do not have permission to role this member. Action cancelled.')
+                return
 
         cls.create(
             guild_id=event.guild.id,
@@ -202,7 +215,7 @@ class Infraction(ModelBase):
                 member.user.open_dm().send_message(':boot: You were **{}** from {}'.format(
                     'kicked',
                     event.guild.name,
-                    ('for: ' + reason) or ''
+                    ('for: ' + reason ) if reason else ''
                 ))
                                 
                 msg_status = True
@@ -211,12 +224,23 @@ class Infraction(ModelBase):
                     msg_status = False
                 plugin.log.warning('Could not DM member %s', member.id)
 
-        member.kick(reason=reason)
+        try:
+            member.kick(reason=reason)
+        except APIException as err:
+            if err.status_code == 50013:
+                plugin.call(
+                    'ModLogPlugin.log_action_ext',
+                    Actions.PERMISSION_ERROR,
+                    event.guild.id,
+                    permission='kick users',
+                )
+                event.channel.send_message('I do not have permission to kick. Action cancelled.')
+                return
 
         # Create a kick modlog event
         plugin.call(
             'ModLogPlugin.log_action_ext',
-            Actions.MEMBER_KICk,
+            Actions.MEMBER_KICK,
             event.guild.id,
             member=member,
             actor=str(event.author) if event.author.id != member.id else 'Automatic',
@@ -250,7 +274,7 @@ class Infraction(ModelBase):
                 member.user.open_dm().send_message(':timer: You were **{}** from {}'.format(
                     'temporarily banned',
                     event.guild.name,
-                    ('for: ' + reason) or ''
+                    ('for: ' + reason ) if reason else ''
                 ))
                                 
                 msg_status = True
@@ -299,7 +323,7 @@ class Infraction(ModelBase):
                 member.user.open_dm().send_message(':hammer: You were **{}** from {}'.format(
                     '_softbanned_',
                     event.guild.name,
-                    ('for: ' + reason) or ''
+                    ('for: ' + reason ) if reason else ''
                 ))
                                 
                 msg_status = True
@@ -346,18 +370,17 @@ class Infraction(ModelBase):
 
         msg_status = None
 
-        if not member.user.bot:
+        if not user_ob.bot:
             try:
-                member.user.open_dm().send_message(':hammer: You were **{}** from {}'.format(
+                user_ob.open_dm().send_message(':hammer: You were **{}** from {}'.format(
                     'banned',
                     event.guild.name,
-                    ('for: ' + reason) or ''
+                    ('for: ' + reason ) if reason else ''
                 ))
                                 
                 msg_status = True
             except APIException as err:
-                if err.status_code == 50007:
-                    msg_status = False
+                msg_status = False # Multiple bad things can happen here, so we'll just... do this.
                 plugin.log.warning('Could not DM member %s', member.id)
 
         guild.create_ban(user_id, reason=reason)
@@ -393,7 +416,7 @@ class Infraction(ModelBase):
                 member.user.open_dm().send_message(':warning: You were **{}** in {}'.format(
                     'warned',
                     event.guild.name,
-                    ('for: ' + reason) or ''
+                    ('for: ' + reason ) if reason else ''
                 ))
 
                 msg_status = True
@@ -441,7 +464,7 @@ class Infraction(ModelBase):
                 member.user.open_dm().send_message(':speak_no_evil: You were **{}** in {}'.format(
                     'muted',
                     event.guild.name,
-                    ('for: ' + reason) or ''
+                    ('for: ' + reason ) if reason else ''
                 ))
                 msg_status = True
             except APIException as err:
@@ -493,7 +516,7 @@ class Infraction(ModelBase):
                 member.user.open_dm().send_message(':speak_no_evil: You were **{}** in {}'.format(
                     'temporarily muted',
                     event.guild.name,
-                    ('for: ' + reason) or ''
+                    ('for: ' + reason ) if reason else ''
                 ))
                 msg_status = True
             except APIException as err:
