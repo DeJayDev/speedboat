@@ -540,7 +540,7 @@ class AdminPlugin(Plugin):
         except requests.exceptions.RequestException as e:  # This is the correct syntax
             raise CommandFail(e)
 
-    @Plugin.command('roles', level=CommandLevels.MOD)
+    @Plugin.command('roles', level=CommandLevels.MOD, global_=True)
     def roles(self, event):
         buff = ''
         for role in list(event.guild.roles.values()):
