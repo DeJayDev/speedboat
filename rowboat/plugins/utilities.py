@@ -406,7 +406,7 @@ class UtilitiesPlugin(Plugin):
 
     @Plugin.command('config')
     def config_cmd(self, event):
-        raise CommandSuccess('{}/guilds/{}}/config'.format(WEB_URL, event.guild.id))
+        raise CommandSuccess('{}/guilds/{}/config'.format(WEB_URL, event.guild.id))
 
     def trigger_reminders(self):
         reminders = Reminder.with_message_join().where(

@@ -280,7 +280,7 @@ class SQLPlugin(Plugin):
             pool.join()
             u.kill()
 
-        msg.edit('RECOVERY COMPLETED ({} total messages)'.format(
+        msg.edit(':ok_hand: Recovery Completed ({} total messages)'.format(
             sum([i._recovered for i in recoveries])
         ))
 

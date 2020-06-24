@@ -372,7 +372,7 @@ class Infraction(ModelBase):
 
         if not user_ob.bot:
             try:
-                user_ob.open_dm().send_message(':hammer: You were **{}** from {}'.format(
+                member.user.open_dm().send_message(':hammer: You were **{}** from {}'.format(
                     'banned',
                     event.guild.name,
                     ('for: ' + reason ) if reason else ''
