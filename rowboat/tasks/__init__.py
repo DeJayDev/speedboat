@@ -125,7 +125,7 @@ class TaskWorker(object):
 
         while self.active:
             chan, job = rdb.blpop(self.queues)
-            job_name = chan.split(':', 1)[1]
+            job_name = chan.split(':', 1)[1].encode()
             job = json.loads(job)
 
             if job_name not in TASKS:

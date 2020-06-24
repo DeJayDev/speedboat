@@ -86,7 +86,7 @@ class CorePlugin(Plugin):
         while True:
             events = inotify.get_events(fd)
             for event in events:
-                # Can't reload core.py sadly
+                # Can't reload core.py
                 if event.name.startswith('core.py'):
                     continue
 
@@ -334,7 +334,7 @@ class CorePlugin(Plugin):
             # If the guild is not awaiting setup, leave it now
             if not rdb.sismember(GUILDS_WAITING_SETUP_KEY, str(event.id)) and event.id != ROWBOAT_GUILD_ID:
                 self.log.warning(
-                    'I am in guild %s (%s), and it\'s not within the setup list',
+                    'Guild %s (%s) is awaiting setup.',
                     event.id, event.name
                 )
                 #event.guild.leave()
@@ -496,9 +496,9 @@ class CorePlugin(Plugin):
 
                 self._attach_local_event_data(event, 'modlog', event.guild.id)
 
-                plugin = self.bot.plugins.get('ModLogPlugin')
-                if plugin:
-                    plugin.log_action(Actions.COMMAND_USED, event)
+                modlog = self.bot.plugins.get('ModLogPlugin')
+                if modlog:
+                    modlog.log_action(Actions.COMMAND_USED, event)
 
             return
 

@@ -4,7 +4,7 @@ from random import randint
 
 from disco.bot import CommandLevels
 from disco.util.sanitize import S
-from disco.types.message import MessageEmbed
+from disco.types.message import MessageEmbed, MessageTable
 
 from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
 from rowboat.types import Field
@@ -29,7 +29,7 @@ class LevelPlugin(Plugin):
                 return False
             raise CommandFail('Cannot execute that action on yourself')
     
-    def getLevelFromExp(self, exp):
+    def level_from_exp(self, exp):
         def getLevelExp(level):
             return (5*(level**2)+50*level+100)
 
@@ -59,17 +59,24 @@ class LevelPlugin(Plugin):
             return # No XP for commands
 
         try:
-            user = GuildMemberLevel.select().where(
+            user = GuildMemberLevel.select(GuildMemberLevel, XPBlock).join(
+                XPBlock,
+                on=((GuildMemberLevel.guild_id == XPBlock.guild_id) &
+                    (GuildMemberLevel.user_id == XPBlock.user_id))
+            ).where(
                 (GuildMemberLevel.user_id == event.author.id) &
                 (GuildMemberLevel.guild_id == event.guild.id)
             ).get()
+
+            if user.xpblock:
+                return # No XP for blocked meanies >:(
         except GuildMemberLevel.DoesNotExist:
             user = GuildMemberLevel.create_new(event.guild.get_member(event.author.id)) # lol
 
         user.add_xp(event.guild.id, event.author.id, randint(15, 25))
     
     @Plugin.command('block', '<user:user|snowflake> [reason:str...]', group='xp2', aliases=['mute', 'stfu'], level=CommandLevels.MOD)
-    def xp_block(self, event, user, reason):
+    def xp_block(self, event, user, reason=None):
         member = event.guild.get_member(user)
         if member:
             self.can_act_on(event, member.id)
@@ -78,7 +85,7 @@ class LevelPlugin(Plugin):
                 user_id = user.id,
                 defaults={
                     'actor_id': event.author.id,
-                    'reason': reason
+                    'reason': reason or 'no reason'
                 })
             
             if not created:
@@ -90,8 +97,8 @@ class LevelPlugin(Plugin):
 
         raise CommandSuccess('Blocked {} from gaining XP.'.format(member))
 
-    @Plugin.command('unblock', '<user:user|snowflake> [reason:str...]', group='xp2', aliases=['unmute'], level=CommandLevels.MOD)
-    def xp_unblock(self, event, user, reason):
+    @Plugin.command('unblock', '<user:user|snowflake>', group='xp2', aliases=['unmute'], level=CommandLevels.MOD)
+    def xp_unblock(self, event, user):
         member = event.guild.get_member(user)
         if member:
             self.can_act_on(event, member.id)
@@ -121,7 +128,32 @@ class LevelPlugin(Plugin):
         except GuildMemberLevel.DoesNotExist:
             raise CommandFail('That user does not have any XP (Have they sent a message?)')
 
-        raise CommandSuccess('{} has {} xp'.format(member, gml.xp))
+        raise CommandSuccess('{} is level {} ({} XP)'.format(member, self.level_from_exp(gml.xp), gml.xp))
+
+    @Plugin.command('leaderboard', '[places:int] [offset:int]', group='xp2', aliases=['top'])
+    def xp_leaderboard(self, event, places=None, offset=None):
+        places = places if places else 10
+        offset = offset if offset else 0
+        user = User.alias()
+
+        leaderboard = GuildMemberLevel.select(GuildMemberLevel, user).join(
+            user,
+            on=((GuildMemberLevel.user_id == user.user_id).alias('user'))
+        ).where(
+            GuildMemberLevel.guild_id == event.guild.id,
+            GuildMemberLevel.xp > 0
+        ).order_by(GuildMemberLevel.xp.desc()).offset(offset).limit(places)
+
+        tbl = MessageTable()
+        tbl.set_header('Place', 'User', 'Level (XP)')
+        for place, entry in enumerate(leaderboard, start=(offset if offset else 1)):
+            tbl.add(
+                place,
+                str(entry.user),
+                '{} ({})'.format(self.level_from_exp(entry.xp), entry.xp)
+            )
+    
+        event.msg.reply(tbl.compile())
 
     @Plugin.command('reset', '<user:user|snowflake>',
     #aliases=[],
@@ -160,9 +192,9 @@ class LevelPlugin(Plugin):
 
             user.add_xp(member.guild_id, member.id, amount)
 
-            raise CommandSuccess('{} was given {} XP. (New Total: `{}`)'.format(
+            raise CommandSuccess('{} is now Level {} ({} XP)'.format(
                 member.user,
-                amount,
+                self.level_from_exp(user.xp + amount),
                 (user.xp + amount)
             ))
         elif action == 'take':
@@ -173,13 +205,13 @@ class LevelPlugin(Plugin):
                 ).get()
             except GuildMemberLevel.DoesNotExist:
                 user = GuildMemberLevel.create_new(member)
-                event.channel.send_message('You\'re a monster. Negative XP? Give them a chance.')
+                event.channel.send_message('You\'re a monster. Negative XP?')
 
             user.rmv_xp(member.guild_id, member.id, amount)
 
-            raise CommandSuccess('Took {} XP from {}. (New Total: `{}`)'.format(
-                amount,
+            raise CommandSuccess('{} is now Level {} ({} XP)'.format(
                 member.user,
+                self.level_from_exp(user.xp - amount),
                 (user.xp - amount)
             ))
         else:
@@ -189,7 +221,7 @@ class LevelPlugin(Plugin):
                     (GuildMemberLevel.guild_id == member.guild_id)
                 ).get()
             except GuildMemberLevel.DoesNotExist:
-                raise CommandFail('This user cannot be reset. (No XP)')
+                raise CommandFail('This user cannot be reset.')
 
             msg = event.msg.reply('Really reset `{}`?'.format(member))
 
