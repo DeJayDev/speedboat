@@ -296,8 +296,8 @@ class SQLPlugin(Plugin):
         backfill_guild.queue(guild.id)
         raise CommandSuccess('Enqueued guild to be backfilled')
 
-    @Plugin.command('usage', '<word:str> [unit:str] [amount:int]', level=-1, group='words')
-    def words_usage(self, event, word, unit='days', amount=7):
+    @Plugin.command('usage', '<word:str> [amount:int] [unit:str]', level=-1, group='words')
+    def words_usage(self, event, word, amount=7, unit='days'):
         sql = '''
             SELECT date, coalesce(count, 0) AS count
             FROM

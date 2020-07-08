@@ -112,14 +112,18 @@ class StatsPlugin(Plugin):
         if(event.member.user.bot):
             return
         
-        statsd.increment('guild.members.add')
+        statsd.increment('guild.members.add', tags=to_tags({
+            'guild_id': event.member.guild_id, # this event fires a GuildMember, so we harvest the guild_id
+        }))
 
     @Plugin.listen('GuildMemberRemove')
     def on_guild_member_remove(self, event): 
         if(event.user.bot):
             return
         
-        statsd.increment('guild.members.remove')
+        statsd.increment('guild.members.remove', tags=to_tags({
+            'guild_id': event.guild_id, # this event fires the id as it's own variable.
+        }))
 
     @Plugin.listen('GuildBanAdd')
     def on_guild_ban_add(self, event):

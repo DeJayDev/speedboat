@@ -8,7 +8,7 @@ services:
       - ENV=production
     stop_grace_period: 1m
   redis:
-    image: redis:5.0
+    image: redis:6.0
     command: redis-server --appendonly yes
     volumes:
       - ./.data:/data

@@ -220,7 +220,7 @@ class UtilitiesPlugin(Plugin):
             '\n'.join(['{} ({})'.format(str(i), i.user_id) for i in users[:25]])
         ))
 
-    @Plugin.command('server', '[guild_id:snowflake]', global_=True)
+    @Plugin.command('server', '[guild_id:snowflake]', aliases=['guild'], global_=True)
     def server(self, event, guild_id=None):
         guild = self.state.guilds.get(guild_id) if guild_id else event.guild
         if not guild:
@@ -275,7 +275,7 @@ class UtilitiesPlugin(Plugin):
         embed.description = '\n'.join(content)
         event.msg.reply('', embed=embed)
 
-    @Plugin.command('info', '[user:user|snowflake]')
+    @Plugin.command('info', '[user:user|snowflake]', aliases='whois')
     def info(self, event, user=None):
         if not user:
             user = event.author
@@ -290,7 +290,7 @@ class UtilitiesPlugin(Plugin):
                         try:
                             user = self.bot.client.api.users_get(user)
                         except APIException:
-                            return event.msg.reply('User not found :eyes:').after(3).delete()
+                            return event.msg.reply(':eyes: User not found').after(3).delete()
 
         self.client.api.channels_typing(event.channel.id)
         
@@ -404,7 +404,7 @@ class UtilitiesPlugin(Plugin):
         embed.color = get_dominant_colors_user(user, avatar)
         event.msg.reply('', embed=embed)
 
-    @Plugin.command('config')
+    @Plugin.command('config', global_=True)
     def config_cmd(self, event):
         raise CommandSuccess('{}/guilds/{}/config'.format(WEB_URL, event.guild.id))
 

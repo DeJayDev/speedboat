@@ -5,7 +5,7 @@ intents: 14335 # https://ziad87.me/intents/
 max_reconnects: 0
 
 manhole_enable: true
-manhole_bind: 127.0.0.1:7171
+manhole_bind: 0.0.0.0:7171
 
 DSN: ''
 

@@ -372,10 +372,17 @@ class Infraction(ModelBase):
 
         if not user_ob.bot:
             try:
-                member.user.open_dm().send_message(':hammer: You were **{}** from {}'.format(
+                expires_in = None
+                if cls.expires_at:
+                    expires_in = '\n\n:timer: This action will expire in: {}'.format(
+                        humanize.naturaldelta(cls.expires_at - datetime.utcnow())
+                    )
+
+                member.user.open_dm().send_message(':hammer: You were **{}** from {} {} {}'.format(
                     'banned',
                     event.guild.name,
-                    ('for: ' + reason ) if reason else ''
+                    ('for: ' + reason ) if reason else None,
+                    expires_in, # This doesn't have an ugly if statement because if it's not defined it's None.
                 ))
                                 
                 msg_status = True
