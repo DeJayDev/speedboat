@@ -1,6 +1,7 @@
 from . import task, get_client
 from rowboat.models.message import Message
 from disco.types.channel import MessageIterator
+from disco.types.permissions import Permissions
 
 
 @task(max_concurrent=1, max_queue_size=10, global_lock=lambda guild_id: guild_id)
@@ -27,6 +28,13 @@ def backfill_channel(task, channel_id):
     for chunk in msgs_iter:
         if not chunk:
             break
+
+        if chunk.author.bot or (chunk.author.discriminator == '0000'):
+            break
+
+        if not chunk.channel.type == 1:
+            if not chunk.channel.get_permissions(self.state.me).can(Permissions.SEND_MESSAGES):
+                return
 
         scanned += len(chunk)
         inserted += len(Message.from_disco_message_many(chunk, safe=True))
