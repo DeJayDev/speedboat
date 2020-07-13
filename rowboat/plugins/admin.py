@@ -16,6 +16,7 @@ from disco.bot import CommandLevels
 from disco.api.http import APIException
 from disco.types.user import User as DiscoUser
 from disco.types.message import MessageTable, MessageEmbed, MessageEmbedField, MessageEmbedThumbnail
+from disco.types.guild import GuildMember
 from disco.types.permissions import Permissions
 from disco.util.functional import chunks
 from disco.util.sanitize import S
@@ -808,28 +809,34 @@ class AdminPlugin(Plugin):
         raise CommandSuccess('Banned {} users'.format(len(members)))
 
     @Plugin.command('ban', '<user:user|snowflake> [reason:str...]', level=CommandLevels.MOD)
-    @Plugin.command('forceban', '<user:snowflake> [reason:str...]', level=CommandLevels.MOD)
-    def ban(self, event, user, reason=None):
-        member = None
+    @Plugin.command('forceban', '<user:snowflake> [reason:str...]', level=CommandLevels.MOD, context={'status': 'deprecated'})
+    def ban(self, event, user, reason=None, status=None):
+        if status == "deprecated":
+            event.channel.send_message('Ban and forceban are now the same! This command will be kept as an alias.')
 
-        if isinstance(user, int):
+        if isinstance(user, (int)):
+            user_id = user
             self.can_act_on(event, user)
-            Infraction.ban(self, event, user, reason, guild=event.guild)
         else:
+            user_id = user.id
             member = event.guild.get_member(user)
             if member:
-                self.can_act_on(event, member.id)
-                Infraction.ban(self, event, member, reason, guild=event.guild)
+                user = member
+                self.can_act_on(event, user_id)
             else:
-                raise CommandFail('Invalid user')
+                user = user_id
 
-        if event.config.confirm_actions:
-            event.msg.reply(maybe_string(
-                reason,
-                ':ok_hand: banned {u} (`{o}`)',
-                ':ok_hand: banned {u}',
-                u=member.user if member else user,
-            ))
+        try:
+            Infraction.ban(self, event, user, reason, guild=event.guild)
+            if event.config.confirm_actions:
+                event.msg.reply(maybe_string(
+                    reason,
+                    ':ok_hand: banned {u} (`{o}`)',
+                    ':ok_hand: banned {u}',
+                    u=user.user if isinstance(user, GuildMember) else user,
+                ))
+        except APIException:
+            raise CommandFail('invalid user')
 
     @Plugin.command('softban', '<user:user|snowflake> [reason:str...]', level=CommandLevels.MOD)
     def softban(self, event, user, reason=None):

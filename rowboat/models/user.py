@@ -1,4 +1,4 @@
-import humanize
+import arrow
 
 from datetime import datetime
 from holster.enum import Enum
@@ -7,6 +7,7 @@ from playhouse.postgres_ext import BinaryJSONField
 
 from rowboat.sql import ModelBase
 from disco.api.http import APIException
+from disco.types.guild import GuildMember
 
 @ModelBase.register
 class User(ModelBase):
@@ -162,8 +163,8 @@ class Infraction(ModelBase):
         return base
 
     @staticmethod
-    def admin_config(event):
-        return getattr(event.base_config.plugins, 'admin', None)
+    def infractions_config(event):
+        return getattr(event.base_config.plugins, 'infractions', None)
 
     @classmethod
     def temprole(cls, plugin, event, member, role_id, reason, expires_at):
@@ -198,7 +199,6 @@ class Infraction(ModelBase):
     @classmethod
     def kick(cls, plugin, event, member, reason):
         from rowboat.plugins.modlog import Actions
-        User.from_disco_user(member.user)
 
         # Prevent the GuildMemberRemove log event from triggering
         plugin.call(
@@ -208,21 +208,7 @@ class Infraction(ModelBase):
             user_id=member.user.id
         )
 
-        msg_status = None
-
-        if not member.user.bot:
-            try:
-                member.user.open_dm().send_message(':boot: You were **{}** from {}'.format(
-                    'kicked',
-                    event.guild.name,
-                    ('for: ' + reason ) if reason else ''
-                ))
-                                
-                msg_status = True
-            except APIException as err:
-                if err.status_code == 50007:
-                    msg_status = False
-                plugin.log.warning('Could not DM member %s', member.id)
+        msg_status = cls.send_message('kicked', member.user, event.guild, reason)
 
         try:
             member.kick(reason=reason)
@@ -267,21 +253,7 @@ class Infraction(ModelBase):
             user_id=member.user.id
         )
 
-        msg_status = None
-
-        if not member.user.bot:
-            try:
-                member.user.open_dm().send_message(':timer: You were **{}** from {}'.format(
-                    'temporarily banned',
-                    event.guild.name,
-                    ('for: ' + reason ) if reason else ''
-                ))
-                                
-                msg_status = True
-            except APIException as err:
-                if err.status_code == 50007:
-                    msg_status = False
-                plugin.log.warning('Could not DM member %s', member.id)
+        msg_status = cls.send_message('banned', member.user, event.guild, reason, expires_at)
 
         member.ban(reason=reason)
 
@@ -316,21 +288,7 @@ class Infraction(ModelBase):
             user_id=member.user.id
         )
 
-        msg_status = None
-
-        if not member.user.bot:
-            try:
-                member.user.open_dm().send_message(':hammer: You were **{}** from {}'.format(
-                    '_softbanned_',
-                    event.guild.name,
-                    ('for: ' + reason ) if reason else ''
-                ))
-                                
-                msg_status = True
-            except APIException as err:
-                if err.status_code == 50007:
-                    msg_status = False
-                plugin.log.warning('Could not DM member %s', member.id)
+        msg_status = cls.send_message('softbanned', member.user, event.guild, reason)
 
         member.ban(delete_message_days=7, reason=reason)
         member.unban(reason=reason)
@@ -356,9 +314,7 @@ class Infraction(ModelBase):
         from rowboat.plugins.modlog import Actions
         if isinstance(member, int):
             user_id = member
-            user_ob = User.with_id(user_id)
         else:
-            user_ob = User.from_disco_user(member.user)
             user_id = member.user.id
 
         plugin.call(
@@ -368,27 +324,7 @@ class Infraction(ModelBase):
             user_id=user_id,
         )
 
-        msg_status = None
-
-        if not user_ob.bot:
-            try:
-                expires_in = None
-                if cls.expires_at:
-                    expires_in = '\n\n:timer: This action will expire in: {}'.format(
-                        humanize.naturaldelta(cls.expires_at - datetime.utcnow())
-                    )
-
-                member.user.open_dm().send_message(':hammer: You were **{}** from {} {} {}'.format(
-                    'banned',
-                    event.guild.name,
-                    ('for: ' + reason ) if reason else None,
-                    expires_in, # This doesn't have an ugly if statement because if it's not defined it's None.
-                ))
-                                
-                msg_status = True
-            except APIException as err:
-                msg_status = False # Multiple bad things can happen here, so we'll just... do this.
-                plugin.log.warning('Could not DM member %s', member.id)
+        msg_status = cls.send_message('banned', member, event.guild, reason)
 
         guild.create_ban(user_id, reason=reason)
 
@@ -416,21 +352,7 @@ class Infraction(ModelBase):
         User.from_disco_user(member.user)
         user_id = member.user.id
 
-        msg_status = None
-
-        if not member.user.bot:
-            try:
-                member.user.open_dm().send_message(':warning: You were **{}** in {}'.format(
-                    'warned',
-                    event.guild.name,
-                    ('for: ' + reason ) if reason else ''
-                ))
-
-                msg_status = True
-            except APIException as err:
-                if err.status_code == 50007:
-                    msg_status = False
-                plugin.log.warning('Could not DM member %s', member.id)
+        msg_status = cls.send_message('warned', member.user, event.guild, reason)
 
         plugin.call(
             'ModLogPlugin.log_action_ext',
@@ -452,32 +374,19 @@ class Infraction(ModelBase):
     @classmethod
     def mute(cls, plugin, event, member, reason):
         from rowboat.plugins.modlog import Actions
-        admin_config = cls.admin_config(event)
+        infractions_config = cls.infractions_config(event)
 
         plugin.call(
             'ModLogPlugin.create_debounce',
             event,
             ['GuildMemberUpdate'],
             user_id=member.user.id,
-            role_id=admin_config.mute_role,
+            role_id=infractions_config.mute_role,
         )
 
-        member.add_role(admin_config.mute_role, reason=reason)
+        member.add_role(infractions_config.mute_role, reason=reason)
 
-        msg_status = None
-
-        if not member.user.bot:
-            try:
-                member.user.open_dm().send_message(':speak_no_evil: You were **{}** in {}'.format(
-                    'muted',
-                    event.guild.name,
-                    ('for: ' + reason ) if reason else ''
-                ))
-                msg_status = True
-            except APIException as err:
-                if err.status_code == 50007:
-                    msg_status = False
-                plugin.log.warning('Could not DM member %s', member.id)
+        msg_status = cls.send_message('muted', member.user, event.guild, reason)
         
         plugin.call(
             'ModLogPlugin.log_action_ext',
@@ -494,15 +403,15 @@ class Infraction(ModelBase):
             actor_id=event.author.id,
             type_=cls.Types.MUTE,
             reason=reason,
-            metadata={'role': admin_config.mute_role},
+            metadata={'role': infractions_config.mute_role},
             messaged=msg_status)
 
     @classmethod
     def tempmute(cls, plugin, event, member, reason, expires_at):
         from rowboat.plugins.modlog import Actions
-        admin_config = cls.admin_config(event)
+        infractions_config = cls.infractions_config(event)
 
-        if not admin_config.mute_role:
+        if not infractions_config.mute_role:
             plugin.log.warning('Cannot tempmute member %s, no tempmute role', member.id)
             return
 
@@ -511,25 +420,12 @@ class Infraction(ModelBase):
             event,
             ['GuildMemberUpdate'],
             user_id=member.user.id,
-            role_id=admin_config.mute_role,
+            role_id=infractions_config.mute_role,
         )
 
-        member.add_role(admin_config.mute_role, reason=reason)
+        member.add_role(infractions_config.mute_role, reason=reason)
 
-        msg_status = None
-
-        if not member.user.bot:
-            try:
-                member.user.open_dm().send_message(':speak_no_evil: You were **{}** in {}'.format(
-                    'temporarily muted',
-                    event.guild.name,
-                    ('for: ' + reason ) if reason else ''
-                ))
-                msg_status = True
-            except APIException as err:
-                if err.status_code == 50007:
-                    msg_status = False
-                plugin.log.warning('Could not DM member %s', member.id)
+        msg_status = cls.send_message('muted', member.user, event.guild, reason, expires_atM)
 
         plugin.call(
             'ModLogPlugin.log_action_ext',
@@ -548,8 +444,61 @@ class Infraction(ModelBase):
             type_=cls.Types.TEMPMUTE,
             reason=reason,
             expires_at=expires_at,
-            metadata={'role': admin_config.mute_role},
+            metadata={'role': infractions_config.mute_role},
             messaged=msg_status)
+
+    @classmethod
+    def send_message(cls, action, user, guild, reason=None, expires_at=None):
+        msg_status = False
+        do_not_message = False
+
+        if isinstance(user, int):
+            if guild.get_member(user):
+                user = guild.get_member(user).user # got em
+            else:
+                do_not_message = True
+
+        if isinstance(user, GuildMember):
+            if user.user.bot:
+                do_not_message = True
+            else:
+                user = user.user # 👌
+
+        if isinstance(user, User):
+            do_not_message = user.bot
+
+        if do_not_message:
+            return msg_status
+                
+        emojis = {
+            'warned': 'warning',
+            'muted': 'speak_no_evil',
+            'kicked': 'boot',
+            'softbanned': 'hammer',
+            'banned': 'hammer'
+        }
+        
+        expires = ''
+
+        if expires_at:
+            expires = '\n\n:timer: This action will expire in {}'.format(
+                arrow.get(expires_at - datetime.utcnow()).humanize())
+        
+        try:
+            user.open_dm().send_message(':{}: You were **{}** from {} {} {}'.format(
+                emojis[action] if action in emojis else 'exclaimation',
+                action,
+                guild.name,
+                ('for: ' + reason) if reason else '',
+                expires, # This doesn't have an ugly if statement because if it's not defined it's None.
+            ))
+                            
+            msg_status = True
+        except APIException as err:
+            msg_status = False # Multiple bad things can happen here, so we'll just... do this.
+            plugin.log.warning('Could not DM member %s', member.id)
+
+        return msg_status
 
     @classmethod
     def clear_active(cls, event, user_id, types):

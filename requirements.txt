@@ -16,7 +16,6 @@ oauthlib==3.1.0
 Pillow==7.2.0
 psycogreen==1.0.2
 psycopg2-binary==2.8.5
-python-dateutil==2.8.1
 pytz==2020.1
 PyYAML==5.3.1
 sentry-sdk==0.16.0

@@ -116,7 +116,7 @@ class LevelPlugin(Plugin):
 
         raise CommandSuccess('Unblocked {} from gaining XP.'.format(member))
 
-    @Plugin.command('xp2', '[user:user|snowflake]')
+    @Plugin.command('xp2show', '[user:user|snowflake]')
     def xp(self, event, user=None):
         member = user if user else event.author
 

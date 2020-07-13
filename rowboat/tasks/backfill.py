@@ -29,12 +29,13 @@ def backfill_channel(task, channel_id):
         if not chunk:
             break
 
-        if chunk.author.bot or (chunk.author.discriminator == '0000'):
-            break
+        for msg in chunk:
+            if msg.author.bot or (msg.author.discriminator == '0000'):
+                break
 
-        if not chunk.channel.type == 1:
-            if not chunk.channel.get_permissions(self.state.me).can(Permissions.SEND_MESSAGES):
-                return
+            if not msg.channel.type == 1:
+                if not msg.channel.get_permissions(351776065477279745).can(Permissions.SEND_MESSAGES, Permissions.VIEW_CHANNEL):
+                    break
 
         scanned += len(chunk)
         inserted += len(Message.from_disco_message_many(chunk, safe=True))

@@ -419,6 +419,14 @@ class Recovery(object):
             if not chunk:
                 break
 
+            for msg in chunk:
+                if msg.author.bot or (msg.author.discriminator == '0000'):
+                    break
+
+            if not msg.channel.type == 1:
+                if not msg.channel.get_permissions(351776065477279745).can(Permissions.SEND_MESSAGES, Permissions.VIEW_CHANNEL):
+                    break
+
             self._recovered += len(Message.from_disco_message_many(chunk, safe=True))
 
             if to_datetime(chunk[-1].id) > self.end_dt:
@@ -440,5 +448,14 @@ class Backfill(object):
         for chunk in msgs_iter:
             if not chunk:
                 break
+
+            for msg in chunk:
+                if msg.author.bot or (msg.author.discriminator == '0000'):
+                    break
+
+            if not msg.channel.type == 1:
+                if not msg.channel.get_permissions(351776065477279745).can(Permissions.SEND_MESSAGES, Permissions.VIEW_CHANNEL):
+                    break
+
             self._scanned += len(chunk)
             self._inserted = len(Message.from_disco_message_many(chunk, safe=True))

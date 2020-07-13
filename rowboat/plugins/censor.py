@@ -2,6 +2,7 @@ import re
 import json
 import urllib.parse
 
+from urllib.parse import unquote
 from holster.enum import Enum
 from disco.types.base import cached_property
 from disco.util.sanitize import S
@@ -198,7 +199,7 @@ class CensorPlugin(Plugin):
             })
 
     def filter_invites(self, event, config):
-        invites = INVITE_LINK_RE.findall(event.content)
+        invites = INVITE_LINK_RE.findall(unquote(event.content))
 
         for _, invite in invites:
             invite_info = self.get_invite_info(invite)
