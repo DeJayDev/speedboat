@@ -41,8 +41,8 @@ def parse_duration(raw, source=None, negative=False, safe=False):
     return (source or datetime.utcnow()) + timedelta(seconds=value + 1)
 
 
-def human_time(*args, **kwargs):
-    secs  = float(datetime.timedelta(*args, **kwargs).total_seconds())
+def human_time(time):
+    secs  = float(time.total_seconds())
 
     units = [("day", 86400), ("hour", 3600), ("minute", 60), ("second", 1)]
     parts = []
@@ -50,10 +50,10 @@ def human_time(*args, **kwargs):
     for unit, mul in units:
         if secs / mul >= 1 or mul == 1:
             if mul > 1:
-                n = int(math.floor(secs / mul))
-                secs -= n * mul
+                length = int(math.floor(secs / mul))
+                secs -= length * mul
             else:
-                n = secs if secs != int(secs) else int(secs)
-            parts.append("%s %s%s" % (n, unit, "" if n == 1 else "s"))
+                length = int(secs) if secs != int(secs) else int(secs)
+            parts.append("{} {}{}".format(length, unit, "" if length == 1 else "s"))
     
     return ", ".join(parts)

@@ -496,7 +496,7 @@ class Infraction(ModelBase):
             msg_status = True
         except APIException as err:
             msg_status = False # Multiple bad things can happen here, so we'll just... do this.
-            plugin.log.warning('Could not DM member %s', member.id)
+            print('Could not DM member %s', member.id)
 
         return msg_status
 
