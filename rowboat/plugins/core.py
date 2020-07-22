@@ -515,7 +515,7 @@ class CorePlugin(Plugin):
                 raise CommandFail('Only the server owner can setup speedboat')
 
         # Make sure we have admin perms
-        m = event.guild.members.get(id=self.state.me.id)
+        m = event.guild.members.get(self.state.me.id)
         if not m.permissions.administrator and not global_admin:
             raise CommandFail('Bot must have the Administrator permission')
 

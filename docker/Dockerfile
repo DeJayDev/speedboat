@@ -1,4 +1,4 @@
-FROM postgres:9.6.18
+FROM postgres:10
 ENV POSTGRES_USER=rowboat
 ENV POSTGRES_DB=rowboat
 ENV POSTGRES_HOST_AUTH_METHOD=trust
