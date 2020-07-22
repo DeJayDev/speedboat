@@ -757,3 +757,7 @@ class CorePlugin(Plugin):
         msg = event.msg.reply(":eyes:")
         ping = (time.time() - pre) * 1000
         msg.edit(":eyes: `BOT: {}ms` `API: {}ms`".format(int(post), int(ping)))
+
+    @Plugin.command('config')
+    def config_cmd(self, event):
+        raise CommandSuccess('{}/guilds/{}/config'.format(WEB_URL, event.guild.id))
