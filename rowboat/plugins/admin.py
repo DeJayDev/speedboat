@@ -78,6 +78,8 @@ class PersistConfig(SlottedModel):
 
     role_ids = ListField(snowflake, default=[])
 
+class InfractionsConfig(PluginConfig):
+    mute_role = Field(snowflake, default=None)
 
 class AdminConfig(PluginConfig):
     confirm_actions = Field(bool, default=True)
