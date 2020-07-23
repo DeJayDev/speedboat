@@ -425,7 +425,7 @@ class Infraction(ModelBase):
 
         member.add_role(infractions_config.mute_role, reason=reason)
 
-        msg_status = cls.send_message('muted', member.user, event.guild, reason, expires_atM)
+        msg_status = cls.send_message('muted', member.user, event.guild, reason, expires_at)
 
         plugin.call(
             'ModLogPlugin.log_action_ext',
