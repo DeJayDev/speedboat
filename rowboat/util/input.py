@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 from disco.bot.command import CommandError
 
+import math
+
 UNITS = {
     's': lambda v: v,
     'm': lambda v: v * 60,
