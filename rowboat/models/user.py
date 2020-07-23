@@ -6,6 +6,7 @@ from peewee import BigIntegerField, IntegerField, SmallIntegerField, TextField, 
 from playhouse.postgres_ext import BinaryJSONField
 
 from rowboat.sql import ModelBase
+from rowboat.util.input import human_time
 from disco.api.http import APIException
 from disco.types.guild import GuildMember
 
@@ -163,7 +164,7 @@ class Infraction(ModelBase):
         return base
 
     @staticmethod
-    def infractions_config(event):
+    def admin_config(event):
         return getattr(event.base_config.plugins, 'admin', None)
 
     @classmethod
@@ -374,17 +375,17 @@ class Infraction(ModelBase):
     @classmethod
     def mute(cls, plugin, event, member, reason):
         from rowboat.plugins.modlog import Actions
-        infractions_config = cls.infractions_config(event)
+        admin_config = cls.admin_config(event)
 
         plugin.call(
             'ModLogPlugin.create_debounce',
             event,
             ['GuildMemberUpdate'],
             user_id=member.user.id,
-            role_id=infractions_config.mute_role,
+            role_id=admin_config.mute_role,
         )
 
-        member.add_role(infractions_config.mute_role, reason=reason)
+        member.add_role(admin_config.mute_role, reason=reason)
 
         msg_status = cls.send_message('muted', member.user, event.guild, reason)
         
@@ -403,15 +404,15 @@ class Infraction(ModelBase):
             actor_id=event.author.id,
             type_=cls.Types.MUTE,
             reason=reason,
-            metadata={'role': infractions_config.mute_role},
+            metadata={'role': admin_config.mute_role},
             messaged=msg_status)
 
     @classmethod
     def tempmute(cls, plugin, event, member, reason, expires_at):
         from rowboat.plugins.modlog import Actions
-        infractions_config = cls.infractions_config(event)
+        admin_config = cls.admin_config(event)
 
-        if not infractions_config.mute_role:
+        if not admin_config.mute_role:
             plugin.log.warning('Cannot tempmute member %s, no tempmute role', member.id)
             return
 
@@ -420,10 +421,10 @@ class Infraction(ModelBase):
             event,
             ['GuildMemberUpdate'],
             user_id=member.user.id,
-            role_id=infractions_config.mute_role,
+            role_id=admin_config.mute_role,
         )
 
-        member.add_role(infractions_config.mute_role, reason=reason)
+        member.add_role(admin_config.mute_role, reason=reason)
 
         msg_status = cls.send_message('muted', member.user, event.guild, reason, expires_at)
 
@@ -444,7 +445,7 @@ class Infraction(ModelBase):
             type_=cls.Types.TEMPMUTE,
             reason=reason,
             expires_at=expires_at,
-            metadata={'role': infractions_config.mute_role},
+            metadata={'role': admin_config.mute_role},
             messaged=msg_status)
 
     @classmethod
@@ -480,9 +481,9 @@ class Infraction(ModelBase):
         
         expires = ''
 
-        if expires_at:
+        if expires_at is not None:
             expires = '\n\n:timer: This action will expire in {}'.format(
-                arrow.get(expires_at - datetime.utcnow()).humanize())
+                human_time(expires_at - datetime.utcnow()))
         
         try:
             user.open_dm().send_message(':{}: You were **{}** from {} {} {}'.format(

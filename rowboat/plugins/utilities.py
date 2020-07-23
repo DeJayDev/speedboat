@@ -267,11 +267,7 @@ class UtilitiesPlugin(Plugin):
         embed = MessageEmbed()
         if guild.icon:
             embed.set_thumbnail(url=guild.icon_url)
-            # TODO: Fix whatever caused me to need to do this
-            try: 
-                embed.color = get_dominant_colors_guild(guild)
-            except:
-                embed.color = 0x7289DA
+            embed.color = get_dominant_colors_guild(guild)
         embed.description = '\n'.join(content)
         event.msg.reply('', embed=embed)
 

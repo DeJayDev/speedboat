@@ -134,7 +134,7 @@ class RedditPlugin(Plugin):
         r = requests.get(
             'https://www.reddit.com/r/{}/new.json'.format(sub),
             headers={
-                'User-Agent': 'discord:RowBoat:v0.0.1 (by /u/b1naryth1ef)'
+                'User-Agent': 'discord:Speedboat:v1.6.1 (by /u/dejaydev)'
             }
         )
         r.raise_for_status()
