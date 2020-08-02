@@ -261,7 +261,7 @@ class SpamPlugin(Plugin):
         if event.author.id == self.state.me.id:
             return
 
-        if event.message.author.bot or (event.message.author.discriminator == '0000'):
+        if event.message.author.bot:
             return
 
         # Lineralize events by guild ID to prevent spamming events

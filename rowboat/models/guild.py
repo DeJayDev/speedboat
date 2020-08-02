@@ -333,6 +333,7 @@ class GuildMemberLevel(ModelBase):
         table_name = 'xp'
         primary_key = CompositeKey('guild_id', 'user_id')
     
+    @classmethod
     def add_xp(cls, guild_id, user_id, xpamt):
         GuildMemberLevel.update(
             xp=(GuildMemberLevel.xp + xpamt)

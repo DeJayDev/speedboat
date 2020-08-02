@@ -390,7 +390,7 @@ class CorePlugin(Plugin):
         This monstrosity of a function handles the parsing and dispatching of
         commands.
         """
-        if event.message.author.bot or (event.message.author.discriminator == '0000'):
+        if event.message.author.bot:
             return
 
         if not event.channel.type == 1:
@@ -623,7 +623,7 @@ class CorePlugin(Plugin):
         code = cmd.func.__code__
         lines, firstlineno = inspect.getsourcelines(code)
 
-        event.msg.reply('<https://github.com/SethBots/speedboat/blob/master/{}#L{}-{}>'.format(
+        event.msg.reply('<https://github.com/SethBots/speedboat/blob/master/{}#L{}-L{}>'.format(
             code.co_filename.replace('/opt/rowboat/', ''),
             firstlineno,
             firstlineno + len(lines)

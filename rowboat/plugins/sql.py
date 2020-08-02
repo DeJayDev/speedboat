@@ -60,7 +60,7 @@ class SQLPlugin(Plugin):
         if event.user.discriminator != UNSET:
             updates['discriminator'] = int(event.user.discriminator)
             
-        if event.user.bot or (event.user.discriminator == '0000'):
+        if event.user.bot:
             return
 
         if not updates:
@@ -70,7 +70,7 @@ class SQLPlugin(Plugin):
 
     @Plugin.listen('MessageCreate')
     def on_message_create(self, event):
-        if event.message.author.bot or (event.message.author.discriminator == '0000'):
+        if event.message.author.bot:
             return
         Message.from_disco_message(event.message)
 
@@ -420,7 +420,7 @@ class Recovery(object):
                 break
 
             for msg in chunk:
-                if msg.author.bot or (msg.author.discriminator == '0000'):
+                if msg.author.bot:
                     break
 
             if not msg.channel.type == 1:
@@ -450,7 +450,7 @@ class Backfill(object):
                 break
 
             for msg in chunk:
-                if msg.author.bot or (msg.author.discriminator == '0000'):
+                if msg.author.bot:
                     break
 
             if not msg.channel.type == 1:

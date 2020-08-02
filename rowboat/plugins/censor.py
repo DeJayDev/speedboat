@@ -31,11 +31,13 @@ class CensorSubConfig(SlottedModel):
     filter_zalgo = Field(bool, default=True)
 
     filter_invites = Field(bool, default=True)
+    invite_filter_ignored_channels = ListField(lower, default=[])
     invites_guild_whitelist = ListField(snowflake, default=[])
     invites_whitelist = ListField(lower, default=[])
     invites_blacklist = ListField(lower, default=[])
 
     filter_domains = Field(bool, default=True)
+    domain_filter_ignored_channels = ListField(lower, default=[])
     domains_whitelist = ListField(lower, default=[])
     domains_blacklist = ListField(lower, default=[])
 
@@ -121,6 +123,9 @@ class CensorPlugin(Plugin):
 
     @Plugin.listen('MessageUpdate')
     def on_message_update(self, event):
+        if event.message.author.bot:
+            return
+
         try:
             msg = Message.get(id=event.id)
         except Message.DoesNotExist:
@@ -141,7 +146,7 @@ class CensorPlugin(Plugin):
         if author.id == self.state.me.id:
             return
 
-        if event.message.author.bot or (event.message.author.discriminator == '0000'):
+        if event.message.author.bot:
             return
 
         if not event.channel.type == 1:
@@ -231,6 +236,9 @@ class CensorPlugin(Plugin):
 
     def filter_domains(self, event, config):
         urls = URL_RE.findall(INVITE_LINK_RE.sub('', event.content))
+
+        if(event.channel.id in config.domain_filter_ignored_channels):
+            return
 
         for url in urls:
             try:

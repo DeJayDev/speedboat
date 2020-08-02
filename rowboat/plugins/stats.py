@@ -47,9 +47,25 @@ class StatsPlugin(Plugin):
             metadata['guild_id'] = event.guild.id
 
         statsd.increment('gateway.events.received', tags=to_tags(metadata))
+    
+    @Plugin.schedule(180, init=False)
+    def track_state(self):
+        # Track members across all our guilds
+        for guild in self.state.guilds:
+            statsd.gauge(guild.members, len(guild.members), tags=to_tags({
+                'guild_id': guild.id
+            }))
+        
+        # Track soome state info
+        statsd.gauge('disco.state.guilds', len(self.state.guilds))
+        statsd.gauge('disco.state.channels', len(self.state.channels))
+        statsd.gauge('disco.state.users', len(self.state.users))
 
     @Plugin.listen('MessageCreate')
     def on_message_create(self, event):
+        if event.author.bot:
+            return
+
         tags = {
             'channel_id': event.channel_id,
             'author_id': event.author.id,
@@ -67,10 +83,16 @@ class StatsPlugin(Plugin):
                 )
                 del self.nonces[event.nonce]
 
+        if event.message.mention_everyone:
+            tags['mention_everyone'] = 'yes' # Does Datadog support booleans? It does now.
+
         statsd.increment('guild.messages.create', tags=to_tags(tags))
 
     @Plugin.listen('MessageUpdate')
     def on_message_update(self, event):
+        if event.message.author.bot:
+            return
+        
         tags = {
             'channel_id': event.channel_id,
             'author_id': event.author.id,
@@ -85,6 +107,7 @@ class StatsPlugin(Plugin):
     def on_message_delete(self, event):
         tags = {
             'channel_id': event.channel_id,
+            'guild_id': event.guild_id,
         }
 
         statsd.increment('guild.messages.delete', tags=to_tags(tags))

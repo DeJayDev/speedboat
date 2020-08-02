@@ -30,7 +30,7 @@ def backfill_channel(task, channel_id):
             break
 
         for msg in chunk:
-            if msg.author.bot or (msg.author.discriminator == '0000'):
+            if msg.author.bot:
                 break
 
             if not msg.channel.type == 1:
