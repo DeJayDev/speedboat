@@ -78,8 +78,10 @@ class Censorship(Exception):
         elif self.reason is CensorReason.DOMAIN:
             if self.ctx['hit'] == 'whitelist':
                 return 'domain `{}` is not in whitelist'.format(S(self.ctx['domain'], escape_codeblocks=True))
-            else:
+            elif self.ctx['hit'] == 'blacklist':
                 return 'domain `{}` is in blacklist'.format(S(self.ctx['domain'], escape_codeblocks=True))
+            else:
+                return 'links are disabled here'
         elif self.reason is CensorReason.WORD:
             return 'found blacklisted words `{}`'.format(
                 ', '.join([S(i, escape_codeblocks=True) for i in self.ctx['words']]))
@@ -172,7 +174,8 @@ class CensorPlugin(Plugin):
                         self.filter_invites(event, config)
 
                     if config.filter_domains:
-                        self.filter_domains(event, config)
+                        if(event.channel.id not in config.domain_filter_ignored_channels):
+                            self.filter_domains(event, config)
 
                     if config.blocked_words or config.blocked_tokens:
                         self.filter_blocked_words(event, config)
@@ -237,17 +240,13 @@ class CensorPlugin(Plugin):
     def filter_domains(self, event, config):
         urls = URL_RE.findall(INVITE_LINK_RE.sub('', event.content))
 
-        if(event.channel.id in config.domain_filter_ignored_channels):
-            return
-
         for url in urls:
             try:
                 parsed = urllib.parse.urlparse(url)
             except:
                 continue
 
-            if (config.domains_whitelist or not config.domains_blacklist)\
-                    and parsed.netloc.lower() not in config.domains_whitelist:
+            if config.domains_whitelist and parsed.netloc.lower() not in config.domains_whitelist:
                 raise Censorship(CensorReason.DOMAIN, event, ctx={
                     'hit': 'whitelist',
                     'url': url,
@@ -256,6 +255,12 @@ class CensorPlugin(Plugin):
             elif config.domains_blacklist and parsed.netloc.lower() in config.domains_blacklist:
                 raise Censorship(CensorReason.DOMAIN, event, ctx={
                     'hit': 'blacklist',
+                    'url': url,
+                    'domain': parsed.netloc
+                })
+            else:
+                raise Censorship(CensorReason.DOMAIN, event, ctx={
+                    'hit': 'other',
                     'url': url,
                     'domain': parsed.netloc
                 })
