@@ -131,7 +131,7 @@ class Infraction(ModelBase):
     expires_at = DateTimeField(null=True)
     created_at = DateTimeField(default=datetime.utcnow)
     active = BooleanField(default=True)
-    messaged = BooleanField(default=False)
+    msg_status = TextField(null=False)
 
     class Meta:
         table_name = 'infractions'
@@ -150,7 +150,7 @@ class Infraction(ModelBase):
             'expires_at': self.expires_at,
             'created_at': self.created_at,
             'active': self.active,
-            'messaged': self.messaged,
+            'msg_status': self.msg_status,
         }
 
         base['type'] = {
@@ -240,7 +240,7 @@ class Infraction(ModelBase):
             actor_id=event.author.id,
             type_=cls.Types.KICK,
             reason=reason,
-            messaged=msg_status)
+            msg_status=msg_status)
 
     @classmethod
     def tempban(cls, plugin, event, member, reason, expires_at):
@@ -275,7 +275,7 @@ class Infraction(ModelBase):
             type_=cls.Types.TEMPBAN,
             reason=reason,
             expires_at=expires_at,
-            messaged=msg_status)
+            msg_status=msg_status)
 
     @classmethod
     def softban(cls, plugin, event, member, reason):
@@ -345,7 +345,7 @@ class Infraction(ModelBase):
             actor_id=event.author.id,
             type_=cls.Types.BAN,
             reason=reason,
-            messaged=msg_status)
+            msg_status=msg_status)
 
     @classmethod
     def warn(cls, plugin, event, member, reason, guild):
@@ -370,7 +370,7 @@ class Infraction(ModelBase):
             actor_id=event.author.id,
             type_=cls.Types.WARNING,
             reason=reason,
-            messaged=msg_status)
+            msg_status=msg_status)
 
     @classmethod
     def mute(cls, plugin, event, member, reason):
@@ -497,8 +497,7 @@ class Infraction(ModelBase):
             msg_status = True
         except APIException as err:
             msg_status = False # Multiple bad things can happen here, so we'll just... do this.
-            #print('Could not DM member {}'.format(user)
-
+            print('Could not DM member {} because {}'.format(user, err)
         return msg_status
 
     @classmethod

@@ -81,7 +81,7 @@ class Censorship(Exception):
             elif self.ctx['hit'] == 'blacklist':
                 return 'domain `{}` is in blacklist'.format(S(self.ctx['domain'], escape_codeblocks=True))
             else:
-                return 'links are disabled here'
+                return 'because links are not allowed here'
         elif self.reason is CensorReason.WORD:
             return 'found blacklisted words `{}`'.format(
                 ', '.join([S(i, escape_codeblocks=True) for i in self.ctx['words']]))
@@ -238,7 +238,7 @@ class CensorPlugin(Plugin):
                 })
 
     def filter_domains(self, event, config):
-        urls = URL_RE.findall(INVITE_LINK_RE.sub('', event.content))
+        urls = URL_RE.findall(URL_RE.sub('', event.content))
 
         for url in urls:
             try:

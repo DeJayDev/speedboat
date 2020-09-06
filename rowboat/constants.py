@@ -17,7 +17,7 @@ STATUS_EMOJI = {
 }
 BADGE_EMOJI = {
     'discord_employee': ':staff:699078007192551444',
-    'discord_partner': ':partner:699078007184425040',
+    'discord_partner': ':partner:748668878363820173',
     'hypesquad_events': ':hypesquad_events:699078007326900265',
     'house_bravery': ':hypesquad_bravery:699078006764732458',
     'house_brilliance': ':hypesquad_brilliance:699078006936961126',
@@ -39,7 +39,7 @@ USER_MENTION_RE = re.compile('<@!?([0-9]+)>')
 
 # IDs and such
 ROWBOAT_GUILD_ID = 342506939340685312
-ROWBOAT_USER_ROLE_ID = 648955559541997578
+ROWBOAT_USER_ROLE_ID = 730247685499650108
 ROWBOAT_CONTROL_CHANNEL = 598682202464845845
 
 # Discord Error codes

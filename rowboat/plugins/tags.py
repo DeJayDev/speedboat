@@ -1,4 +1,3 @@
-
 from disco.bot import CommandLevels
 from disco.util.sanitize import S
 from disco.types.message import MessageEmbed
@@ -11,7 +10,7 @@ from rowboat.models.user import User
 
 
 class TagsConfig(PluginConfig):
-    max_tag_length = Field(int)
+    max_tag_length = Field(int, default=1950)
     min_level_remove_others = Field(int, default=int(CommandLevels.MOD))
 
 @Plugin.with_config(TagsConfig)

@@ -336,7 +336,7 @@ class UtilitiesPlugin(Plugin):
 
             if member.roles:
                 content.append('Roles: {}'.format(
-                    ', '.join(('<@&{}>'.format(member.guild.roles.get(r).id) for r in member.roles))
+                    ', '.join(('<@&{}>'.format(r) for r in member.roles))
                 ))
 
         # Execute a bunch of queries
@@ -345,10 +345,10 @@ class UtilitiesPlugin(Plugin):
             (Message.guild_id == event.guild.id)
         ).tuples()[0][0]
         
-        oldest_msg = Message.select(fn.MIN(Message.id)).where(
-            (Message.author_id == user.id) & 
-            (Message.guild_id == event.guild.id)
-        ).tuples()[0][0] #Slow Query
+        #oldest_msg = Message.select(fn.MIN(Message.id)).where(
+        #    (Message.author_id == user.id) & 
+        #    (Message.guild_id == event.guild.id)
+        #).tuples()[0][0] #Slow Query
 
         voice = GuildVoiceSession.select(fn.COUNT(GuildVoiceSession.user_id),
             fn.SUM(GuildVoiceSession.ended_at - GuildVoiceSession.started_at)).where(
@@ -358,16 +358,16 @@ class UtilitiesPlugin(Plugin):
         infractions = Infraction.select(Infraction.id).where(
             (Infraction.user_id == user.id) & (Infraction.guild_id == event.guild.id)).tuples()
 
-        if newest_msg and oldest_msg:
+        if newest_msg:
             content.append('\n **\u276F Activity**')
             content.append('Last Message: {} ({})'.format(
                 humanize.naturaltime(datetime.utcnow() - to_datetime(newest_msg)),
                 to_datetime(newest_msg).strftime("%b %d %Y %H:%M:%S"),
             ))
-            content.append('First Message: {} ({})'.format(
-                humanize.naturaltime(datetime.utcnow() - to_datetime(oldest_msg)),
-                to_datetime(oldest_msg).strftime("%b %d %Y %H:%M:%S"),
-            ))
+            #content.append('First Message: {} ({})'.format(
+            #    humanize.naturaltime(datetime.utcnow() - to_datetime(oldest_msg)),
+            #    to_datetime(oldest_msg).strftime("%b %d %Y %H:%M:%S"),
+            #))
 
         if len(infractions) > 0: 
             content.append('\n**\u276F Infractions**')
