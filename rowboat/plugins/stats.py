@@ -51,10 +51,10 @@ class StatsPlugin(Plugin):
     @Plugin.schedule(180, init=False)
     def track_state(self):
         # Track members across all our guilds
-        for guild in self.state.guilds:
-            statsd.gauge(guild.members, len(guild.members), tags=to_tags({
-                'guild_id': guild.id
-            }))
+        #for guild in self.state.guilds:
+        #    statsd.gauge('guild.members', len(guild.members), tags=to_tags({
+        #        'guild_id': guild.id
+        #    }))
         
         # Track soome state info
         statsd.gauge('disco.state.guilds', len(self.state.guilds))
