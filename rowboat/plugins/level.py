@@ -116,7 +116,7 @@ class LevelPlugin(Plugin):
             event.channel.send_message(str(dir(event.config)))
             self.try_levelup(event, new_level)
   
-    @Plugin.command('block', '<user:user|snowflake> [reason:str...]', group='xp2', aliases=['mute', 'stfu'], level=CommandLevels.MOD)
+    @Plugin.command('block', '<user:user|snowflake> [reason:str...]', group='xp', aliases=['mute', 'stfu'], level=CommandLevels.MOD)
     def xp_block(self, event, user, reason=None):
         member = event.guild.get_member(user)
         if member:
@@ -138,7 +138,7 @@ class LevelPlugin(Plugin):
 
         raise CommandSuccess('Blocked {} from gaining XP.'.format(member))
 
-    @Plugin.command('unblock', '<user:user|snowflake>', group='xp2', aliases=['unmute'], level=CommandLevels.MOD)
+    @Plugin.command('unblock', '<user:user|snowflake>', group='xp', aliases=['unmute'], level=CommandLevels.MOD)
     def xp_unblock(self, event, user):
         member = event.guild.get_member(user)
         if member:
@@ -157,7 +157,7 @@ class LevelPlugin(Plugin):
 
         raise CommandSuccess('Unblocked {} from gaining XP.'.format(member))
 
-    @Plugin.command('xp2', '[user:user|snowflake]')
+    @Plugin.command('xp', '[user:user|snowflake]')
     def xp(self, event, user=None):
         member = user if user else event.author
 
@@ -171,7 +171,7 @@ class LevelPlugin(Plugin):
 
         raise CommandSuccess('{} is level {} ({} XP)'.format(member, self.level_from_xp(gml.xp), gml.xp))
 
-    @Plugin.command('leaderboard', '[places:int] [offset:int]', group='xp2', aliases=['top'])
+    @Plugin.command('leaderboard', '[places:int] [offset:int]', group='xp', aliases=['top'])
     def xp_leaderboard(self, event, places=None, offset=None):
         places = places if places else 10
         offset = offset if offset else 0
@@ -199,17 +199,17 @@ class LevelPlugin(Plugin):
     @Plugin.command('reset', '<user:user|snowflake>',
     #aliases=[],
     context={'action': 'reset'},
-    group='xp2',
+    group='xp',
     level=CommandLevels.ADMIN)
     @Plugin.command('give', '<user:user|snowflake> <amount:int>',
     aliases=['add'],
     context={'action': 'give'},
-    group='xp2', 
+    group='xp', 
     level=CommandLevels.ADMIN)
     @Plugin.command('take', '<user:user|snowflake> <amount:int>',
     aliases=['remove'],
     context={'action': 'take'},
-    group='xp2',
+    group='xp',
     level=CommandLevels.ADMIN)
     def xp_edit(self, event, user, amount=None, action=None):
         member = event.guild.get_member(user)

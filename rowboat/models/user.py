@@ -131,7 +131,6 @@ class Infraction(ModelBase):
     expires_at = DateTimeField(null=True)
     created_at = DateTimeField(default=datetime.utcnow)
     active = BooleanField(default=True)
-    msg_status = TextField(null=False)
 
     class Meta:
         table_name = 'infractions'

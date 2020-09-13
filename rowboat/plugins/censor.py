@@ -125,16 +125,13 @@ class CensorPlugin(Plugin):
 
     @Plugin.listen('MessageUpdate')
     def on_message_update(self, event):
-        if event.message.author.bot:
+        if event.message.author.bot or not event.content:
             return
 
         try:
             msg = Message.get(id=event.id)
         except Message.DoesNotExist:
             self.log.warning('Not censoring MessageUpdate for id %s, %s, no stored message', event.channel_id, event.id)
-            return
-
-        if not event.content:
             return
 
         return self.on_message_create(
