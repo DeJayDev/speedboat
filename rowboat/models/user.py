@@ -498,6 +498,7 @@ class Infraction(ModelBase):
         except APIException as err:
             msg_status = False # Multiple bad things can happen here, so we'll just... do this.
             print('Could not DM member {} because {}'.format(user, err)
+    
         return msg_status
 
     @classmethod

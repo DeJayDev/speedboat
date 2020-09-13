@@ -38,13 +38,13 @@ class LevelPlugin(Plugin):
             raise CommandFail('Cannot execute that action on yourself')
     
     def level_from_xp(self, exp):
-        def getLevelExp(level):
-            return (5*(level**2)+50*level+100)
+        def get_required_xp(level):
+            return (5 * (level**2) + 50 * level + 100) # (5x^2)+500x
 
         level = 0
 
-        while exp >= getLevelExp(level):
-            exp -= getLevelExp(level)
+        while exp >= get_required_xp(level):
+            exp -= get_required_xp(level)
             level += 1
 
         return level
