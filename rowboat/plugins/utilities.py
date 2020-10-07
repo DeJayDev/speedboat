@@ -432,7 +432,7 @@ class UtilitiesPlugin(Plugin):
             reminder.created_at,
             humanize.naturaltime(datetime.utcnow() - reminder.created_at),
             S(reminder.content)
-        ))
+        ), allowed_mentions={'users': [str(message.author_id)]})
 
         # Add the emoji options
         msg.add_reaction(SNOOZE_EMOJI)

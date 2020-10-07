@@ -113,7 +113,6 @@ class LevelPlugin(Plugin):
         new_level = self.level_from_xp(user.xp + new_xp)
 
         if new_level > pre_level:
-            event.channel.send_message(str(dir(event.config)))
             self.try_levelup(event, new_level)
   
     @Plugin.command('block', '<user:user|snowflake> [reason:str...]', group='xp', aliases=['mute', 'stfu'], level=CommandLevels.MOD)
