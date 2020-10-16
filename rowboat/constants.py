@@ -8,6 +8,7 @@ RED_TICK_EMOJI_ID = 318468934938394626
 GREEN_TICK_EMOJI = 'green_tick:{}'.format(GREEN_TICK_EMOJI_ID)
 RED_TICK_EMOJI = 'red_tick:{}'.format(RED_TICK_EMOJI_ID)
 STAR_EMOJI = '\U00002B50'
+
 STATUS_EMOJI = {
     Status.ONLINE: ':status_online:318468935362281472',
     Status.IDLE: ':status_away:318468935387316234',
@@ -15,6 +16,7 @@ STATUS_EMOJI = {
     Status.OFFLINE: ':status_offline:318468935391641600',
     ActivityTypes.STREAMING: ':status_streaming:318468935450099712',
 }
+
 BADGE_EMOJI = {
     'discord_employee': ':staff:699078007192551444',
     'discord_partner': ':partner:748668878363820173',
@@ -32,7 +34,7 @@ BADGE_EMOJI = {
 SNOOZE_EMOJI = '\U0001f4a4'
 
 # Regexes
-INVITE_LINK_RE = re.compile(r'(discordapp.com/invite|discord.me|discord.gg)(?:/#)?(?:/invite)?/([a-z0-9\-]+)', re.I)
+INVITE_LINK_RE = re.compile(r'(?:http|https)?(?::)?(?://)?((?:dsc|dis|discord|invite).(?:gd|gg|io|me)/([a-zA-Z0-9\-]+))', re.I)
 URL_RE = re.compile(r'(https?://[^\s]+)')
 EMOJI_RE = re.compile(r'<a?:(.+):([0-9]+)>')
 USER_MENTION_RE = re.compile('<@!?([0-9]+)>')

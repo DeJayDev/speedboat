@@ -18,15 +18,18 @@ from rowboat.constants import (
     GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID, GREEN_TICK_EMOJI, RED_TICK_EMOJI
 )
 
+
 class LevelUpActionConfig(SlottedModel):
     message = Field(bool, default=False)
     chat = Field(bool, default=True)
+
 
 class LevelPluginConfig(PluginConfig):
     actions = Field(LevelUpActionConfig)
 
     rewards = DictField(int, snowflake)
     pass
+
 
 @Plugin.with_config(LevelPluginConfig)
 class LevelPlugin(Plugin):
@@ -39,7 +42,7 @@ class LevelPlugin(Plugin):
     
     def level_from_xp(self, exp):
         def get_required_xp(level):
-            return (5 * (level**2) + 50 * level + 100) # (5x^2)+500x
+            return 5 * (level ** 2) + 50 * level + 100  # (5x^2)+500x
 
         level = 0
 
@@ -63,7 +66,7 @@ class LevelPlugin(Plugin):
             ))
 
         if event.config.rewards:
-            if(event.config.rewards[level]):
+            if event.config.rewards[level]:
                 event.member.add_role(event.config.rewards[level], reason="Leveled Up!")
 
     @Plugin.listen('MessageCreate')
@@ -81,7 +84,7 @@ class LevelPlugin(Plugin):
                 event.message))
         
         if commands:
-            return # No XP for commands
+            return  # No XP for commands
 
         try:
             user = GuildMemberLevel.select(GuildMemberLevel, XPBlock).join(
@@ -99,9 +102,9 @@ class LevelPlugin(Plugin):
             ).order_by(Message.timestamp.desc()).limit(1).get()
 
             if user.xpblock:
-                return # No XP for blocked meanies >:(
-            elif (last_message.timestamp < datetime.timedelta(seconds=60)):
-                return # Too fast.
+                return  # No XP for blocked meanies >:(
+            elif last_message.timestamp < datetime.timedelta(seconds=60):
+                return  # Too fast.
 
         except GuildMemberLevel.DoesNotExist:
             user = GuildMemberLevel.create_new(event.guild.get_member(event.author.id)) # lol
@@ -219,7 +222,7 @@ class LevelPlugin(Plugin):
         if not isinstance(amount, int) and action != "reset":
             raise CommandFail('Invalid amount')
 
-        #self.can_act_on(event, member.id)
+        # self.can_act_on(event, member.id)
 
         if action == 'give':
             try:
@@ -288,5 +291,5 @@ class LevelPlugin(Plugin):
             user.reset_member(event.guild.id, member.id)
             raise CommandSuccess('{} has been reset.'.format(member))
 
-        #TODO: Modlog call :)
+        # TODO: Modlog call :)
 

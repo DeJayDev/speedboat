@@ -1,5 +1,6 @@
 from dominantcolors import get_dominant_colors_for
 
+
 def get_dominant_colors(img):
     return get_dominant_colors_for(img, 1)
 
@@ -25,6 +26,7 @@ def get_dominant_colors_user(user, url=None):
         rdb.set(key, color)
         
         return color
+
 
 def get_dominant_colors_guild(guild, url=None):
     import requests

@@ -31,6 +31,7 @@ PunishmentType = Enum(
     'TEMPMUTE'
 )
 
+
 class CheckConfig(SlottedModel):
     count = Field(int)
     interval = Field(int)
@@ -75,7 +76,7 @@ class SubConfig(SlottedModel):
     def get_bucket(self, attr, guild_id):
         obj = getattr(self, attr)
         if not obj or not obj.count or not obj.interval:
-            return (None, None)
+            return None, None
 
         bucket = getattr(self, '_cached_{}_bucket'.format(attr), None)
         if not bucket:
@@ -280,7 +281,7 @@ class SpamPlugin(Plugin):
 
                 level = int(self.bot.plugins.get('CorePlugin').get_level(event.guild, event.author))
 
-                # TODO: We should linerialize the work required for all rules in one go,
+                # TODO: We should linearize the work required for all rules in one go,
                 #  we repeat all the work in each rule which sucks.
 
                 for rule in event.config.compute_relevant_rules(member, level):

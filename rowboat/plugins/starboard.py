@@ -54,12 +54,12 @@ class StarboardConfig(PluginConfig):
     def get_board(self, channel_id):
         # Starboards can't work recursively
         if channel_id in self.channels:
-            return (None, None)
+            return None, None
 
         for starboard, config in list(self.channels.items()):
             if not config.sources or channel_id in config.sources:
-                return (starboard, config)
-        return (None, None)
+                return starboard, config
+        return None, None
 
 
 @Plugin.with_config(StarboardConfig)
@@ -207,7 +207,6 @@ class StarboardPlugin(Plugin):
             raise CommandFail('{} is already blocked from the starboard'.format(
                 user,
             ))
-            return
 
         # Update the starboard, remove stars and posts
         StarboardEntry.block_user(user.id)
@@ -231,7 +230,7 @@ class StarboardPlugin(Plugin):
                 user,
             ))
 
-        # Renable posts and stars for this user
+        # Reenable posts and stars for this user
         StarboardEntry.unblock_user(user.id)
 
         # Finally, queue an update for the guild
@@ -253,7 +252,6 @@ class StarboardPlugin(Plugin):
 
         if not count:
             raise CommandFail('No hidden starboard message with that ID')
-            
 
         self.queue_update(event.guild.id, event.config)
         raise CommandSuccess('Message {} has been unhidden from the starboard'.format(
@@ -317,7 +315,6 @@ class StarboardPlugin(Plugin):
     def lock_stars(self, event):
         if event.guild.id in self.locks:
             raise CommandFail('Starboard is already locked')
-            return
 
         self.locks[event.guild.id] = True
         raise CommandSuccess('Starboard has been locked')
@@ -327,7 +324,7 @@ class StarboardPlugin(Plugin):
         if event.guild.id in self.locks:
             del self.locks[event.guild.id]
             raise CommandSuccess('Starboard has been unlocked')
-            return
+
         raise CommandFail('Starboard is not locked')
 
     def queue_update(self, guild_id, config):

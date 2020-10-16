@@ -10,6 +10,7 @@ from rowboat.util.input import human_time
 from disco.api.http import APIException
 from disco.types.guild import GuildMember
 
+
 @ModelBase.register
 class User(ModelBase):
     user_id = BigIntegerField(primary_key=True)
@@ -104,6 +105,7 @@ class User(ModelBase):
 
     def __str__(self):
         return '{}#{}'.format(self.username, str(self.discriminator).zfill(4))
+
 
 @ModelBase.register
 class Infraction(ModelBase):
@@ -307,7 +309,8 @@ class Infraction(ModelBase):
             user_id=member.user.id,
             actor_id=event.author.id,
             type_=cls.Types.SOFTBAN,
-            reason=reason)
+            reason=reason,
+            msg_status=msg_status)
 
     @classmethod
     def ban(cls, plugin, event, member, reason, guild):
@@ -454,7 +457,7 @@ class Infraction(ModelBase):
 
         if isinstance(user, int):
             if guild.get_member(user):
-                user = guild.get_member(user).user # got em
+                user = guild.get_member(user).user  # got em
             else:
                 do_not_message = True
 
@@ -462,7 +465,7 @@ class Infraction(ModelBase):
             if user.user.bot:
                 do_not_message = True
             else:
-                user = user.user # 👌
+                user = user.user  # 👌
 
         if isinstance(user, User):
             do_not_message = user.bot
@@ -486,16 +489,16 @@ class Infraction(ModelBase):
         
         try:
             user.open_dm().send_message(':{}: You were **{}** from {} {} {}'.format(
-                emojis[action] if action in emojis else 'exclaimation',
+                emojis[action] if action in emojis else 'exclamation',
                 action,
                 guild.name,
                 ('for: ' + reason) if reason else '',
-                expires, # This doesn't have an ugly if statement because if it's not defined it's None.
+                expires,  # This doesn't have an ugly if statement because if it's not defined it's None.
             ))
                             
             msg_status = True
         except APIException as err:
-            msg_status = False # Multiple bad things can happen here, so we'll just... do this.
+            msg_status = False  # Multiple bad things can happen here, so we'll just... do this.
             print('Could not DM member {} because {}'.format(user, err))
     
         return msg_status
@@ -515,6 +518,7 @@ class Infraction(ModelBase):
             (cls.active == 1)
         ).execute() >= 1
 
+
 @ModelBase.register
 class StarboardBlock(ModelBase):
     guild_id = BigIntegerField()
@@ -525,6 +529,7 @@ class StarboardBlock(ModelBase):
         indexes = (
             (('guild_id', 'user_id'), True),
         )
+
 
 @ModelBase.register
 class XPBlock(ModelBase):

@@ -51,12 +51,12 @@ class StatsPlugin(Plugin):
     @Plugin.schedule(180, init=False)
     def track_state(self):
         # Track members across all our guilds
-        #for guild in self.state.guilds:
+        # for guild in self.state.guilds:
         #    statsd.gauge('guild.members', len(guild.members), tags=to_tags({
         #        'guild_id': guild.id
         #    }))
         
-        # Track soome state info
+        # Track some state info
         statsd.gauge('disco.state.guilds', len(self.state.guilds))
         statsd.gauge('disco.state.channels', len(self.state.channels))
         statsd.gauge('disco.state.users', len(self.state.users))
@@ -84,7 +84,7 @@ class StatsPlugin(Plugin):
                 del self.nonces[event.nonce]
 
         if event.message.mention_everyone:
-            tags['mention_everyone'] = 'yes' # Does Datadog support booleans? It does now.
+            tags['mention_everyone'] = 'yes'  # Does Datadog support booleans? It does now.
 
         statsd.increment('guild.messages.create', tags=to_tags(tags))
 
@@ -132,20 +132,20 @@ class StatsPlugin(Plugin):
 
     @Plugin.listen('GuildMemberAdd')
     def on_guild_member_add(self, event): 
-        if(event.member.user.bot):
+        if event.member.user.bot:
             return
         
         statsd.increment('guild.members.add', tags=to_tags({
-            'guild_id': event.member.guild_id, # this event fires a GuildMember, so we harvest the guild_id
+            'guild_id': event.member.guild_id,  # this event fires a GuildMember, so we harvest the guild_id
         }))
 
     @Plugin.listen('GuildMemberRemove')
     def on_guild_member_remove(self, event): 
-        if(event.user.bot):
+        if event.user.bot:
             return
         
         statsd.increment('guild.members.remove', tags=to_tags({
-            'guild_id': event.guild_id, # this event fires the id as it's own variable.
+            'guild_id': event.guild_id,  # this event fires the id as it's own variable.
         }))
 
     @Plugin.listen('GuildBanAdd')

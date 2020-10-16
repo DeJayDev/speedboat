@@ -171,7 +171,7 @@ class CensorPlugin(Plugin):
                         self.filter_invites(event, config)
 
                     if config.filter_domains:
-                        if(str(event.channel.id) not in config.domain_filter_ignored_channels):
+                        if str(event.channel.id) not in config.domain_filter_ignored_channels:
                             self.filter_domains(event, config)
 
                     if config.blocked_words or config.blocked_tokens:

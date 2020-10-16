@@ -11,7 +11,7 @@ def to_tags(obj=None, **kwargs):
 
 
 @contextmanager
-def timed(metricname, tags=None):
+def timed(metric, tags=None):
     start = time.time()
     try:
         yield
@@ -20,4 +20,4 @@ def timed(metricname, tags=None):
     finally:
         if tags and isinstance(tags, dict):
             tags = to_tags(tags)
-        statsd.timing(metricname, (time.time() - start) * 1000, tags=tags)
+        statsd.timing(metric, (time.time() - start) * 1000, tags=tags)

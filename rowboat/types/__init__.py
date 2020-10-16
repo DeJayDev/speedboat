@@ -71,10 +71,10 @@ def _check_filter(filter_name, filter_data, value):
     if filter_name not in _FILTERS:
         raise RuleException('unknown filter {}'.format(filter_name))
 
-    typs, filt = _FILTERS[filter_name]
-    if not isinstance(value, typs):
+    types, filt = _FILTERS[filter_name]
+    if not isinstance(value, types):
         raise RuleException('invalid type for filter, have {} but want {}'.format(
-            type(value), typs,
+            type(value), types,
         ))
 
     if negate:

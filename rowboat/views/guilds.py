@@ -14,12 +14,14 @@ from functools import reduce
 
 guilds = Blueprint('guilds', __name__, url_prefix='/api/guilds')
 
+
 def serialize_user(u):
     return {
         'user_id': str(u.user_id),
         'username': u.username,
         'discriminator': str(u.discriminator),
     }
+
 
 def with_guild(f=None):
     def deco(f):
@@ -42,6 +44,7 @@ def with_guild(f=None):
                 return f(guild, *args, **kwargs)
             except Guild.DoesNotExist:
                 return 'Invalid Guild', 404
+
         return func
 
     if f and callable(f):
@@ -49,10 +52,12 @@ def with_guild(f=None):
 
     return deco
 
+
 @guilds.route('/<gid>')
 @with_guild
 def guild_get(guild):
     return jsonify(guild.serialize())
+
 
 @guilds.route('/<gid>/config')
 @with_guild
@@ -106,8 +111,10 @@ def guild_z_config_update(guild):
     except Exception as e:
         return 'Invalid Data: %s' % e, 400
 
+
 CAN_FILTER = ['id', 'user_id', 'actor_id', 'type', 'reason']
 CAN_SORT = ['id', 'user_id', 'actor_id', 'created_at', 'expires_at', 'type']
+
 
 @guilds.route('/<gid>/infractions')
 @with_guild

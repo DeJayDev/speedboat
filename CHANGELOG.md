@@ -1,5 +1,11 @@
 # Changelog
 
+## V1.8
+
+Me again! Discord API v8 Support, I give up on this changelog thing, just watch the commits or, optionally:
+
+[Join the new hub for Speedboat.](https://discord.gg/am6SYkm)
+
 ## V1.7.0
 
 Awesome, Python 3. The 1.7 branch of updates will all be counted as minors until the release of either LevelPlugin or XPPlugin.
@@ -9,17 +15,17 @@ Awesome, Python 3. The 1.7 branch of updates will all be counted as minors until
 - Moves away from the old Speedboat control guild
 - Updates any python container to python3
 - Updates to redis 5 (doing this slowly for compat reasons)
-- Updates to postgers 9.6.17
+- Updates to postgres 9.6.17
 - Updates to node 10
-- Update all frontend dependencies and fix the incompatitibilities
-- - This is all part of an effort to reduce server load, where most of it comes from node.
-- Updates all bot/web depdencies to something that supports python3 natively.
+- Update all frontend dependencies and fix the incompatibilities
+  - This is all part of an effort to reduce server load, where most of it comes from node.
+- Updates all bot/web dependencies to something that supports python3 natively.
 
 ### Bug Fixes
 
 - Properly uses Custom Status
 - Moves to thecatapi (rip random.cat)
-- 
+
 
 ## V1.6.1
 
@@ -86,7 +92,7 @@ This update attempts to catch Speedboat up to the rest of the rowboat clones by 
 
 - Adds a force option to setup
 - Uses Discos `register_plugin_base_class`
-- Uses Sentrys Unified SDK instead of Raven
+- Uses Sentry's Unified SDK instead of Raven
 - Begins removal of holster, because b1nzy said so
 
 ### Bugfixes
@@ -116,7 +122,7 @@ No.
 
 - Fixed the response text of the `seen` command (thanks @OGNova)
 - Fixed the infractions tab not showing up in the sidebar when viewing the config (thanks @OGNova)
-- Fixed carrige returns not being counted as new lines in spam (thanks @liampwll)
+- Fixed carriage returns not being counted as new lines in spam (thanks @liampwll)
 - Fixed a bug with `mute` that would not allow a mute with no duration or reason to be applied
 - Fixed case where long message deletions would not be properly logged (they are now truncated properly by the modlog)
 
@@ -183,12 +189,12 @@ Similar changes to v1.0.4
 - Fixed some misc errors thrown when passing webhook messages to censor/spam plugins
 - Fixed case where Rowboat guild access was not being properly synced due to invalid data being passed in the web configuration for some guilds
 - Fixed the documentation URL being outdated
-- Fixed some commands being incorrectly exposed publically
+- Fixed some commands being incorrectly exposed publicly
 - Fixed the ability to revoke or change ones own roles within the configuration
 
 ### Etc
 
-- Removed ignored\_channels, this concept is no longer (and hasn't been for a long time) used.
+- Removed `ignored_channels`, this concept is no longer (and hasn't been for a long time) used.
 - Improved the performance (and formatting) around the !info command
 
 ## V1.0.1

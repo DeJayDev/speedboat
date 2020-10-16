@@ -106,7 +106,7 @@ class UtilitiesPlugin(Plugin):
             ext = r.headers['content-type'].split('/')[-1].split(';')[0]
             event.msg.reply('', attachments=[('cat.{}'.format(ext), r.content)])
         except:
-            return event.msg.reply(r.status_code + ' Cat not found :(')
+            return event.msg.reply('{} Cat not found :('.format(r.status_code))
 
     @Plugin.command('dog', global_=True)
     def dog(self, event):
@@ -238,7 +238,7 @@ class UtilitiesPlugin(Plugin):
             humanize.naturaltime(datetime.utcnow() - created_at),
             created_at.isoformat(),
         ))
-        
+
         content.append('Members: {:,}'.format(len(guild.members)))
         if guild.features:
             content.append('Features: {}'.format(', '.join(guild.features)))
@@ -289,11 +289,11 @@ class UtilitiesPlugin(Plugin):
                             return event.msg.reply(':eyes: User not found').after(3).delete()
 
         self.client.api.channels_typing(event.channel.id)
-        
+
         content = []
         content.append('**\u276F User Information**')
         content.append('Profile: <@{}>'.format(user.id))
-        
+
         created_dt = to_datetime(user.id)
         content.append('Created: {} ({})'.format(
             humanize.naturaltime(datetime.utcnow() - created_dt),
@@ -302,7 +302,7 @@ class UtilitiesPlugin(Plugin):
 
         member = event.guild.get_member(user.id) if event.guild else None
 
-        if user.presence: #I couldn't get this to work w/o it lol
+        if user.presence:  # I couldn't get this to work w/o it lol
             emoji, status = get_status_emoji(user.presence)
             content.append('Status: <{}> {}'.format(emoji, status))
             if user.presence.game and user.presence.game.name:
@@ -311,7 +311,7 @@ class UtilitiesPlugin(Plugin):
                 if user.presence.game.type == ActivityTypes.CUSTOM:
                     content.append('Custom Status: {}'.format(user.presence.game.state))
                 if user.presence.game.type == ActivityTypes.LISTENING:
-                    content.append('Listening to {} on Spotify'.format(user.presence.game.details)) #In the embed, details is the songname.
+                    content.append('Listening to {} on Spotify'.format(user.presence.game.details))  # In the embed, details is the songname.
                 if user.presence.game.type == ActivityTypes.STREAMING:
                     content.append('Streaming: [{}]({})'.format(user.presence.game.name, user.presence.game.url))
 
@@ -320,7 +320,7 @@ class UtilitiesPlugin(Plugin):
             user_badges = list(UserFlags(user.public_flags))
             for badge in user_badges:
                 badges += '<{}> '.format(BADGE_EMOJI[badge])
-                
+
             content.append('Badges: {}'.format(badges))
 
         if member:
@@ -341,14 +341,14 @@ class UtilitiesPlugin(Plugin):
 
         # Execute a bunch of queries
         newest_msg = Message.select(fn.MAX(Message.id)).where(
-            (Message.author_id == user.id) & 
+            (Message.author_id == user.id) &
             (Message.guild_id == event.guild.id)
         ).tuples()[0][0]
-        
-        #oldest_msg = Message.select(fn.MIN(Message.id)).where(
+
+        # oldest_msg = Message.select(fn.MIN(Message.id)).where(
         #    (Message.author_id == user.id) & 
         #    (Message.guild_id == event.guild.id)
-        #).tuples()[0][0] #Slow Query
+        # ).tuples()[0][0] #Slow Query
 
         voice = GuildVoiceSession.select(fn.COUNT(GuildVoiceSession.user_id),
             fn.SUM(GuildVoiceSession.ended_at - GuildVoiceSession.started_at)).where(
@@ -364,12 +364,12 @@ class UtilitiesPlugin(Plugin):
                 humanize.naturaltime(datetime.utcnow() - to_datetime(newest_msg)),
                 to_datetime(newest_msg).strftime("%b %d %Y %H:%M:%S"),
             ))
-            #content.append('First Message: {} ({})'.format(
+            # content.append('First Message: {} ({})'.format(
             #    humanize.naturaltime(datetime.utcnow() - to_datetime(oldest_msg)),
             #    to_datetime(oldest_msg).strftime("%b %d %Y %H:%M:%S"),
-            #))
+            # ))
 
-        if len(infractions) > 0: 
+        if len(infractions) > 0:
             content.append('\n**\u276F Infractions**')
             total = len(infractions)
             content.append('Total Infractions: **{:,}**'.format(total))
@@ -386,7 +386,7 @@ class UtilitiesPlugin(Plugin):
         try:
             avatar = User.with_id(user.id).get_avatar_url()
         except:
-            avatar = user.get_avatar_url() # This fails if the user has never been seen by speedboat.
+            avatar = user.get_avatar_url()  # This fails if the user has never been seen by speedboat.
 
         embed.set_author(name='{}#{} ({})'.format(
             user.username,

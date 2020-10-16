@@ -138,7 +138,7 @@ class Message(ModelBase):
 
     @classmethod
     def create_message_link(self):
-        return 'https://discordapp.com/channels/{}/{}/{}'.format(
+        return 'https://discord.com/channels/{}/{}/{}'.format(
             self.guild_id,
             self.channel_id,
             self.id

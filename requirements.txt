@@ -1,35 +1,35 @@
--e git+https://github.com/elderlabs/disco@rowboat#egg=disco-py
+-e git+https://github.com/elderlabs/betterdisco@v8/py3-testing#egg=disco-py
 -e git+https://github.com/DeJayDev/holster#egg=holster
 -e git+https://github.com/elderlabs/pygal#egg=pygal
 -e git+https://github.com/wenmin-wu/dominant-colors-py#egg=dominantcolors
-arrow==0.15.7
+arrow==0.17.0
 CairoSVG==2.4.2
 click==7.1.2
-dill==0.3.1.1
-emoji==0.5.4
+dill==0.3.2
+emoji==0.6.0
 Earl-ETF==2.1.2
 Flask==1.1.2
-greenlet==0.4.16
-humanize==2.5.0
-markovify==0.8.2
+greenlet==0.4.17
+humanize==3.0.1
+markovify==0.8.3
 oauthlib==3.1.0
 Pillow==7.2.0
 psycogreen==1.0.2
-psycopg2-binary==2.8.5
+psycopg2-binary==2.8.6
 pytz==2020.1
 PyYAML==5.3.1
-sentry-sdk==0.16.0
+sentry-sdk==0.18.0
 redis==3.5.3
-regex==2020.6.8
+regex==2020.10.11
 requests-oauthlib==1.3.0
-urllib3==1.22
+urllib3==1.25.10
 Werkzeug==1.0.1
-wheel==0.34.2
+wheel==0.35.1
 fuzzywuzzy==0.18.0
-pytest==5.4.3
+pytest==6.1.1
 python-Levenshtein==0.12.0
 peewee==3.13.3
-gevent==20.6.2
+gevent==20.9.0
 gevent_inotifyx==0.2
-datadog==0.38.0
+datadog==0.39.0
 pynacl==1.4.0

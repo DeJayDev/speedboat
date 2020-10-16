@@ -3,6 +3,7 @@ from http.client import FORBIDDEN
 
 import functools
 
+
 def _authed(func):
     @functools.wraps(func)
     def deco(*args, **kwargs):
@@ -11,6 +12,7 @@ def _authed(func):
 
         return func(*args, **kwargs)
     return deco
+
 
 def authed(func=None):
     if callable(func):

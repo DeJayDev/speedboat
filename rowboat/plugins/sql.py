@@ -423,9 +423,9 @@ class Recovery(object):
                 if msg.author.bot:
                     break
 
-            if not msg.channel.type == 1:
-                if not msg.channel.get_permissions(351776065477279745).can(Permissions.SEND_MESSAGES, Permissions.VIEW_CHANNEL):
-                    break
+                if not msg.channel.type == 1:
+                    if not msg.channel.get_permissions(351776065477279745).can(Permissions.SEND_MESSAGES, Permissions.VIEW_CHANNEL):
+                        break
 
             self._recovered += len(Message.from_disco_message_many(chunk, safe=True))
 
@@ -453,9 +453,9 @@ class Backfill(object):
                 if msg.author.bot:
                     break
 
-            if not msg.channel.type == 1:
-                if not msg.channel.get_permissions(351776065477279745).can(Permissions.SEND_MESSAGES, Permissions.VIEW_CHANNEL):
-                    break
+                if not msg.channel.type == 1:
+                    if not msg.channel.get_permissions(351776065477279745).can(Permissions.SEND_MESSAGES, Permissions.VIEW_CHANNEL):
+                        break
 
             self._scanned += len(chunk)
             self._inserted = len(Message.from_disco_message_many(chunk, safe=True))

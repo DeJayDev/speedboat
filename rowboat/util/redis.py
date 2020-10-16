@@ -1,5 +1,3 @@
-
-
 import gevent
 
 from gevent.lock import Semaphore

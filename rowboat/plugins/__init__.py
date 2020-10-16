@@ -21,6 +21,7 @@ class SafePluginInterface(object):
                 return None
 
             return getattr(self.plugin, name)(*args, **kwargs)
+
         return wrapped
 
 
@@ -29,8 +30,9 @@ class SentryPlugin(object):
     The SentryPlugin base plugin class manages tracking exceptions on a plugin
     level, by hooking the `handle_exception` function from disco.
     """
+
     def handle_exception(self, greenlet, event):
-        extra = {}
+        extra = { }
 
         if isinstance(greenlet.exception, MetaException):
             extra.update(greenlet.exception.metadata)
@@ -87,7 +89,7 @@ class RowboatPlugin(SentryPlugin, Plugin):
     A plugin which wraps events to load guild configuration.
     """
     global_plugin = False
-    
+
     def get_safe_plugin(self, name):
         return SafePluginInterface(self.bot.plugins.get(name))
 
@@ -99,6 +101,7 @@ class RowboatPlugin(SentryPlugin, Plugin):
             PluginsConfig._fields[name].name = name
             # PluginsConfig._fields[name].default = None
             return plugin_cls
+
         return deco
 
     @property
@@ -117,9 +120,11 @@ class RowboatPlugin(SentryPlugin, Plugin):
             raise Exception('Cannot resolve method %s for plugin %s' % (method_name, plugin_name))
 
         return method(*args, **kwargs)
-        
+
+
 register_plugin_base_class(BasePlugin)
 register_plugin_base_class(RowboatPlugin)
+
 
 class CommandResponse(Exception):
     EMOJI = None
@@ -129,8 +134,10 @@ class CommandResponse(Exception):
             response = ':{}: {}'.format(self.EMOJI, response)
         self.response = response
 
+
 class CommandFail(CommandResponse):
     EMOJI = 'no_entry_sign'
+
 
 class CommandSuccess(CommandResponse):
     EMOJI = 'ok_hand'

@@ -13,6 +13,7 @@ class TagsConfig(PluginConfig):
     max_tag_length = Field(int, default=1950)
     min_level_remove_others = Field(int, default=int(CommandLevels.MOD))
 
+
 @Plugin.with_config(TagsConfig)
 class TagsPlugin(Plugin):
     @Plugin.command('create', '<name:str> <content:str...>', group='tag', aliases=['add', 'new'], level=CommandLevels.TRUSTED)

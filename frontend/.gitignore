@@ -1,6 +1,4 @@
-build/
 node_modules/
 public/
-develop/
-.cache
 dist/
+.cache

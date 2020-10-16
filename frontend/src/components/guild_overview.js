@@ -4,7 +4,7 @@ import {withRouter} from 'react-router';
 
 class GuildWidget extends Component {
   render() {
-    const source = `https://discordapp.com/api/guilds/${this.props.guildID}/widget.png?style=banner2`;
+    const source = `https://discord.com/api/guilds/${this.props.guildID}/widget.png?style=banner2`;
     return (<img src={source} alt="(Guild must have widget enabled)" />);
   }
 }

@@ -16,7 +16,6 @@ log = logging.getLogger(__name__)
 @ModelBase.register
 class Guild(ModelBase):
     WhitelistFlags = Enum(
-        'MUSIC',
         'MODLOG_CUSTOM_FORMAT',
         bitmask=False
     )
@@ -332,7 +331,7 @@ class GuildMemberLevel(ModelBase):
     class Meta:
         table_name = 'xp'
         primary_key = CompositeKey('guild_id', 'user_id')
-    
+
     @classmethod
     def add_xp(cls, guild_id, user_id, xpamt):
         GuildMemberLevel.update(
@@ -350,7 +349,7 @@ class GuildMemberLevel(ModelBase):
             (GuildMemberLevel.guild_id == guild_id) &
             (GuildMemberLevel.user_id == user_id)
         ).execute()
-    
+
     @classmethod
     def reset_member(cls, guild_id, user_id):
         GuildMemberLevel.update(
@@ -365,10 +364,9 @@ class GuildMemberLevel(ModelBase):
         xpobj, created = cls.get_or_create(
             user_id=member.user.id,
             guild_id=member.guild_id,
-            defaults = {
+            defaults={
                 'xp': 0
             }
         )
 
         return xpobj
-    

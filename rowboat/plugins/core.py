@@ -44,6 +44,7 @@ Speedboat is a modernized fork of rowboat, a moderation and utilitarian bot buil
 
 GUILDS_WAITING_SETUP_KEY = 'gws'
 
+
 class CorePlugin(Plugin):
     def load(self, ctx):
         init_db(ENV)
@@ -55,7 +56,7 @@ class CorePlugin(Plugin):
 
         super(CorePlugin, self).load(ctx)
 
-        # Overwrite the main bot instances plugin loader so we can magicfy events
+        # Overwrite the main bot instances plugin loader so we can magicify events
         self.bot.add_plugin = self.our_add_plugin
 
         if ENV != 'prod':
@@ -96,7 +97,7 @@ class CorePlugin(Plugin):
                     self.log.info('Detected change in %s, reloading...', plugin_name)
                     try:
                         plugin.reload()
-                    except Exception:
+                    except:
                         self.log.exception('Failed to reload: ')
 
     def wait_for_actions(self):
@@ -141,8 +142,8 @@ class CorePlugin(Plugin):
         super(CorePlugin, self).unload(ctx)
 
     def update_rowboat_guild_access(self):
-#        if ROWBOAT_GUILD_ID not in self.state.guilds or ENV != 'prod':
-#            return
+        if ROWBOAT_GUILD_ID not in self.state.guilds or ENV != 'prod':
+            return
 
         rb_guild = self.state.guilds.get(ROWBOAT_GUILD_ID)
         if not rb_guild:
@@ -337,7 +338,6 @@ class CorePlugin(Plugin):
                     'Guild %s (%s) is awaiting setup.',
                     event.id, event.name
                 )
-                #event.guild.leave()
             return
 
         if not guild.enabled:
@@ -621,12 +621,12 @@ class CorePlugin(Plugin):
             return
 
         code = cmd.func.__code__
-        lines, firstlineno = inspect.getsourcelines(code)
+        lines, firstlinenum = inspect.getsourcelines(code)
 
         event.msg.reply('<https://github.com/SethBots/speedboat/blob/master/{}#L{}-L{}>'.format(
             code.co_filename.replace('/opt/rowboat/', ''),
-            firstlineno,
-            firstlineno + len(lines)
+            firstlinenum,
+            firstlinenum + len(lines)
         ))
 
     @Plugin.command('eval', level=-1)
@@ -647,7 +647,7 @@ class CorePlugin(Plugin):
             'crab': '🦀'
         }
 
-        # Mulitline eval
+        # Multiline eval
         src = event.codeblock
         if src.count('\n'):
             lines = list(filter(bool, src.split('\n')))
@@ -691,8 +691,8 @@ class CorePlugin(Plugin):
 
     @Plugin.command('reconnect', group='control', level=-1)
     def control_reconnect(self, event):
-        raise CommandSuccess('Closing connection')
         self.client.gw.ws.close()
+        raise CommandSuccess('Closing connection')
 
     @Plugin.command('invite', '<guild:snowflake>', aliases=['inv'], group='guilds', level=-1)
     def guild_join(self, event, guild):
@@ -717,7 +717,7 @@ class CorePlugin(Plugin):
                 guild.name,
             ))
 
-        msg.edit('Ok, here is a temporary invite for you: discord.gg/{}'.format(
+        msg.edit("Ok, here's that temporary invite for you: discord.gg/{}".format(
             invite.code,
         ))
 

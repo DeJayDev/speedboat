@@ -8,7 +8,6 @@ from holster.flask_ext import Holster
 from rowboat import ENV
 from rowboat.sql import init_db
 from rowboat.models.user import User
-from rowboat.types.guild import PluginsConfig
 
 from rowboat.views.auth import auth
 from rowboat.views.dashboard import dashboard
@@ -29,7 +28,7 @@ rowboat.app.register_blueprint(users)
 def before_first_request():
     init_db(ENV)
 
-    #PluginsConfig.force_load_plugin_configs()
+    # PluginsConfig.force_load_plugin_configs()
 
     with open('config.yaml', 'r') as f:
         data = safe_load(f)
@@ -59,6 +58,4 @@ def save_auth(response):
 
 @rowboat.app.context_processor
 def inject_data():
-    return dict(
-        user=g.user,
-    )
+    return {'user': g.user}

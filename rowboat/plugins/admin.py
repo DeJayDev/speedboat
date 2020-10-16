@@ -118,10 +118,10 @@ class AdminPlugin(Plugin):
         ).order_by(Infraction.expires_at.asc()).limit(1))
 
         if not next_infraction:
-            self.log.info('[INF] no infractions to wait for')
+            self.log.info('[INF] Not waiting for on any infractions..')
             return
 
-        self.log.info('[INF] waiting until %s for %s', next_infraction[0].expires_at, next_infraction[0].id)
+        self.log.info('[INF] Waiting until %s for #%s', next_infraction[0].expires_at, next_infraction[0].id)
         self.inf_task.set_next_schedule(next_infraction[0].expires_at)
 
     def clear_infractions(self):
@@ -130,12 +130,12 @@ class AdminPlugin(Plugin):
             (Infraction.expires_at < datetime.utcnow())
         ))
 
-        self.log.info('[INF] attempting to clear %s expired infractions', len(expired))
+        self.log.info('[INF] Trying to clear %s expired infractions', len(expired))
 
         for item in expired:
             guild = self.state.guilds.get(item.guild_id)
             if not guild:
-                self.log.warning('[INF] failed to clear infraction %s, no guild exists', item.id)
+                self.log.warning('[INF] FAILED clearing infraction #%s! Guild does not exist.', item.id)
                 continue
 
             # TODO: hacky
@@ -515,7 +515,7 @@ class AdminPlugin(Plugin):
     def infraction_import(self, event, url):
         import requests
         r = requests.get(url)
-        try: 
+        try:
             infs = json.load(r.content)
             for inf in infs:
                 if inf.server and inf.user and inf.actor and inf.type and inf.reason and inf.start and inf.end:
@@ -528,7 +528,7 @@ class AdminPlugin(Plugin):
                         created_at=datetime.fromtimestamp(inf.start),
                         expires_at=datetime.fromtimestamp(inf.end)
                     )
-                elif inf.start: 
+                elif inf.start:
                     Infraction.create(
                         guild_id=inf.server,
                         user_id=inf.user,
@@ -568,9 +568,9 @@ class AdminPlugin(Plugin):
         ).execute())
 
         if deleted:
-            raise CommandSuccess('I\'ve cleared the member backup for that user')
+            raise CommandSuccess("I've cleared the member backup for that user")
         else:
-            raise CommandFail('I couldn\'t find any member backups for that user')
+            raise CommandFail("I couldn't find any member backups for that user")
 
     def can_act_on(self, event, victim_id, throw=True):
         if event.author.id == victim_id:
@@ -626,7 +626,7 @@ class AdminPlugin(Plugin):
             else:
                 existed = False
                 # If the user is already muted check if we can take this from a temp
-                #  to perma mute.
+                # to perma mute.
                 if event.config.mute_role in member.roles:
                     existed = Infraction.clear_active(event, member.id, [Infraction.Types.TEMPMUTE])
 
@@ -807,13 +807,9 @@ class AdminPlugin(Plugin):
 
         raise CommandSuccess('Banned {} users'.format(len(members)))
 
-    @Plugin.command('ban', '<user:user|snowflake> [reason:str...]', level=CommandLevels.MOD)
-    @Plugin.command('forceban', '<user:snowflake> [reason:str...]', level=CommandLevels.MOD, context={'status': 'deprecated'})
+    @Plugin.command('ban', '<user:user|snowflake> [reason:str...]', aliases=['forceban'], level=CommandLevels.MOD)
     def ban(self, event, user, reason=None, status=None):
-        if status == "deprecated":
-            event.channel.send_message('Ban and forceban are now the same! This command will be kept as an alias.')
-
-        if isinstance(user, (int)):
+        if isinstance(user, int):
             user_id = user
             self.can_act_on(event, user)
         else:
@@ -908,10 +904,10 @@ class AdminPlugin(Plugin):
                 cid = channel if isinstance(channel, int) else channel.id
             channel = event.guild.channels.get(cid)
             if not channel:
-              raise CommandFail('Channel not Found')
+                raise CommandFail('Channel not Found')
             perms = channel.get_permissions(event.author)
             if not (perms.administrator or perms.view_channel):
-              raise CommandFail('Cannot access channel due to permissions')
+                raise CommandFail('Cannot access channel due to permissions')
             q = q.where(Message.channel_id == cid)
         else:
             user_id = user if isinstance(user, int) else user.id
@@ -944,7 +940,7 @@ class AdminPlugin(Plugin):
         ))
 
     @Plugin.command('clean cancel', level=CommandLevels.MOD)
-    def clean_cacnel(self, event):
+    def clean_cancel(self, event):
         if event.channel.id not in self.cleans:
             raise CommandFail('No clean is running in this channel')
 
@@ -1015,11 +1011,11 @@ class AdminPlugin(Plugin):
         raise CommandSuccess('Deleted {} messages'.format(size))
 
     @Plugin.command(
-	    'addbypass',
+        'addbypass',
         '<user:user> <role:str> [reason:str...]',
-	    level=-1,
-	    context={'mode': 'add', 'type': 'bypass'},
-	    group='role')
+        level=-1,
+        context={'mode': 'add', 'type': 'bypass'},
+        group='role')
     @Plugin.command(
         'add',
         '<user:user> <role:str> [reason:str...]',
@@ -1027,18 +1023,19 @@ class AdminPlugin(Plugin):
         context={'mode': 'add'},
         group='role')
     @Plugin.command(
-	    'rmbypass',
+        'rmbypass',
         '<user:user> <role:str> [reason:str...]',
-	    level=-1,
-	    context={'mode': 'remove', 'type': 'bypass'},
-	    group='role')
+        level=-1,
+        context={'mode': 'remove', 'type': 'bypass'},
+        group='role')
     @Plugin.command(
         'rmv',
         '<user:user> <role:str> [reason:str...]',
         level=CommandLevels.MOD,
         context={'mode': 'remove'},
         group='role')
-    @Plugin.command('remove',
+    @Plugin.command(
+        'remove',
         '<user:user> <role:str> [reason:str...]',
         level=CommandLevels.MOD,
         context={'mode': 'remove'},
@@ -1111,12 +1108,13 @@ class AdminPlugin(Plugin):
             reason=reason or 'no reason',
         )
 
-        raise CommandSuccess('{} role {} to {}'.format('added' if mode == 'add' else 'removed',
+        raise CommandSuccess('{} role {} to {}'.format(
+            'added' if mode == 'add' else 'removed',
             role_obj.name,
             member))
 
     @Plugin.command('stats', '[user:user]', level=CommandLevels.MOD)
-    def msgstats(self, event, user=None):
+    def msg_stats(self, event, user=None):
         if user is None:
             user = event.author
         # Query for the basic aggregate message statistics
@@ -1242,10 +1240,10 @@ class AdminPlugin(Plugin):
         ]
 
         if not invites:
-            raise CommandFail('I didn\'t find any invites matching your criteria')
+            raise CommandFail("I didn't find any invites matching your criteria")
 
         msg = event.msg.reply(
-            'Ok, a total of {} invites created by {} users with {} total uses would be pruned.'.format(
+            'Ok, this would prune a total of {} invites created by {} users with {} total uses. Sound good?'.format(
                 len(invites),
                 len({i.inviter.id for i in invites}),
                 sum(i.uses for i in invites)

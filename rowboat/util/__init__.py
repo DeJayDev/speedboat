@@ -25,7 +25,8 @@ def ordered_load(stream, Loader=yaml.SafeLoader, object_pairs_hook=OrderedDict):
     return yaml.safe_load(stream)
 
 
-INVITE_DOMAIN_RE = re.compile(r'(discord.gg|discordapp.com/invite)')
+# Shoutout Fire https://git.io/JUh3b
+INVITE_DOMAIN_RE = re.compile(r'(?:http|https)?(?::)?(?:\/\/)?((?:dsc|dis|discord|invite).(?:gd|gg|io|me)\/([a-zA-Z0-9\-]+))')
 
 
 def C(txt, codeblocks=False):

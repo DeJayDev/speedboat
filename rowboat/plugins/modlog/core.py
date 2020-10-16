@@ -183,9 +183,7 @@ class ModLogPlugin(Plugin):
         super(ModLogPlugin, self).unload(ctx)
 
     def resolve_channels(self, guild, config):
-        self.log.info('Resolving channels for guild %s (%s)',
-            guild.id,
-            guild.name)
+        self.log.info('Resolving channels for guild %s (%s)', guild.id, guild.name)
 
         channels = {}
         for key, channel in list(config.channels.items()):
@@ -314,7 +312,7 @@ class ModLogPlugin(Plugin):
             raise CommandFail('Modlog is not hushed')
 
         del self.hushed[event.guild.id]
-        raise CommandSuccess('Modlog unhushed, shhhhh... nobody saw anything')
+        raise CommandSuccess('Modlog unhushed, nobody saw anything')
 
     @Plugin.schedule(120)
     def cleanup_debounce(self):

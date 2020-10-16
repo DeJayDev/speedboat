@@ -37,14 +37,14 @@ def parse_duration(raw, source=None, negative=False, safe=False):
     if negative:
         value = value * -1
 
-    if value > 999999999: # Fixes SPEEDBOAT-60 on Sentry
+    if value > 999999999:  # Fixes SPEEDBOAT-60 on Sentry
         raise CommandError('Invalid duration')
 
     return (source or datetime.utcnow()) + timedelta(seconds=value + 1)
 
 
 def human_time(time):
-    secs  = float(time.total_seconds())
+    secs = float(time.total_seconds())
 
     units = [("day", 86400), ("hour", 3600), ("minute", 60), ("second", 1)]
     parts = []
@@ -57,5 +57,5 @@ def human_time(time):
             else:
                 length = int(secs) if secs != int(secs) else int(secs)
             parts.append("{} {}{}".format(length, unit, "" if length == 1 else "s"))
-    
+
     return ", ".join(parts)

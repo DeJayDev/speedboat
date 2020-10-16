@@ -1,5 +1,7 @@
 import os
-import psycogreen.gevent; psycogreen.gevent.patch_psycopg()
+import psycogreen.gevent;
+
+psycogreen.gevent.patch_psycopg()
 
 from peewee import Proxy, OP, Model
 from peewee import Expression
@@ -12,8 +14,10 @@ database = Proxy()
 
 OP['IRGX'] = 'irgx'
 
+
 def pg_regex_i(lhs, rhs):
     return Expression(lhs, OP.IRGX, rhs)
+
 
 class ModelBase(Model):
     class Meta:
@@ -23,6 +27,7 @@ class ModelBase(Model):
     def register(cls):
         REGISTERED_MODELS.append(cls)
         return cls
+
 
 def init_db(env):
     database.initialize(PostgresqlExtDatabase(
@@ -37,7 +42,8 @@ def init_db(env):
 
         if hasattr(model, 'SQL'):
             database.execute_sql(model.SQL)
-            
+
+
 def reset_db():
     init_db()
 

@@ -53,10 +53,7 @@ class Notification(ModelBase):
         return obj
 
     def to_user(self):
-        data = {}
-
-        data['id'] = self.id
-        data['date'] = arrow.get(self.created_at).humanize()
+        data = {'id': self.id, 'date': arrow.get(self.created_at).humanize()}
 
         if self.type_ == self.Types.GENERIC:
             data['title'] = self.metadata.get('title', 'Generic Notification')
