@@ -1,7 +1,7 @@
+from gevent import monkey; monkey.patch_all()
+
 import time
 import unittest
-
-from gevent import monkey; monkey.patch_all()
 
 from rowboat.redis import rdb
 from rowboat.util.redis import RedisSet
