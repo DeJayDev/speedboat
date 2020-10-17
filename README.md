@@ -1,20 +1,20 @@
 # Speedboat
 
-Speedboat is a fork of Rowboat: A Discord bot focused on being a highly powerful and configurable moderation and utilitarian bot for Discord. Rowboat is built to feel and behave similarly to [AutoModerator](https://github.com/Deimos/AutoModerator) for reddit.
+Speedboat is a fork of rowboat: A Discord bot focused on being a highly powerful and configurable moderation and utilitarian bot for Discord. Speedboat is complete with user infractions, filtering, a web panel with advanced access and the ability to request custom analytics for your servers. Speedboat aims to eventually become a plug and play replacement for public moderation bots with a load that sacrifies speed and efficiency. Speedboat's configuration is built to feel and behave similarly to [AutoModerator](https://github.com/Deimos/AutoModerator) for reddit.
 
-##### Main Discord
+###### Main Discord
 
 [![widget](https://inv.wtf/widget/dejay)](https://discord.gg/am6SYkm)
 
 ## Should I Run Speedboat Locally?
 
-I mean, if you want to. The rowboat (and by extension Speedboat) has a lot of random moving pieces making spinning it up a bit more complicated. 
+I mean, if you want to. Speedboat has a lot of random moving pieces making spinning it up a bit more complicated. 
 
 However, if you manage to pull it off, we have a place for people like you. 
 
 DM me on Discord: DeJay#1337
 
-## Development
+### Development
 
 Speedboat development is focused on the requirements of the servers seeking Speedboat for core moderation. Generally a good overview of general planned or in-development tasks is the [Trello Board](https://trello.com/b/FRCXmXKg), although its by no means a purely-true source.
 
@@ -42,4 +42,4 @@ Finally, you must make sure to copy the example configuration and properly repla
 
 Again, it depends. If you are interested in using Speedboat in your server, please message me and provide an invite alongside some general information about the server. At this time, Speedboat is only being added to larger (1-2k+ average CCU) servers that have more complex moderation requirements as we scale up to support more bots/become "public" (Google Forms application for the bot)
 
-I am happy to add Speedboat to larger servers within the Minecraft community no questions asked.  
+However, I am happy to add Speedboat to larger servers within the Minecraft community no questions asked.  
