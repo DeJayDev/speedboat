@@ -4,13 +4,13 @@ import {globalState} from '../state';
 
 class SidebarLink extends Component {
   render () {
-    const iconClass = `fa fa-${this.props.icon} fa-fw`;
+    const iconClass = `fas fa-${this.props.icon}`;
 
     return (
-      <li>
-        <Link to={this.props.to}>
-          <i className={iconClass}></i> {this.props.text}
-        </Link>
+      <li className="nav-item">
+        <Link className="nav-link" to={this.props.to}>
+          <i className={iconClass}></i> 
+          {this.props.text}</Link>
       </li>
     );
   }
@@ -35,16 +35,7 @@ class GuildLinks extends Component {
       );
     }
 
-    return (
-      <li>
-        <Link to={'/guilds/' + this.props.guild.id}>
-          {this.props.guild.name}
-        </Link>
-        <ul className="nav nav-second-level collapse in">
-          {links}
-        </ul>
-      </li>
-    );
+    return links;
   }
 }
 
@@ -76,7 +67,7 @@ class Sidebar extends Component {
     let sidebarLinks = [];
 
     sidebarLinks.push(
-      <SidebarLink icon='dashboard' to='/' text='Dashboard' key='dashboard' />
+      <SidebarLink icon='tachometer-alt' to='/' text='Dashboard' key='dashboard' />
     );
 
     if (this.state.guilds) {
@@ -91,13 +82,11 @@ class Sidebar extends Component {
       }
     }
 
-    return (<div className="navbar-default sidebar" role="navigation">
-      <div className="sidebar-nav navbar-collapse">
-        <ul className="nav in" id="side-menu">
-          {sidebarLinks}
-        </ul>
-      </div>
-    </div>);
+    return (
+      <ul className="navbar-nav sidebar accordion shadow" id="accordionSidebar">
+        {sidebarLinks}
+      </ul>
+    );
   }
 }
 

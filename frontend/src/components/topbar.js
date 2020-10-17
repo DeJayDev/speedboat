@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import Sidebar from './sidebar';
 import {globalState} from '../state';
 import {withRouter} from 'react-router';
 
@@ -24,20 +23,18 @@ class Topbar extends Component {
   }
 
   render() {
-    const expandIcon = this.state.showAllGuilds ? 'fa fa-folder-open-o fa-fw' : ' fa fa-folder-o fa-fw';
+    const expandIcon = this.state.showAllGuilds ? 'far fa-folder-open' : 'far fa-folder';
 
 		return(
-			<nav className="navbar navbar-default navbar-static-top" role="navigation" style={{marginBottom: 0}}>
+			<nav className="navbar navbar-expand bg-gray-900 topbar mb-4 static-top shadow" role="navigation">
 				<div className="navbar-header">
-					<a className="navbar-brand">Speedboat</a>
+					<a className="navbar-brand text-primary">Speedboat</a>
 				</div>
-
-				<ul className="nav navbar-top-links navbar-right">
-					<li><a onClick={this.onLogoutClicked.bind(this)}><i className="fa fa-sign-out fa-fw"></i></a></li>
-					<li><a onClick={this.onExpandClicked.bind(this)}><i className={expandIcon}></i></a></li>
+        <div className="topbar-divider d-none d-sm-block"></div>
+				<ul className="navbar-nav ml-auto">
+					<li className="nav-item mx-1"><a onClick={this.onLogoutClicked.bind(this)}><i className="fas fa-sign-out-alt"></i></a></li>
+					<li className="nav-item mx-1"><a onClick={this.onExpandClicked.bind(this)}><i className={expandIcon}></i></a></li>
 				</ul>
-
-        <Sidebar />
 			</nav>
     );
   }

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 import {globalState} from '../state';
 import Topbar from './topbar';
+import Sidebar from './sidebar';
 import Dashboard from './dashboard';
 import Login from './login';
 import GuildOverview from './guild_overview';
@@ -38,7 +39,15 @@ class AppWrapper extends Component {
 
   render() {
     if (!this.state.ready) {
-      return <div><h1>Loading...</h1></div>;
+      return (
+      <div className="card shadow align-middle">
+        <div className="card-header">
+          <h1 className="font-weight-bold text-center text-primary">Loading...</h1>
+        </div>
+        <div className="card-body">
+          <h1 className="text-center text-primary">This doesn't take long... <sup>(usually)</sup></h1>
+        </div>
+      </div>);
     }
 
     if (this.state.ready && !this.state.user) {
@@ -47,9 +56,10 @@ class AppWrapper extends Component {
 
     return (
       <div id="wrapper">
-        <Topbar />
-        <div id="page-wrapper">
-          <this.props.view params={this.props.params} />
+        <Sidebar />
+        <div id="content-wrapper" className="d-flex flex-column">
+          <Topbar />
+          <this.props.view params={this.props.params}/>
         </div>
       </div>
     );

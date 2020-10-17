@@ -7,14 +7,14 @@ class GuildTableRowActions extends Component {
   render(props, state) {
     return (
       <div>
-        <Link to={`/guilds/${this.props.guild.id}`} style={{paddingLeft: '4px'}}>
-          <button type="button" className="btn btn-success btn-circle"><i className="fa fa-info"></i></button>
+        <Link to={`/guilds/${this.props.guild.id}`} style={{padding: '4px'}}>
+          <button type="button" className="btn btn-success btn-circle"><i className="fas fa-info"></i></button>
         </Link>
-        <Link to={`/guilds/${this.props.guild.id}/config`} style={{paddingLeft: '4px'}}>
-          <button type="button" className="btn btn-info btn-circle"><i className="fa fa-edit"></i></button>
+        <Link to={`/guilds/${this.props.guild.id}/config`} style={{padding: '4px'}}>
+          <button type="button" className="btn btn-info btn-circle"><i className="fas fa-edit"></i></button>
         </Link>
-        <Link to={`/guilds/${this.props.guild.id}/infractions`} style={{paddingLeft: '4px'}}>
-          <button type="button" className="btn btn-danger btn-circle"><i className="fa fa-ban"></i></button>
+        <Link to={`/guilds/${this.props.guild.id}/infractions`} style={{padding: '4px'}}>
+          <button type="button" className="btn btn-danger btn-circle"><i className="fas fa-ban"></i></button>
         </Link>
       </div>
     );
@@ -60,7 +60,7 @@ class GuildsTable extends Component {
 
     return (
       <div className="table-responsive">
-        <table className="table table-sriped table-bordered table-hover">
+        <table className="table table-sriped table-bordered">
           <thead>
             <tr>
               <th>ID</th>

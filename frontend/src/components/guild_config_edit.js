@@ -84,11 +84,11 @@ export default class GuildConfigEdit extends Component {
       {this.state.message && <div className={"alert alert-" + this.state.message.type}>{this.state.message.contents}</div>}
       <div className="row">
         <div className="col-md-12">
-          <div className="panel panel-default">
-            <div className="panel-heading">
+          <div className="card">
+            <div className="card-header">
               Configuration Editor
             </div>
-            <div className="panel-body">
+            <div className="card-body">
               <AceEditor
                 mode="yaml"
                 theme="monokai"
@@ -98,7 +98,7 @@ export default class GuildConfigEdit extends Component {
                 onChange={(newValue) => this.onEditorChange(newValue)}
               />
             </div>
-            <div className="panel-footer">
+            <div className="card-footer">
               {
                 this.state.guild && this.state.guild.role != 'viewer' &&
                   <button onClick={() => this.onSave()} type="button" className="btn btn-success btn-circle btn-lg">

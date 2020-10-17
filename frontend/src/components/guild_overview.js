@@ -34,7 +34,7 @@ class GuildSplash extends Component {
 class GuildOverviewInfoTable extends Component {
   render() {
     return (
-      <table className="table table-striped table-bordered table-hover">
+      <table className="table table-striped table-bordered">
         <thead></thead>
         <tbody>
           <tr>
@@ -97,15 +97,15 @@ export default class GuildOverview extends Component {
     return (<div>
       <div className="row">
         <div className="col-lg-12">
-          <div className="panel panel-default">
-            <div className="panel-heading">Guild Banner</div>
-            <div className="panel-body">
+          <div className="card">
+            <div className="card-header">Guild Banner</div>
+            <div className="card-body">
               <GuildWidget guildID={this.state.guild.id} />
             </div>
           </div>
-          <div className="panel panel-default">
-            <div className="panel-heading">Guild Info</div>
-            <div className="panel-body">
+          <div className="card">
+            <div className="card-header">Guild Info</div>
+            <div className="card-body">
               <div className="table-responsive">
                 <OverviewTable guild={this.state.guild} />
               </div>

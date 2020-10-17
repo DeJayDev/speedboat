@@ -9,12 +9,6 @@ class InfractionTable extends Component {
 
     return (
       <table className="table table-striped table-bordered table-hover">
-        <thead>
-          <tr>
-            <th className="col-xs-1"></th>
-            <th className="col-xs-11"></th>
-          </tr>
-        </thead>
         <tbody>
           <tr>
             <td>ID</td>
@@ -44,6 +38,10 @@ class InfractionTable extends Component {
             <td>Reason</td>
             <td>{inf.reason}</td>
           </tr>
+          <tr>
+            <td>Messaged?</td>
+            <td>{inf.messaged ? 'Yes' : 'No'}</td>
+          </tr>
         </tbody>
       </table>
     );
@@ -53,9 +51,9 @@ class InfractionTable extends Component {
 class GuildInfractionInfo extends Component {
   render() {
     return (
-      <div className="panel panel-default">
-        <div className="panel-heading">Infraction Info</div>
-        <div className="panel-body">
+      <div className="card">
+        <div className="card-header">Infraction Info</div>
+        <div className="card-body">
           <InfractionTable infraction={this.props.infraction} />
         </div>
       </div>
@@ -144,7 +142,7 @@ export default class GuildInfractions extends Component {
     };
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     globalState.getGuild(this.props.params.gid).then((guild) => {
       globalState.currentGuild = guild;
       this.setState({guild});
@@ -170,9 +168,9 @@ export default class GuildInfractions extends Component {
     return (
       <div className="row">
         <div className="col-lg-12">
-          <div className="panel panel-default">
-            <div className="panel-heading">Infractions</div>
-            <div className="panel-body">
+          <div className="card">
+            <div className="card-header">Infractions</div>
+            <div className="card-body">
               <GuildInfractionsTable guild={this.state.guild} onSelectInfraction={this.onSelectInfraction.bind(this)} />
             </div>
           </div>

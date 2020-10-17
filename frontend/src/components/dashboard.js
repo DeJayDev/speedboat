@@ -10,7 +10,7 @@ class DashboardGuildsList extends Component {
     this.state = {guilds: null};
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     globalState.getCurrentUser().then((user) => {
       user.getGuilds().then((guilds) => {
         this.setState({guilds});
@@ -20,11 +20,11 @@ class DashboardGuildsList extends Component {
 
   render() {
     return (
-      <div className="panel panel-default">
-        <div className="panel-heading">
+      <div className="card">
+        <div className="card-header">
           Guilds
         </div>
-        <div className="panel-body">
+        <div className="card-body">
           <GuildsTable guilds={this.state.guilds}/>
         </div>
       </div>
