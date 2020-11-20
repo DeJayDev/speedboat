@@ -168,4 +168,8 @@ PERMISSION_ERROR:
 
 API_ERROR:
   emoji: warning
-  format: 'An action failed, DIscord returned: {statuscode} when trying to {}.'
+  format: 'An action failed, Discord returned: {statuscode} when trying to {}.'
+
+INTEGRATION_UPDATE:
+  emoji: key
+  format: 'An integration was updated {event}.'

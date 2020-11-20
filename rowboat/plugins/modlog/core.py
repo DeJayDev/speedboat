@@ -573,3 +573,7 @@ class ModLogPlugin(Plugin):
                 Actions.VOICE_CHANNEL_LEAVE,
                 event,
                 channel=old_vs.channel)
+
+    @Plugin.listen('IntegrationUpdate', priority=Priority.SEQUENTIAL)
+    def on_integration_update(self, event):
+        self.log_action(Actions.INTEGRATION_UPDATE, event)

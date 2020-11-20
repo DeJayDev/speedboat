@@ -37,7 +37,7 @@ from functools import reduce
 
 
 def get_status_emoji(presence):
-    if presence.game and presence.game.type == ActivityTypes.STREAMING:
+    if presence.activity and presence.activity.type == ActivityTypes.STREAMING:
         return STATUS_EMOJI[ActivityTypes.STREAMING], 'Streaming'
     elif presence.status == Status.ONLINE:
         return STATUS_EMOJI[Status.ONLINE], 'Online'
@@ -305,15 +305,19 @@ class UtilitiesPlugin(Plugin):
         if user.presence:  # I couldn't get this to work w/o it lol
             emoji, status = get_status_emoji(user.presence)
             content.append('Status: <{}> {}'.format(emoji, status))
-            if user.presence.game and user.presence.game.name:
-                if user.presence.game.type == ActivityTypes.DEFAULT:
-                    content.append('{}'.format(user.presence.game.name))
-                if user.presence.game.type == ActivityTypes.CUSTOM:
-                    content.append('Custom Status: {}'.format(user.presence.game.state))
-                if user.presence.game.type == ActivityTypes.LISTENING:
-                    content.append('Listening to {} on Spotify'.format(user.presence.game.details))  # In the embed, details is the songname.
-                if user.presence.game.type == ActivityTypes.STREAMING:
-                    content.append('Streaming: [{}]({})'.format(user.presence.game.name, user.presence.game.url))
+            if user.presence.activity and user.presence.activity.name:
+                if user.presence.activity.type is ActivityTypes.DEFAULT:
+                    content.append('{}'.format(user.presence.activity.name))
+                if user.presence.activity.type is ActivityTypes.STREAMING:
+                    content.append('Streaming: [{}]({})'.format(user.presence.activity.name, user.presence.activity.url))
+                if user.presence.activity.type is ActivityTypes.LISTENING:
+                    content.append('Listening to {} on Spotify'.format(user.presence.activity.details))
+                if user.presence.activity.type is ActivityTypes.WATCHING:
+                    content.append('Watching: {}'.format(user.presence.activity.name))
+                if user.presence.activity.type is ActivityTypes.CUSTOM:
+                    content.append('Custom Status: {}'.format(user.presence.activity.state))
+                if user.presence.activity.type is ActivityTypes.COMPETING:
+                    content.append('Competing: {}'.format(user.presence.activity.name))
 
         if user.public_flags:
             badges = ''

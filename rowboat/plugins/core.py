@@ -623,7 +623,7 @@ class CorePlugin(Plugin):
         code = cmd.func.__code__
         lines, firstlinenum = inspect.getsourcelines(code)
 
-        event.msg.reply('<https://github.com/SethBots/speedboat/blob/master/{}#L{}-L{}>'.format(
+        event.msg.reply('<https://github.com/DeJayDev/speedboat/blob/master/{}#L{}-L{}>'.format(
             code.co_filename.replace('/opt/rowboat/', ''),
             firstlinenum,
             firstlinenum + len(lines)

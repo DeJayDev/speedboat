@@ -12,6 +12,7 @@ DSN: ''
 web:
     CLIENT_SECRET: ''
     SECRET_KEY: ''
+    TWITCH_CLIENT_ID: '' # Unfinished, not required... yet.
     DISCORD_CLIENT_ID: ''
     DISCORD_CLIENT_SECRET: ''
     DISCORD_API_BASE_URL: 'https://discord.com/api' #Leave this

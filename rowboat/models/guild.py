@@ -166,7 +166,7 @@ class GuildEmoji(ModelBase):
         table_name = 'guild_emojis'
 
     @classmethod
-    def from_disco_guild_emoji(cls, emoji, guild_id=None):
+    def from_disco_guild_emoji(cls, emoji):
         try:
             ge = cls.get(emoji_id=emoji.id)
             new = False
@@ -174,7 +174,7 @@ class GuildEmoji(ModelBase):
             ge = cls(emoji_id=emoji.id)
             new = True
 
-        ge.guild_id = guild_id or emoji.guild_id
+        ge.guild_id = emoji.guild_id
         ge.name = emoji.name
         ge.require_colons = emoji.require_colons
         ge.managed = emoji.managed

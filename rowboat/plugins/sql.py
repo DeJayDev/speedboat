@@ -107,7 +107,7 @@ class SQLPlugin(Plugin):
         ids = []
 
         for emoji in event.emojis:
-            GuildEmoji.from_disco_guild_emoji(emoji, event.guild_id)
+            GuildEmoji.from_disco_guild_emoji(emoji)
             ids.append(emoji.id)
 
         GuildEmoji.update(deleted=True).where(
@@ -121,7 +121,7 @@ class SQLPlugin(Plugin):
             Channel.from_disco_channel(channel)
 
         for emoji in list(event.emojis.values()):
-            GuildEmoji.from_disco_guild_emoji(emoji, guild_id=event.guild.id)
+            GuildEmoji.from_disco_guild_emoji(emoji)
 
     @Plugin.listen('GuildDelete')
     def on_guild_delete(self, event):
