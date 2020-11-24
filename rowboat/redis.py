@@ -5,7 +5,10 @@ import redis
 
 ENV = os.getenv('ENV', 'local')
 
-rdb = redis.Redis(db=0, host='redis')
+if ENV == 'docker':
+    rdb = redis.Redis(db=0, host='redis')
+else:
+    rdb = redis.Redis(db=0)
 
 
 def emit(typ, **kwargs):
