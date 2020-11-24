@@ -7,7 +7,6 @@ rowboat-*.json
 __pycache__/
 .data
 .vscode
-src/
 
 # MacOS...
 */*.DS_Store
