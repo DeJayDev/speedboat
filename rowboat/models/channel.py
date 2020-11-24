@@ -1,7 +1,7 @@
 from peewee import (BigIntegerField, SmallIntegerField, CharField, TextField, BooleanField)
 
-from rowboat.sql import ModelBase
 from rowboat.models.message import Message
+from rowboat.sql import ModelBase
 
 
 @ModelBase.register

@@ -1,13 +1,13 @@
 import json
-import arrow
-
 from datetime import datetime
+
+import arrow
 from holster.enum import Enum
 from peewee import IntegerField, DateTimeField
 from playhouse.postgres_ext import BinaryJSONField, BooleanField
 
-from rowboat.sql import ModelBase
 from rowboat.redis import rdb
+from rowboat.sql import ModelBase
 
 NotificationTypes = Enum(
     GENERIC=1,

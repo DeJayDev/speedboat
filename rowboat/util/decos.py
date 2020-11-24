@@ -1,7 +1,7 @@
-from flask import g, jsonify
+import functools
 from http.client import FORBIDDEN
 
-import functools
+from flask import g, jsonify
 
 
 def _authed(func):

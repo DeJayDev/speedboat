@@ -1,24 +1,24 @@
+import operator
 import re
 import time
-import operator
-
-from gevent.lock import Semaphore
-from datetime import datetime, timedelta
 from collections import defaultdict
-from holster.enum import Enum
-from disco.util.emitter import Priority
+from datetime import datetime, timedelta
+from functools import reduce
 
+from disco.util.emitter import Priority
+from gevent.lock import Semaphore
+from holster.enum import Enum
+
+from rowboat.models.message import Message, EMOJI_RE
+from rowboat.models.user import Infraction
 from rowboat.plugins import RowboatPlugin as Plugin
-from rowboat.redis import rdb
-from rowboat.plugins.modlog import Actions
 from rowboat.plugins.censor import URL_RE
+from rowboat.plugins.modlog import Actions
+from rowboat.redis import rdb
+from rowboat.types import SlottedModel, DictField, Field
+from rowboat.types.plugin import PluginConfig
 from rowboat.util.leakybucket import LeakyBucket
 from rowboat.util.stats import timed
-from rowboat.types.plugin import PluginConfig
-from rowboat.types import SlottedModel, DictField, Field
-from rowboat.models.user import Infraction
-from rowboat.models.message import Message, EMOJI_RE
-from functools import reduce
 
 UPPER_RE = re.compile('[A-Z]')
 

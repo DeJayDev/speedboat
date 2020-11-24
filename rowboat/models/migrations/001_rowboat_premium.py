@@ -1,5 +1,4 @@
 from rowboat.models.migrations import Migrate
-from rowboat.models.guild import Guild
 
 
 @Migrate.always()

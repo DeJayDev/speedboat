@@ -1,11 +1,12 @@
 import json
-import uuid
 import logging
-import time
 import os
-import gevent
+import time
+import uuid
 
+import gevent
 from gevent.lock import Semaphore
+
 from rowboat.redis import rdb
 
 log = logging.getLogger(__name__)

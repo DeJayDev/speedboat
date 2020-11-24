@@ -1,4 +1,5 @@
 import re
+
 import yaml
 from disco.types.user import ActivityTypes, Status
 

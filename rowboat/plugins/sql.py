@@ -1,31 +1,30 @@
 import time
-import gevent
-import psycopg2
-import markovify
-import cairosvg
-import pygal
-
-from gevent.pool import Pool
-from disco.util.emitter import Priority
 from datetime import datetime
 
+import cairosvg
+import gevent
+import markovify
+import psycopg2
+import pygal
 from disco.types.base import UNSET
-from disco.types.message import MessageTable
-from disco.types.user import User as DiscoUser
-from disco.types.guild import Guild as DiscoGuild
 from disco.types.channel import Channel as DiscoChannel, MessageIterator
+from disco.types.guild import Guild as DiscoGuild
+from disco.types.message import MessageTable
 from disco.types.permissions import Permissions
+from disco.types.user import User as DiscoUser
+from disco.util.emitter import Priority
 from disco.util.snowflake import to_datetime, from_datetime
+from gevent.pool import Pool
 
+from rowboat.models.channel import Channel
+from rowboat.models.guild import GuildEmoji, GuildVoiceSession
+from rowboat.models.message import Message, Reaction
+from rowboat.models.user import User
 from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
 from rowboat.sql import database
-from rowboat.models.user import User
-from rowboat.models.guild import GuildEmoji, GuildVoiceSession
-from rowboat.models.channel import Channel
-from rowboat.models.message import Message, Reaction
+from rowboat.tasks.backfill import backfill_channel, backfill_guild
 from rowboat.util.input import parse_duration
 from rowboat.util.reqaddons import DiscordStyle
-from rowboat.tasks.backfill import backfill_channel, backfill_guild
 
 
 class SQLPlugin(Plugin):

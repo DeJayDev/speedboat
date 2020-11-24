@@ -1,23 +1,22 @@
-import re
 import json
+import re
 import urllib.parse
-
 from urllib.parse import unquote
-from holster.enum import Enum
-from disco.types.base import cached_property
-from disco.util.sanitize import S
-from disco.api.http import APIException
-from disco.types.permissions import Permissions
 
-from rowboat.redis import rdb
-from rowboat.util.stats import timed
-from rowboat.util.zalgo import ZALGO_RE
+from disco.types.base import cached_property
+from disco.types.permissions import Permissions
+from disco.util.sanitize import S
+from holster.enum import Enum
+
+from rowboat.constants import INVITE_LINK_RE, URL_RE
+from rowboat.models.message import Message
 from rowboat.plugins import RowboatPlugin as Plugin
+from rowboat.plugins.modlog import Actions
+from rowboat.redis import rdb
 from rowboat.types import SlottedModel, Field, ListField, DictField, ChannelField, snowflake, lower
 from rowboat.types.plugin import PluginConfig
-from rowboat.models.message import Message
-from rowboat.plugins.modlog import Actions
-from rowboat.constants import INVITE_LINK_RE, URL_RE
+from rowboat.util.stats import timed
+from rowboat.util.zalgo import ZALGO_RE
 
 CensorReason = Enum(
     'INVITE',

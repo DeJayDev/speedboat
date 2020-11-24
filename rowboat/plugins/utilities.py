@@ -1,39 +1,36 @@
-import random
-import requests
-import humanize
 import operator
-import gevent
-
-from io import BytesIO
-from PIL import Image
-from peewee import fn
-from gevent.pool import Pool
-from datetime import datetime, timedelta
+import random
 from collections import defaultdict
+from datetime import datetime, timedelta
+from functools import reduce
+from io import BytesIO
 
+import gevent
+import humanize
+import requests
+from PIL import Image
+from disco.api.http import APIException
+from disco.types.message import MessageEmbed
 from disco.types.user import ActivityTypes, Status
 from disco.types.user import User as DiscoUser
-from disco.types.message import MessageEmbed
-from disco.util.snowflake import to_datetime
 from disco.util.sanitize import S
-from disco.api.http import APIException
+from disco.util.snowflake import to_datetime
+from gevent.pool import Pool
+from peewee import fn
 
-from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
-from rowboat.util.timing import Eventual
-from rowboat.util.input import parse_duration
-from rowboat.util.gevent import wait_many
-from rowboat.util.stats import to_tags
-from rowboat.types.plugin import PluginConfig
-from rowboat.models.guild import GuildVoiceSession
-from rowboat.models.user import User, Infraction
-from rowboat.models.message import Message, Reminder
-from rowboat.util.images import get_dominant_colors_user, get_dominant_colors_guild
-from rowboat.util.badges import UserFlags
 from rowboat.constants import (
     STATUS_EMOJI, BADGE_EMOJI, SNOOZE_EMOJI, GREEN_TICK_EMOJI, GREEN_TICK_EMOJI_ID,
     EMOJI_RE, USER_MENTION_RE, YEAR_IN_SEC, CDN_URL, WEB_URL
 )
-from functools import reduce
+from rowboat.models.guild import GuildVoiceSession
+from rowboat.models.message import Message, Reminder
+from rowboat.models.user import User, Infraction
+from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
+from rowboat.types.plugin import PluginConfig
+from rowboat.util.badges import UserFlags
+from rowboat.util.images import get_dominant_colors_user, get_dominant_colors_guild
+from rowboat.util.input import parse_duration
+from rowboat.util.timing import Eventual
 
 
 def get_status_emoji(presence):

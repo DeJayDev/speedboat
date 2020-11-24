@@ -1,40 +1,38 @@
-import os
+import contextlib
+import functools
+import inspect
 import json
+import os
 import pprint
 import signal
-import inspect
-import humanize
-import functools
-import contextlib
 import time
-
 from datetime import datetime, timedelta
-from disco.util.emitter import Priority, Emitter
+
+import humanize
+from disco.api.http import APIException
 from disco.bot import Bot
+from disco.bot.command import CommandEvent
 from disco.types.message import MessageEmbed
 from disco.types.permissions import Permissions
-from disco.api.http import APIException
-from disco.bot.command import CommandEvent
+from disco.util.emitter import Priority, Emitter
 from disco.util.sanitize import S
 from disco.util.snowflake import to_datetime
 
 from rowboat import ENV
-from rowboat.util import LocalProxy
-from rowboat.util.stats import timed
-from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess, CommandResponse
-from rowboat.sql import init_db
-from rowboat.redis import rdb
-
-import rowboat.models
-from rowboat.models.user import Infraction
-from rowboat.models.guild import Guild, GuildBan
-from rowboat.models.message import Command
-from rowboat.models.notification import Notification
-from rowboat.plugins.modlog import Actions
 from rowboat.constants import (
     GREEN_TICK_EMOJI, RED_TICK_EMOJI, ROWBOAT_GUILD_ID, ROWBOAT_USER_ROLE_ID,
     ROWBOAT_CONTROL_CHANNEL, WEB_URL
 )
+from rowboat.models.guild import Guild, GuildBan
+from rowboat.models.message import Command
+from rowboat.models.notification import Notification
+from rowboat.models.user import Infraction
+from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess, CommandResponse
+from rowboat.plugins.modlog import Actions
+from rowboat.redis import rdb
+from rowboat.sql import init_db
+from rowboat.util import LocalProxy
+from rowboat.util.stats import timed
 
 PY_CODE_BLOCK = '```py\n{}\n```'
 

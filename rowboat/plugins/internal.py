@@ -1,18 +1,18 @@
-import gevent
-from gevent.lock import Semaphore
 from datetime import datetime, timedelta
 
-from peewee import fn
+import gevent
 from disco.gateway.packets import OPCode, RECV
 from disco.types.message import MessageTable, MessageEmbed
+from gevent.lock import Semaphore
+from peewee import fn
 
-from rowboat.redis import rdb
-from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
-from rowboat.util.redis import RedisSet
-from rowboat.models.event import Event
-from rowboat.models.user import User
 from rowboat.models.channel import Channel
+from rowboat.models.event import Event
 from rowboat.models.message import Command, Message
+from rowboat.models.user import User
+from rowboat.plugins import RowboatPlugin as Plugin, CommandSuccess
+from rowboat.redis import rdb
+from rowboat.util.redis import RedisSet
 
 
 class InternalPlugin(Plugin):

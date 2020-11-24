@@ -1,8 +1,8 @@
-import os
 import logging
+import os
 import subprocess
-import sentry_sdk as sentry
 
+import sentry_sdk as sentry
 from disco.util.logging import LOG_FORMAT
 from sentry_sdk.integrations.redis import RedisIntegration
 from yaml import safe_load

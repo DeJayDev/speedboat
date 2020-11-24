@@ -1,14 +1,14 @@
-from disco.bot import Plugin
-from disco.types.base import Unset
 from disco.api.http import APIException
+from disco.bot import Plugin
 from disco.bot.command import CommandEvent
-from disco.gateway.events import GatewayEvent
 from disco.bot.plugin import register_plugin_base_class
+from disco.gateway.events import GatewayEvent
+from disco.types.base import Unset
 
 from rowboat import sentry
-from rowboat.util import MetaException
 from rowboat.types import Field
 from rowboat.types.guild import PluginsConfig
+from rowboat.util import MetaException
 
 
 class SafePluginInterface(object):

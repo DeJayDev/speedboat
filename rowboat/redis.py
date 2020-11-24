@@ -1,9 +1,8 @@
-import os
 import json
 
 import redis
 
-ENV = os.getenv('ENV', 'local')
+from rowboat import ENV
 
 if ENV == 'docker':
     rdb = redis.Redis(db=0, host='redis')

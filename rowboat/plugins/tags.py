@@ -1,12 +1,12 @@
 from disco.bot import CommandLevels
-from disco.util.sanitize import S
 from disco.types.message import MessageEmbed
+from disco.util.sanitize import S
 
+from rowboat.models.tags import Tag
+from rowboat.models.user import User
 from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
 from rowboat.types import Field
 from rowboat.types.plugin import PluginConfig
-from rowboat.models.tags import Tag
-from rowboat.models.user import User
 
 
 class TagsConfig(PluginConfig):

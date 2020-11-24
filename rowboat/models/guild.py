@@ -1,14 +1,14 @@
-import yaml
 import logging
-
-from peewee import (BigIntegerField, CharField, TextField, BooleanField, DateTimeField, CompositeKey, BlobField)
-from holster.enum import Enum
 from datetime import datetime
+
+import yaml
+from holster.enum import Enum
+from peewee import (BigIntegerField, CharField, TextField, BooleanField, DateTimeField, CompositeKey, BlobField)
 from playhouse.postgres_ext import BinaryJSONField, ArrayField
 
-from rowboat.sql import ModelBase
-from rowboat.redis import emit
 from rowboat.models.user import User
+from rowboat.redis import emit
+from rowboat.sql import ModelBase
 
 log = logging.getLogger(__name__)
 

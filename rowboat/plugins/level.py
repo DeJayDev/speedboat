@@ -1,22 +1,18 @@
-import gevent
-
 from random import randint
 
+import gevent
 from disco.bot import CommandLevels
-from disco.util.sanitize import S
-from disco.types.message import MessageEmbed, MessageTable
-
-from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
-from rowboat.types import Field, DictField, ListField, SlottedModel, snowflake
-from rowboat.types.plugin import PluginConfig
-from rowboat.models.tags import Tag
-from rowboat.models.user import User, XPBlock
-from rowboat.models.guild import GuildMemberLevel
-from rowboat.models.message import Message
+from disco.types.message import MessageTable
 
 from rowboat.constants import (
     GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID, GREEN_TICK_EMOJI, RED_TICK_EMOJI
 )
+from rowboat.models.guild import GuildMemberLevel
+from rowboat.models.message import Message
+from rowboat.models.user import User, XPBlock
+from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
+from rowboat.types import Field, DictField, SlottedModel, snowflake
+from rowboat.types.plugin import PluginConfig
 
 
 class LevelUpActionConfig(SlottedModel):

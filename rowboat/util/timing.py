@@ -1,8 +1,8 @@
 import time
-import gevent
-
-from gevent.lock import Semaphore
 from datetime import datetime
+
+import gevent
+from gevent.lock import Semaphore
 
 
 class Eventual(object):

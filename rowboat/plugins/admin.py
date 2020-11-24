@@ -1,42 +1,39 @@
-import re
 import csv
+import operator
+import re
 import time
+from datetime import datetime, timedelta
+from functools import reduce
+from io import StringIO
+
 import gevent
 import humanize
-import operator
-
-from io import StringIO
-from peewee import fn
-from disco.util.emitter import Priority
-from fuzzywuzzy import fuzz
-
-from datetime import datetime, timedelta
-
-from disco.bot import CommandLevels
 from disco.api.http import APIException
-from disco.types.user import User as DiscoUser
-from disco.types.message import MessageTable, MessageEmbed, MessageEmbedField, MessageEmbedThumbnail
+from disco.bot import CommandLevels
 from disco.types.guild import GuildMember
+from disco.types.message import MessageTable, MessageEmbed, MessageEmbedField, MessageEmbedThumbnail
 from disco.types.permissions import Permissions
+from disco.types.user import User as DiscoUser
+from disco.util.emitter import Priority
 from disco.util.functional import chunks
 from disco.util.sanitize import S
+from fuzzywuzzy import fuzz
+from peewee import fn
 
-from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
-from rowboat.util.timing import Eventual
-from rowboat.util.images import get_dominant_colors_user
-from rowboat.util.input import parse_duration
-from rowboat.util.gevent import wait_many
-from rowboat.redis import rdb
-from rowboat.types import Field, DictField, ListField, snowflake, SlottedModel
-from rowboat.types.plugin import PluginConfig
-from rowboat.plugins.modlog import Actions
-from rowboat.models.user import User, Infraction
-from rowboat.models.guild import GuildMemberBackup, GuildBan, GuildEmoji, GuildVoiceSession
-from rowboat.models.message import Message, Reaction, MessageArchive
 from rowboat.constants import (
     GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID, GREEN_TICK_EMOJI, RED_TICK_EMOJI
 )
-from functools import reduce
+from rowboat.models.guild import GuildMemberBackup, GuildBan, GuildEmoji, GuildVoiceSession
+from rowboat.models.message import Message, Reaction, MessageArchive
+from rowboat.models.user import User, Infraction
+from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
+from rowboat.plugins.modlog import Actions
+from rowboat.redis import rdb
+from rowboat.types import Field, DictField, ListField, snowflake, SlottedModel
+from rowboat.types.plugin import PluginConfig
+from rowboat.util.images import get_dominant_colors_user
+from rowboat.util.input import parse_duration
+from rowboat.util.timing import Eventual
 
 EMOJI_RE = re.compile(r'<:[a-zA-Z0-9_]+:([0-9]+)>')
 

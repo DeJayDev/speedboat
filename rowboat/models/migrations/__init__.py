@@ -1,10 +1,11 @@
-import time
 import operator
+import time
+from functools import reduce
 
 from playhouse.migrate import PostgresqlMigrator, migrate
+
 from rowboat import ENV
 from rowboat.sql import database, init_db
-from functools import reduce
 
 COLUMN_EXISTS_SQL = '''
 SELECT 1

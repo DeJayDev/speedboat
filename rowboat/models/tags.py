@@ -1,7 +1,8 @@
+from datetime import datetime
+
 from peewee import (
     BigIntegerField, TextField, DateTimeField, CompositeKey, IntegerField
 )
-from datetime import datetime
 
 from rowboat.sql import ModelBase
 

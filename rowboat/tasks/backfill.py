@@ -1,7 +1,8 @@
-from . import task, get_client
-from rowboat.models.message import Message
 from disco.types.channel import MessageIterator
 from disco.types.permissions import Permissions
+
+from rowboat.models.message import Message
+from . import task, get_client
 
 
 @task(max_concurrent=1, max_queue_size=10, global_lock=lambda guild_id: guild_id)

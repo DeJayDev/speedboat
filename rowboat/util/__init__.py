@@ -1,8 +1,8 @@
 import re
-import yaml
-
 from collections import OrderedDict
 from datetime import datetime
+
+import yaml
 from gevent.local import local
 
 # Invisible space that can be used to escape mentions

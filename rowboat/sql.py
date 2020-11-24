@@ -1,11 +1,11 @@
-import os
-import psycogreen.gevent;
-
-psycogreen.gevent.patch_psycopg()
-
 from peewee import Proxy, OP, Model
 from peewee import Expression
 from playhouse.postgres_ext import PostgresqlExtDatabase
+
+import os
+import psycogreen.gevent
+
+psycogreen.gevent.patch_psycopg()
 
 REGISTERED_MODELS = []
 

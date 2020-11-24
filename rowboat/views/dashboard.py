@@ -1,11 +1,11 @@
 import json
 import subprocess
-
-from flask import Blueprint, g, make_response
 from datetime import datetime
 
-from rowboat.redis import rdb
+from flask import Blueprint, g, make_response
+
 from rowboat.models.message import MessageArchive
+from rowboat.redis import rdb
 from rowboat.util.decos import authed
 
 dashboard = Blueprint('dash', __name__)

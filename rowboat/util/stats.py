@@ -1,6 +1,6 @@
 import time
-
 from contextlib import contextmanager
+
 from datadog import statsd
 
 
