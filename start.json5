@@ -1,0 +1,27 @@
+{
+  apps: [{
+    name: 'workers',
+    script: 'manage.py',
+    watch: false,
+    args: "workers",
+    interpreter: "python3"
+  }, {
+    name: 'web',
+    script: 'manage.py',
+    watch: false,
+    args: "serve -r",
+    interpreter: "python3"
+  }, {
+    name: 'frontend',
+    script: 'npm',
+    watch: false,
+    cwd: 'frontend',
+    args: "run serve"
+  }, {
+    name: 'bot',
+    script: 'manage.py',
+    watch: false,
+    interpreter: "python3",
+    args: "bot -e prod"
+  }]
+}

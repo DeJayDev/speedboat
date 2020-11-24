@@ -30,6 +30,6 @@ pytest==6.1.2
 python-Levenshtein==0.12.0
 peewee==3.14.0
 gevent==20.9.0
-gevent_inotify`11x==0.2
+gevent_inotifyx==0.2
 datadog==0.39.0
 pynacl==1.4.0
