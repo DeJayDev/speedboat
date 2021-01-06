@@ -3,7 +3,7 @@
 -e git+https://github.com/elderlabs/pygal#egg=pygal
 -e git+https://github.com/wenmin-wu/dominant-colors-py#egg=dominantcolors
 arrow==0.17.0
-CairoSVG==2.5.0
+CairoSVG==2.5.1
 click==7.1.2
 dill==0.3.3
 emoji==0.6.0
