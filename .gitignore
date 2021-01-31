@@ -7,6 +7,7 @@ rowboat-*.json
 __pycache__/
 .data
 .vscode
+src
 
 # MacOS...
 */*.DS_Store
@@ -22,3 +23,6 @@ venv.bak/
 
 # User-specific stuff
 .idea/**
+
+# Prevent forks from spawning too easily.
+start.json5

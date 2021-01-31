@@ -18,7 +18,7 @@ class StatsPlugin(Plugin):
         if ENV == 'docker':
             initialize(statsd_host='dd-agent', statsd_port=8125, hostname_from_config=False)
         else:
-            initialize(statsd_host='dd-agent', statsd_port=8125, hostname_from_config=False)
+            initialize(statsd_host='127.0.0.1', statsd_port=8125, hostname_from_config=False)
 
         self.nonce = 0
         self.nonces = {}
@@ -83,7 +83,7 @@ class StatsPlugin(Plugin):
                 )
                 del self.nonces[event.nonce]
 
-        if event.message.mention_everyone:
+        if event.message.mention_everyone or event.message.mentions_here:
             tags['mention_everyone'] = 'yes'  # Does Datadog support booleans? It does now.
 
         statsd.increment('guild.messages.create', tags=to_tags(tags))

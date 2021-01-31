@@ -9,5 +9,10 @@
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/disco" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/disco-py" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/dominantcolors" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/holster" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/pygal" vcs="Git" />
   </component>
 </project>

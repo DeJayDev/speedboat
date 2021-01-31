@@ -57,8 +57,7 @@ class CorePlugin(Plugin):
         # Overwrite the main bot instances plugin loader so we can magicify events
         self.bot.add_plugin = self.our_add_plugin
 
-        if ENV != 'prod':
-            self.spawn(self.wait_for_plugin_changes)
+        self.spawn(self.wait_for_plugin_changes)
 
         self._wait_for_actions_greenlet = self.spawn(self.wait_for_actions)
 
@@ -615,16 +614,15 @@ class CorePlugin(Plugin):
             if command.lower() in cmd.triggers:
                 break
         else:
-            raise CommandFail("Couldn't find command for `{}`".format(S(command, escape_codeblocks=True)))
-            return
+            raise CommandFail("Couldn't find command `{}` (try being specific)".format(S(command, escape_codeblocks=True)))
 
         code = cmd.func.__code__
-        lines, firstlinenum = inspect.getsourcelines(code)
+        length, firstline = inspect.getsourcelines(code)
 
         event.msg.reply('<https://github.com/DeJayDev/speedboat/blob/master/{}#L{}-L{}>'.format(
-            code.co_filename.replace('/opt/rowboat/', ''),
-            firstlinenum,
-            firstlinenum + len(lines)
+            code.co_filename.replace('/home/speedboat/', ''),
+            firstline,
+            firstline + len(length)  # length length
         ))
 
     @Plugin.command('eval', level=-1)

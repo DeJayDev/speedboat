@@ -3,33 +3,32 @@
 -e git+https://github.com/elderlabs/pygal#egg=pygal
 -e git+https://github.com/wenmin-wu/dominant-colors-py#egg=dominantcolors
 arrow==0.17.0
-CairoSVG==2.5.0
+CairoSVG==2.5.1
 click==7.1.2
 dill==0.3.3
-emoji==0.6.0
+emoji==1.2.0
 Earl-ETF==2.1.2
 Flask==1.1.2
-greenlet==0.4.17
-humanize==3.1.0
+greenlet==1.0.0
+humanize==3.2.0
 markovify==0.8.3
 oauthlib==3.1.0
-Pillow==8.0.1
+Pillow==8.1.0
 psycogreen==1.0.2
 psycopg2-binary==2.8.6
-pytz==2020.4
-PyYAML==5.3.1
-sentry-sdk==0.19.4
+pytz==2020.5
+PyYAML==5.4.1
+sentry-sdk==0.19.5
 redis==3.5.3
 regex==2020.11.13
 requests-oauthlib==1.3.0
-urllib3==1.26.2
+urllib3==1.26.3
 Werkzeug==1.0.1
-wheel==0.35.1
-fuzzywuzzy==0.18.0
-pytest==6.1.2
-python-Levenshtein==0.12.0
+wheel==0.36.2
+rapidfuzz==0.14.2
+pytest==6.2.2
 peewee==3.14.0
-gevent==20.9.0
+gevent==20.12.1 # Locked here for Disco compat
 gevent_inotifyx==0.2
 datadog==0.39.0
 pynacl==1.4.0

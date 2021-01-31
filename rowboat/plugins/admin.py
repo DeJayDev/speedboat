@@ -17,7 +17,7 @@ from disco.types.user import User as DiscoUser
 from disco.util.emitter import Priority
 from disco.util.functional import chunks
 from disco.util.sanitize import S
-from fuzzywuzzy import fuzz
+from rapidfuzz import fuzz
 from peewee import fn
 
 from rowboat.constants import (
@@ -115,7 +115,7 @@ class AdminPlugin(Plugin):
         ).order_by(Infraction.expires_at.asc()).limit(1))
 
         if not next_infraction:
-            self.log.info('[INF] Not waiting for on any infractions..')
+            self.log.info('[INF] Not awaiting any infractions..')
             return
 
         self.log.info('[INF] Waiting until %s for #%s', next_infraction[0].expires_at, next_infraction[0].id)
@@ -132,7 +132,7 @@ class AdminPlugin(Plugin):
         for item in expired:
             guild = self.state.guilds.get(item.guild_id)
             if not guild:
-                self.log.warning('[INF] FAILED clearing infraction #%s! Guild does not exist.', item.id)
+                self.log.warning('[INF] Could not remove #%s! Guild does not exist.', item.id)
                 continue
 
             # TODO: hacky
@@ -673,7 +673,7 @@ class AdminPlugin(Plugin):
             ))
 
     @Plugin.command('unmute', '<user:user|snowflake>', aliases=['umute'], level=CommandLevels.MOD)
-    def unmute(self, event, user, reason=None):
+    def unmute(self, event, user):
         # TODO: eventually we should pull the role from the GuildMemberBackup if they arent in server
         member = event.guild.get_member(user)
 
@@ -784,9 +784,9 @@ class AdminPlugin(Plugin):
             mra_event = self.wait_for_event(
                 'MessageReactionAdd',
                 message_id=msg.id,
-                conditional=lambda e: (
-                    e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
-                    e.user_id == event.author.id
+                conditional=lambda conf: (
+                    conf.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
+                    conf.user_id == event.author.id
                 )).get(timeout=10)
         except gevent.Timeout:
             return

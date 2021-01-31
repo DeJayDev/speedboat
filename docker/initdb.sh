@@ -1,4 +1,3 @@
-#!/bin/bash
 set -e
 
 psql -v ON_ERROR_STOP=1 --username "rowboat" -d rowboat -c "CREATE DATABASE rowboat;"

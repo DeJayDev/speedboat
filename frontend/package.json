@@ -34,6 +34,6 @@
   "scripts": {
     "serve": "node serve.js",
     "build": "NODE_ENV=production parcel build src/index.html",
-    "dev": "NODE_ENV=development npm run serve"
+    "dev": "NODE_ENV=development node serve.js"
   }
 }
