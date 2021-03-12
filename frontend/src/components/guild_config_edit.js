@@ -82,35 +82,31 @@ export default class GuildConfigEdit extends Component {
   render() {
     return (<div>
       {this.state.message && <div className={"alert alert-" + this.state.message.type}>{this.state.message.contents}</div>}
-      <div className="row">
-        <div className="col-md-12">
-          <div className="card">
-            <div className="card-header">
-              Configuration Editor
-            </div>
-            <div className="card-body">
-              <AceEditor
-                mode="yaml"
-                theme="monokai"
-                width="100%"
-                height="75vh"
-                value={this.state.contents == null ? '' : this.state.contents}
-                onChange={(newValue) => this.onEditorChange(newValue)}
-              />
-            </div>
-            <div className="card-footer">
-              {
-                this.state.guild && this.state.guild.role != 'viewer' &&
-                  <button onClick={() => this.onSave()} type="button" className="btn btn-success btn-circle btn-lg">
-                  <i className="fa fa-check"></i>
-                </button>
-              }
-              { this.state.hasUnsavedChanges && <i style={{paddingLeft: '10px'}}>Unsaved Changes!</i>}
-            </div>
+        <div className="card">
+          <div className="card-header">
+            Configuration Editor
+          </div>
+          <div className="card-body">
+            <AceEditor
+              mode="yaml"
+              theme="monokai"
+              width="100%"
+              height="75vh"
+              value={this.state.contents == null ? '' : this.state.contents}
+              onChange={(newValue) => this.onEditorChange(newValue)}
+            />
+          </div>
+          <div className="card-footer">
+            {
+              this.state.guild && this.state.guild.role != 'viewer' &&
+                <button onClick={() => this.onSave()} type="button" className="btn btn-success btn-circle btn-lg">
+                <i className="fa fa-check"></i>
+              </button>
+            }
+            { this.state.hasUnsavedChanges && <i style={{paddingLeft: '10px'}}>Unsaved Changes!</i>}
           </div>
         </div>
-      </div>
-    </div>);
+      </div>);
   }
 }
 

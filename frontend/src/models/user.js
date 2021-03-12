@@ -1,5 +1,4 @@
 import axios from 'axios';
-import {globalState} from '../state';
 import BaseModel from './base';
 import Guild from './guild';
 

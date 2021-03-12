@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import 'react-table/react-table.css'
 
 function init() {
 	// HMR requires that this be a require()

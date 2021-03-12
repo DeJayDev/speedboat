@@ -83,8 +83,8 @@ class StatsPlugin(Plugin):
                 )
                 del self.nonces[event.nonce]
 
-        if event.message.mention_everyone or event.message.mentions_here:
-            tags['mention_everyone'] = 'yes'  # Does Datadog support booleans? It does now.
+        if event.message.mention_everyone:
+            tags['mentions_everyone'] = '1'  # Does Datadog support booleans? It does now.
 
         statsd.increment('guild.messages.create', tags=to_tags(tags))
 

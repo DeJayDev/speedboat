@@ -4,6 +4,7 @@ import inspect
 import json
 import os
 import pprint
+from re import L
 import signal
 import time
 from datetime import datetime, timedelta
@@ -264,7 +265,7 @@ class CorePlugin(Plugin):
 
     @Plugin.listen('GuildUpdate')
     def on_guild_update(self, event):
-        self.log.info('Got guild update for guild %s (%s)', event.guild.id, event.guild.channels)
+        self.log.info('Got guild update for guild %s (%s)', event.guild.name, event.guild.id)
 
     @Plugin.listen('GuildBanAdd')
     def on_guild_ban_add(self, event):
@@ -753,6 +754,32 @@ class CorePlugin(Plugin):
         msg = event.msg.reply(":eyes:")
         ping = (time.time() - pre) * 1000
         msg.edit(":eyes: `BOT: {}ms` `API: {}ms`".format(int(post), int(ping)))
+
+    @Plugin.command('help', '[user:user|snowflake]')
+    def help(self, event, user=None):
+        if not user:
+            user = event.msg.author
+
+        cmds = ''
+        othercmds = ''
+
+        for plugin in self.bot.plugins.values():
+            plugin_cmds = []
+            ungrouped_plugin_cmds = []
+            event.level = self.get_level(event.guild, user)
+            for command in self.bot.commands:
+                if command.level and (command.level != -1) and (command.level <= event.level) and command.plugin is plugin:
+                    if command.group:
+                        plugin_cmds.append('{} {}'.format(command.group, command.name))
+                    else:
+                        ungrouped_plugin_cmds.append(command.name)
+            plugin_cmds = sorted(plugin_cmds)
+            if not plugin_cmds:
+                continue # No commands? lets go.
+            cmds += "**{}**: {}\n".format(plugin.name.capitalize(), ', '.join(plugin_cmds))
+            othercmds += "{}".format(', '.join(ungrouped_plugin_cmds))
+
+        raise CommandSuccess('You can use:\n {}'.format(cmds + othercmds))
 
     @Plugin.command('config')
     def config_cmd(self, event):

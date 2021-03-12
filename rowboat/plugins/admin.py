@@ -901,7 +901,7 @@ class AdminPlugin(Plugin):
                 cid = channel if isinstance(channel, int) else channel.id
             channel = event.guild.channels.get(cid)
             if not channel:
-                raise CommandFail('Channel not Found')
+                raise CommandFail('Channel not found')
             perms = channel.get_permissions(event.author)
             if not (perms.administrator or perms.view_channel):
                 raise CommandFail('Cannot access channel due to permissions')
@@ -936,7 +936,7 @@ class AdminPlugin(Plugin):
             archive.url,
         ))
 
-    @Plugin.command('clean cancel', level=CommandLevels.MOD)
+    @Plugin.command('cancel', level=CommandLevels.MOD, group='clean')
     def clean_cancel(self, event):
         if event.channel.id not in self.cleans:
             raise CommandFail('No clean is running in this channel')
@@ -944,9 +944,8 @@ class AdminPlugin(Plugin):
         self.cleans[event.channel.id].kill()
         raise CommandSuccess('Ok, the running clean was cancelled')
 
-    @Plugin.command('clean all', '[size:int]', level=CommandLevels.MOD, context={'mode': 'all'})
-    @Plugin.command('clean bots', '[size:int]', level=CommandLevels.MOD, context={'mode': 'bots'})
-    @Plugin.command('clean user', '<user:user> [size:int]', level=CommandLevels.MOD, context={'mode': 'user'})
+    @Plugin.command('all', '[size:int]', level=CommandLevels.MOD, group='clean')
+    @Plugin.command('user', '<user:user> [size:int]', level=CommandLevels.MOD, group='clean')
     def clean(self, event, user=None, size=25, typ=None, mode='all'):
         """
         Removes messages
@@ -963,10 +962,7 @@ class AdminPlugin(Plugin):
             (Message.timestamp > (datetime.utcnow() - timedelta(days=13)))
         ).join(User).order_by(Message.timestamp.desc()).limit(size)
 
-        if mode == 'bots':
-            query = query.where((User.bot >> True))
-        elif mode == 'user':
-            query = query.where((User.user_id == user.id))
+        query.where((User.user_id == user.id))
 
         messages = [i[0] for i in query.tuples()]
 

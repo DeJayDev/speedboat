@@ -36,12 +36,7 @@ class Dashboard extends Component {
   render() {
 		return (
       <div>
-        <PageHeader name="Dashboard" />
-        <div className="row">
-          <div className="col-lg-12">
-            <DashboardGuildsList />
-          </div>
-        </div>
+        <DashboardGuildsList />
       </div>
     );
   }

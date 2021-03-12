@@ -40,7 +40,7 @@ class AppWrapper extends Component {
   render() {
     if (!this.state.ready) {
       return (
-      <div className="card shadow align-middle">
+      <div className="card align-middle">
         <div className="card-header">
           <h1 className="font-weight-bold text-center text-primary">Loading...</h1>
         </div>
@@ -55,12 +55,9 @@ class AppWrapper extends Component {
     }
 
     return (
-      <div id="wrapper">
-        <Sidebar />
-        <div id="content-wrapper" className="d-flex flex-column">
-          <Topbar />
-          <this.props.view params={this.props.params}/>
-        </div>
+      <div id="content-wrapper">
+        <Topbar />
+        <this.props.view params={this.props.params}/>
       </div>
     );
   }

@@ -4,15 +4,17 @@ rowboat/constants.py
 rowboat-*.json
 *.pyc
 *.log
-__pycache__/
-.data
-.vscode
-src
+ssl
 
-# MacOS...
+# Junk
 */*.DS_Store
+.idea/**
+.data
+__pycache__
+.vscode
 
 # Environments
+src
 .env
 .venv
 env/
@@ -20,9 +22,6 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-
-# User-specific stuff
-.idea/**
 
 # Prevent forks from spawning too easily.
 start.json5

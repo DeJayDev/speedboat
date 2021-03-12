@@ -133,7 +133,7 @@ class SpamPlugin(Plugin):
         if not last_violated > time.time() - 10:
             self.call(
                 'ModLogPlugin.log_action_ext',
-                Actions.SPAM_DEBUG,
+                Actions.SPAM,
                 violation.event.guild.id,
                 v=violation
             )

@@ -7,7 +7,7 @@ class SidebarLink extends Component {
     const iconClass = `fas fa-${this.props.icon}`;
 
     return (
-      <li className="nav-item">
+      <li>
         <Link className="nav-link" to={this.props.to}>
           <i className={iconClass}></i> 
           {this.props.text}</Link>
@@ -83,9 +83,9 @@ class Sidebar extends Component {
     }
 
     return (
-      <ul className="navbar-nav sidebar accordion shadow" id="accordionSidebar">
+      <div className="sidenav">
         {sidebarLinks}
-      </ul>
+      </div>
     );
   }
 }

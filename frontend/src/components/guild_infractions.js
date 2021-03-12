@@ -166,16 +166,14 @@ export default class GuildInfractions extends Component {
     }
 
     return (
-      <div className="row">
-        <div className="col-lg-12">
-          <div className="card">
-            <div className="card-header">Infractions</div>
-            <div className="card-body">
-              <GuildInfractionsTable guild={this.state.guild} onSelectInfraction={this.onSelectInfraction.bind(this)} />
-            </div>
+      <div className="col-lg-12">
+        <div className="card">
+          <div className="card-header">Infractions</div>
+          <div className="card-body">
+            <GuildInfractionsTable guild={this.state.guild} onSelectInfraction={this.onSelectInfraction.bind(this)} />
           </div>
-          {this.state.infraction && <GuildInfractionInfo infraction={this.state.infraction} />}
         </div>
+        {this.state.infraction && <GuildInfractionInfo infraction={this.state.infraction} />}
       </div>
     );
   }
