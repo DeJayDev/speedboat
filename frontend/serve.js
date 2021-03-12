@@ -2,16 +2,13 @@ const {createProxyMiddleware} = require('http-proxy-middleware')
 const express = require('express')
 const fs = require('fs')
 const https = require('https')
+const ip = Object.values(require('os').networkInterfaces()).flat().find(i => i.family == 'IPv4' && !i.internal).address // lol
 const app = express()
-const Parcel = require("@parcel/core").default
-const path = require("path")
 
-const bundler = new Parcel({
-  entries: path.join(__dirname, "./src/index.html"),
-  defaultConfig: require.resolve("@parcel/config-default")
-})
+app.use('/build', express.static(require("path").join(__dirname, 'build')))
+app.use(express.static('src'))
 
-let proxyURL = 'http://localhost:8686'
+let proxyURL = 'http://localhost:8686';
 
 if (process.env.NODE_ENV === 'docker') {
   proxyURL = 'http://web:8686'
@@ -33,13 +30,16 @@ const proxyOptions = {
   }
 }
 
+app.use(express.static('src'))
 app.use('/api', createProxyMiddleware(proxyOptions))
 
 if (fs.existsSync('./ssl/certificate.pem') && fs.existsSync('./ssl/key.pem')) {
-  https.createServer({
+  var listener = https.createServer({
     key: fs.readFileSync('./ssl/key.pem'),
     cert: fs.readFileSync('./ssl/certificate.pem')
   }, app).listen(Number(process.env.PORT || 443))
 } else {
-    app.listen(Number(process.env.PORT || 80));
+  var listener = app.listen(Number(process.env.PORT || 80));
 }
+
+console.log('Running on: ' + ip + ':' + listener.address().port)
