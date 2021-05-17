@@ -17,8 +17,8 @@ from disco.types.user import User as DiscoUser
 from disco.util.emitter import Priority
 from disco.util.functional import chunks
 from disco.util.sanitize import S
-from rapidfuzz import fuzz
 from peewee import fn
+from rapidfuzz import fuzz
 
 from rowboat.constants import (
     GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID, GREEN_TICK_EMOJI, RED_TICK_EMOJI
@@ -962,7 +962,8 @@ class AdminPlugin(Plugin):
             (Message.timestamp > (datetime.utcnow() - timedelta(days=13)))
         ).join(User).order_by(Message.timestamp.desc()).limit(size)
 
-        query.where((User.user_id == user.id))
+        if mode == 'user':
+            query.where((User.user_id == user.id))
 
         messages = [i[0] for i in query.tuples()]
 
