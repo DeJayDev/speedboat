@@ -962,7 +962,8 @@ class AdminPlugin(Plugin):
             (Message.timestamp > (datetime.utcnow() - timedelta(days=13)))
         ).join(User).order_by(Message.timestamp.desc()).limit(size)
 
-        query.where((User.user_id == user.id))
+        if mode == 'user':
+            query.where((User.user_id == user.id))
 
         messages = [i[0] for i in query.tuples()]
 
