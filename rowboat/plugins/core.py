@@ -284,7 +284,7 @@ class CorePlugin(Plugin):
             'Production' if ENV == 'prod' else 'Testing'
         ))
         embed.timestamp = datetime.utcnow().isoformat()
-        embed.color = 0x779ecb
+        embed.color = 0x5865F2
         try:
             yield embed
             self.bot.client.api.channels_messages_create(
@@ -304,7 +304,7 @@ class CorePlugin(Plugin):
 
         with self.send_control_message() as embed:
             embed.title = 'Resumed'
-            embed.color = 0xffb347
+            embed.color = 0xFEE75C
             embed.add_field(name='Replayed Events', value=str(self.client.gw.replayed_events))
 
     @Plugin.listen('Ready', priority=Priority.SEQUENTIAL)
@@ -319,10 +319,10 @@ class CorePlugin(Plugin):
         with self.send_control_message() as embed:
             if reconnects:
                 embed.title = 'Reconnected'
-                embed.color = 0xffb347
+                embed.color = 0xFEE75C
             else:
                 embed.title = 'Connected'
-                embed.color = 0x77dd77
+                embed.color = 0x57F287
 
     @Plugin.listen('GuildCreate', priority=Priority.SEQUENTIAL, conditional=lambda e: not e.created)
     def on_guild_create(self, event):
@@ -472,7 +472,7 @@ class CorePlugin(Plugin):
 
                     with self.send_control_message() as embed:
                         embed.title = 'Command Error: {}'.format(command.name)
-                        embed.color = 0xff6961
+                        embed.color = 0xED4245
                         embed.add_field(
                             name='Author', value='({}) `{}`'.format(event.author, event.author.id), inline=True)
                         embed.add_field(name='Channel', value='({}) `{}`'.format(

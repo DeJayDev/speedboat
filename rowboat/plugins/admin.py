@@ -379,7 +379,7 @@ class AdminPlugin(Plugin):
         elif type_ in (Infraction.Types.KICK, Infraction.Types.SOFTBAN):
             embed.color = 0xffb347
         else:
-            embed.color = 0xff6961
+            embed.color = 0xed4245
 
         embed.title = str(type_).title()
         embed.set_thumbnail(url=infraction.user.get_avatar_url())

@@ -85,7 +85,7 @@ class RedditPlugin(Plugin):
             if 'nsfw' in data and data['nsfw']:
                 if not config.nsfw:
                     return
-                embed.color = 0xff6961
+                embed.color = 0xED4245
             else:
                 embed.color = 0xaecfc8
 

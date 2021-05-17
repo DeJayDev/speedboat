@@ -59,7 +59,7 @@ class InternalPlugin(Plugin):
         embed = MessageEmbed()
         embed.title = '{}.{} ({})'.format(cmd.plugin, cmd.command, cmd.message.id)
         embed.set_author(name=str(cmd.message.author), icon_url=cmd.message.author.get_avatar_url())
-        embed.color = 0x77dd77 if cmd.success else 0xff6961
+        embed.color = 0x57F287 if cmd.success else 0xed4245
 
         if not cmd.success:
             embed.description = '```{}```'.format(cmd.traceback)

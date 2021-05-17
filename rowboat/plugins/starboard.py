@@ -118,7 +118,7 @@ class StarboardPlugin(Plugin):
                 raise CommandFail('Failed to crunch the numbers on that user')
 
             embed = MessageEmbed()
-            embed.color = 0xffd700
+            embed.color = 0xFEE75C
             embed.title = user.username
             embed.set_thumbnail(url=user.avatar_url)
             embed.add_field(name='Total Stars Given', value=str(given_stars), inline=True)
@@ -149,7 +149,7 @@ class StarboardPlugin(Plugin):
         ).group_by(User).order_by(fn.SUM(fn.array_length(StarboardEntry.stars, 1)).desc()).limit(5).tuples())
 
         embed = MessageEmbed()
-        embed.color = 0xffd700
+        embed.color = 0xFEE75C
         embed.title = 'Star Stats'
         embed.add_field(name='Total Stars Given', value=total_stars, inline=True)
         embed.add_field(name='Total Starred Posts', value=total_starred_posts, inline=True)
