@@ -4,7 +4,6 @@ import inspect
 import json
 import os
 import pprint
-from re import L
 import signal
 import time
 from datetime import datetime, timedelta
@@ -58,7 +57,7 @@ class CorePlugin(Plugin):
         # Overwrite the main bot instances plugin loader so we can magicify events
         self.bot.add_plugin = self.our_add_plugin
 
-        self.spawn(self.wait_for_plugin_changes)
+        #self.spawn(self.wait_for_plugin_changes)
 
         self._wait_for_actions_greenlet = self.spawn(self.wait_for_actions)
 
@@ -76,27 +75,27 @@ class CorePlugin(Plugin):
         inst.register_trigger('listener', 'pre', functools.partial(self.on_pre, inst))
         Bot.add_plugin(self.bot, inst, *args, **kwargs)
 
-    def wait_for_plugin_changes(self):
-        import gevent_inotifyx as inotify
-
-        fd = inotify.init()
-        inotify.add_watch(fd, 'rowboat/plugins/', inotify.IN_MODIFY)
-        inotify.add_watch(fd, 'rowboat/plugins/modlog', inotify.IN_MODIFY)
-        while True:
-            events = inotify.get_events(fd)
-            for event in events:
-                # Can't reload core.py
-                if event.name.startswith('core.py'):
-                    continue
-
-                plugin_name = '{}Plugin'.format(event.name.split('.', 1)[0].title())
-                plugin = next((v for k, v in list(self.bot.plugins.items()) if k.lower() == plugin_name.lower()), None)
-                if plugin:
-                    self.log.info('Detected change in %s, reloading...', plugin_name)
-                    try:
-                        plugin.reload()
-                    except:
-                        self.log.exception('Failed to reload: ')
+    # def wait_for_plugin_changes(self):
+    #     import gevent_inotifyx as inotify
+    #
+    #     fd = inotify.init()
+    #     inotify.add_watch(fd, 'rowboat/plugins/', inotify.IN_MODIFY)
+    #     inotify.add_watch(fd, 'rowboat/plugins/modlog', inotify.IN_MODIFY)
+    #     while True:
+    #         events = inotify.get_events(fd)
+    #         for event in events:
+    #             # Can't reload core.py
+    #             if event.name.startswith('core.py'):
+    #                 continue
+    #
+    #             plugin_name = '{}Plugin'.format(event.name.split('.', 1)[0].title())
+    #             plugin = next((v for k, v in list(self.bot.plugins.items()) if k.lower() == plugin_name.lower()), None)
+    #             if plugin:
+    #                 self.log.info('Detected change in %s, reloading...', plugin_name)
+    #                 try:
+    #                     plugin.reload()
+    #                 except:
+    #                     self.log.exception('Failed to reload: ')
 
     def wait_for_actions(self):
         ps = rdb.pubsub()

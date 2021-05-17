@@ -4,6 +4,8 @@ services:
     build: ./docker/
     volumes:
       - ./.data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     environment:
       - ENV=production
     stop_grace_period: 1m

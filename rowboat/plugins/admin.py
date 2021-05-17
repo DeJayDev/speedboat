@@ -17,8 +17,8 @@ from disco.types.user import User as DiscoUser
 from disco.util.emitter import Priority
 from disco.util.functional import chunks
 from disco.util.sanitize import S
-from rapidfuzz import fuzz
 from peewee import fn
+from rapidfuzz import fuzz
 
 from rowboat.constants import (
     GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID, GREEN_TICK_EMOJI, RED_TICK_EMOJI

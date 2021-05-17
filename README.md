@@ -1,6 +1,6 @@
 # Speedboat
 
-Speedboat is a fork of rowboat: A Discord bot focused on being a highly powerful and configurable moderation and utilitarian bot for Discord. Speedboat is complete with user infractions, filtering, a web panel with advanced access and the ability to request custom analytics for your servers. Speedboat aims to eventually become a plug and play replacement for public moderation bots with a load that sacrifies speed and efficiency. Speedboat's configuration is built to feel and behave similarly to [AutoModerator](https://github.com/Deimos/AutoModerator) for reddit.
+Speedboat is a fork of rowboat: A Discord bot focused on being a highly powerful and configurable moderation and utilitarian bot for Discord. Speedboat is complete with user infractions, filtering, a web panel with advanced access and the ability to request custom analytics for your servers. Speedboat aims to eventually become a plug and play replacement for public moderation bots under such a load that speed and efficiency start to fall off. Speedboat's configuration is built to feel and behave similarly to [AutoModerator](https://github.com/Deimos/AutoModerator) for reddit.
 
 ###### Main Discord
 

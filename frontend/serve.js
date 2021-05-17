@@ -37,7 +37,7 @@ if (fs.existsSync('./ssl/certificate.pem') && fs.existsSync('./ssl/key.pem')) {
   var listener = https.createServer({
     key: fs.readFileSync('./ssl/key.pem'),
     cert: fs.readFileSync('./ssl/certificate.pem')
-  }, app).listen(Number(process.env.PORT || 443))
+  }, app).listen(443)
 } else {
   var listener = app.listen(Number(process.env.PORT || 80));
 }

@@ -1,8 +1,10 @@
+import datetime
 from random import randint
 
 import gevent
 from disco.bot import CommandLevels
 from disco.types.message import MessageTable
+from disco.util.sanitize import S
 
 from rowboat.constants import (
     GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID, GREEN_TICK_EMOJI, RED_TICK_EMOJI
@@ -56,10 +58,10 @@ class LevelPlugin(Plugin):
             ))
             
         if event.config.actions.chat:
-            event.channel.send_message(':ok_hand: {} is now level {}!'.format(
+            event.channel.send_message(S(':ok_hand: {} is now level {}!'.format(
                 event.author,
                 level
-            ))
+            )))
 
         if event.config.rewards:
             if event.config.rewards[level]:
