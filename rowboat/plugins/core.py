@@ -12,7 +12,7 @@ import humanize
 from disco.api.http import APIException
 from disco.bot import Bot
 from disco.bot.command import CommandEvent
-from disco.types.message import MessageEmbed
+from disco.types.message import MessageEmbed, ChannelType
 from disco.types.permissions import Permissions
 from disco.util.emitter import Priority, Emitter
 from disco.util.sanitize import S
@@ -390,8 +390,8 @@ class CorePlugin(Plugin):
         if event.message.author.bot:
             return
 
-        if not event.channel.type == 1:
-            if not event.message.channel.get_permissions(self.state.me).can(Permissions.SEND_MESSAGES):
+        if not event.channel.type == ChannelType.DM:
+            if not event.message.channel.get_permissions(self.state.me).can(Permissions.SEND_MESSAGES, Permissions.VIEW_CHANNEL):
                 return
 
         # If this is message for a guild, grab the guild object

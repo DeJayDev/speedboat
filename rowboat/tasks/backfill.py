@@ -1,4 +1,4 @@
-from disco.types.channel import MessageIterator
+from disco.types.channel import MessageIterator, ChannelType
 from disco.types.permissions import Permissions
 
 from rowboat.models.message import Message
@@ -34,7 +34,7 @@ def backfill_channel(task, channel_id):
             if msg.author.bot:
                 break
 
-            if not msg.channel.type == 1:
+            if msg.channel.type is not ChannelType.DM:
                 if not msg.channel.get_permissions(351776065477279745).can(Permissions.SEND_MESSAGES, Permissions.VIEW_CHANNEL):
                     break
 

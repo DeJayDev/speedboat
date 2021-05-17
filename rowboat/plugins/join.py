@@ -35,17 +35,17 @@ class JoinPlugin(Plugin):
         if verification_level is VerificationLevel.LOW:  # "Must have a verified email on their Discord account"
             # We take a "guess" that if the server has join roles enabled, they don't care about email verification.
             event.member.add_role(event.config.join_role)
-            gevent.spawn_later(event.config.join_role.low, event.member.add_role, event.config.join_role)
+            gevent.spawn_later(event.config.advanced.low, event.member.add_role, event.config.join_role)
             return
 
         if verification_level is VerificationLevel.MEDIUM:
-            gevent.spawn_later(event.config.join_role.medium, event.member.add_role, event.config.join_role)
+            gevent.spawn_later(event.config.advanced.medium, event.member.add_role, event.config.join_role)
 
         if verification_level is VerificationLevel.HIGH:
-            gevent.spawn_later(event.config.join_role.high, event.member.add_role, event.config.join_role)
+            gevent.spawn_later(event.config.advanced.high, event.member.add_role, event.config.join_role)
 
         if verification_level is VerificationLevel.EXTREME:
-            gevent.spawn_later(event.config.join_role.high, event.member.add_role, event.config.join_role)
+            gevent.spawn_later(event.config.advanced.high, event.member.add_role, event.config.join_role)
 
     @Plugin.command('debugdelay', '[length:int]', group='join', level=-1)
     def trigger_delay(self, event, length: int = None):

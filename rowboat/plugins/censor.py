@@ -5,6 +5,7 @@ from urllib.parse import unquote
 
 from disco.types.base import cached_property
 from disco.types.permissions import Permissions
+from disco.types.message import ChannelType
 from disco.util.sanitize import S
 from holster.enum import Enum
 
@@ -147,8 +148,8 @@ class CensorPlugin(Plugin):
         if event.message.author.bot:
             return
 
-        if not event.channel.type == 1:
-            if not event.message.channel.get_permissions(self.state.me).can(Permissions.SEND_MESSAGES):
+        if not event.channel.type == ChannelType.DM:
+            if not event.message.channel.get_permissions(self.state.me).can(Permissions.SEND_MESSAGES, Permissions.VIEW_CHANNEL):
                 return
 
         if event.webhook_id:

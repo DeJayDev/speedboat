@@ -247,7 +247,7 @@ class SQLPlugin(Plugin):
         else:
             chlist = list(event.guild.channels.values())
         for gch in chlist:
-            if self.state.channels[gch.id].type is ChannelType.GUILD_TEXT:
+            if self.state.channels[gch.id].type is not ChannelType.DM:
                 if self.state.channels[gch.id].get_permissions(self.state.me.id).can(Permissions.VIEW_CHANNEL):
                     channels.append(self.state.channels[gch.id])
 
@@ -422,7 +422,7 @@ class Recovery(object):
                 if msg.author.bot:
                     break
 
-                if not msg.channel.type == 1:
+                if msg.channel.type is not ChannelType.DM:
                     if not msg.channel.get_permissions(351776065477279745).can(Permissions.SEND_MESSAGES, Permissions.VIEW_CHANNEL):
                         break
 
@@ -452,7 +452,7 @@ class Backfill(object):
                 if msg.author.bot:
                     break
 
-                if not msg.channel.type == 1:
+                if not msg.channel.type == ChannelType.DM:
                     if not msg.channel.get_permissions(351776065477279745).can(Permissions.SEND_MESSAGES, Permissions.VIEW_CHANNEL):
                         break
 
