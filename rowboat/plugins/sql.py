@@ -7,7 +7,7 @@ import markovify
 import psycopg2
 import pygal
 from disco.types.base import UNSET
-from disco.types.channel import Channel as DiscoChannel, MessageIterator
+from disco.types.channel import Channel as DiscoChannel, MessageIterator, ChannelType
 from disco.types.guild import Guild as DiscoGuild
 from disco.types.message import MessageTable
 from disco.types.permissions import Permissions
@@ -247,7 +247,7 @@ class SQLPlugin(Plugin):
         else:
             chlist = list(event.guild.channels.values())
         for gch in chlist:
-            if int(self.state.channels[gch.id].type) == 0 or int(self.state.channels[gch.id].type) == 5:
+            if self.state.channels[gch.id].type is ChannelType.GUILD_TEXT:
                 if self.state.channels[gch.id].get_permissions(self.state.me.id).can(Permissions.VIEW_CHANNEL):
                     channels.append(self.state.channels[gch.id])
 
