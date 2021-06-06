@@ -554,7 +554,7 @@ class StarboardPlugin(Plugin):
                 stars = ':star2:'
             stars = stars + ' {}'.format(len(star.stars))
 
-        content = '{} <#{}> ({})'.format(
+        content = '**{}** <#{}> ({})'.format(
             stars,
             msg.channel_id,
             msg.id
@@ -562,7 +562,10 @@ class StarboardPlugin(Plugin):
 
         # Generate embed section
         embed = MessageEmbed()
-        embed.description = msg.content
+        embed.description ='{}\n\n[Jump!]({})'.format(
+            msg.content,
+            msg.url
+        )
 
         if msg.attachments:
             attach = list(msg.attachments.values())[0]
