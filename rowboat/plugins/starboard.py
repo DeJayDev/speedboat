@@ -474,7 +474,7 @@ class StarboardPlugin(Plugin):
                 event.delete()
                 return
         except AttributeError:
-            pass # /shrug
+            pass  # /shrug
 
         # Check if the board prevents self stars
         sb_id, board = event.config.get_board(event.channel_id)

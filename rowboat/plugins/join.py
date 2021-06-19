@@ -14,11 +14,12 @@ class JoinPluginConfigAdvanced(SlottedModel):
     low = Field(int, default=0)
     medium = Field(int, default=5)
     high = Field(int, default=10)
-    highest = Field(int, default=30)
+    highest = Field(int, default=30, alias='extreme')  # Disco calls it extreme, the client calls it Highest.
 
 
 class JoinPluginConfig(PluginConfig):
     join_role = Field(snowflake, default=None)
+    security = Field(bool, default=False)
     advanced = Field(JoinPluginConfigAdvanced)
     pass
 
@@ -32,6 +33,13 @@ class JoinPlugin(Plugin):
             return  # I simply do not care
 
         verification_level = event.guild.verification_level
+
+        if not event.config.security:
+            # Let's assume that if the server has join roles enabled and security disabled,
+            # they don't care about email verification.
+            event.member.add_role(event.config.join_role)
+            return
+
         if verification_level is VerificationLevel.LOW:  # "Must have a verified email on their Discord account"
             # We take a "guess" that if the server has join roles enabled, they don't care about email verification.
             event.member.add_role(event.config.join_role)
@@ -45,7 +53,7 @@ class JoinPlugin(Plugin):
             gevent.spawn_later(event.config.advanced.high, event.member.add_role, event.config.join_role)
 
         if verification_level is VerificationLevel.EXTREME:
-            gevent.spawn_later(event.config.advanced.high, event.member.add_role, event.config.join_role)
+            gevent.spawn_later(event.config.advanced.highest, event.member.add_role, event.config.join_role)
 
     @Plugin.command('debugdelay', '[length:int]', group='join', level=-1)
     def trigger_delay(self, event, length: int = None):
