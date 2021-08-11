@@ -511,6 +511,7 @@ class AdminPlugin(Plugin):
     @Plugin.command('import', '<url:str>', group='infractions', level=-1)
     def infraction_import(self, event, url):
         import requests
+        import json
         r = requests.get(url)
         try:
             infs = json.load(r.content)

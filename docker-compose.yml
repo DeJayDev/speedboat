@@ -3,15 +3,17 @@ services:
   db:
     build: ./docker/
     volumes:
-      - ./.data:/var/lib/postgresql/data
+      - ~/.speedboatdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     environment:
       - ENV=production
     stop_grace_period: 1m
   redis:
-    image: redis:6.0
+    image: redis:6.2.5-alpine
     command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
     volumes:
       - ./.data:/data
   web:
