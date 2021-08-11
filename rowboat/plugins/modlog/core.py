@@ -16,6 +16,7 @@ from disco.util.snowflake import to_unix, to_datetime
 from holster.enum import Enum
 
 from rowboat.models.guild import Guild
+from rowboat.models.message import Message, MessageArchive
 from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
 from rowboat.types import SlottedModel, Field, ListField, DictField, ChannelField, snowflake
 from rowboat.types.plugin import PluginConfig
