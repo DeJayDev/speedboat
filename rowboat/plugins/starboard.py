@@ -562,9 +562,11 @@ class StarboardPlugin(Plugin):
 
         # Generate embed section
         embed = MessageEmbed()
-        embed.description ='{}\n\n[Jump!]({})'.format(
+        embed.description ='{}\n\n[Jump!](https://discord.com/channels/{}/{}/{})'.format(
             msg.content,
-            msg.url
+            msg.guild.id,
+            msg.channel.id,
+            msg.id
         )
 
         if msg.attachments:
