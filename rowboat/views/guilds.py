@@ -99,9 +99,9 @@ def guild_z_config_update(guild):
     if data.get('starboard', {}):
         for starboard in data.get('starboard', {}).get('channels'):
             try:
-                _starboard = Channel.get(channel_id=channel, guild_id=guild.guild_id)
+                _starboard = Channel.get(channel_id=starboard, guild_id=guild.guild_id)
             except Channel.DoesNotExist:
-                return u'No channel exists with id {}'.format(channel), 400
+                return u'No channel exists with id {}'.format(starboard), 400
 
     try:
         guild.update_config(g.user.user_id, request.json['config'])

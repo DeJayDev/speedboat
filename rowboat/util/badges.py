@@ -92,3 +92,7 @@ class UserFlags:
     @FlagValue
     def verified_dev(self):
         return 1 << 17
+
+    @FlagValue
+    def certified_moderator(self):
+        return 1 << 18
