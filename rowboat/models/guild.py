@@ -6,7 +6,6 @@ from holster.enum import Enum
 from peewee import (BigIntegerField, CharField, TextField, BooleanField, DateTimeField, CompositeKey, BlobField)
 from playhouse.postgres_ext import BinaryJSONField, ArrayField
 
-from rowboat.models.user import User
 from rowboat.redis import emit
 from rowboat.sql import ModelBase
 
@@ -195,6 +194,7 @@ class GuildBan(ModelBase):
 
     @classmethod
     def ensure(cls, guild, user, reason=None):
+        from rowboat.models.user import User
         User.ensure(user)
         obj, _ = cls.get_or_create(guild_id=guild.id, user_id=user.id, defaults=dict({
             'reason': reason,
