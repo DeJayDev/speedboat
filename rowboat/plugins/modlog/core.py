@@ -16,7 +16,6 @@ from disco.util.snowflake import to_unix, to_datetime
 from holster.enum import Enum
 
 from rowboat.models.guild import Guild
-from rowboat.models.message import Message, MessageArchive
 from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
 from rowboat.types import SlottedModel, Field, ListField, DictField, ChannelField, snowflake
 from rowboat.types.plugin import PluginConfig
@@ -485,6 +484,8 @@ class ModLogPlugin(Plugin):
         if event.channel_id in event.config.ignored_channels:
             return
 
+        from rowboat.models.message import Message
+
         try:
             msg = Message.get(Message.id == event.id)
         except Message.DoesNotExist:
@@ -504,6 +505,8 @@ class ModLogPlugin(Plugin):
     def on_message_delete(self, event):
         if event.guild.id in self.hushed:
             return
+
+        from rowboat.models.message import Message
 
         try:
             msg = Message.get(Message.id == event.id)
@@ -551,6 +554,7 @@ class ModLogPlugin(Plugin):
         if event.guild.id in self.hushed:
             return
 
+        from rowboat.models.message import MessageArchive
         archive = MessageArchive.create_from_message_ids(event.ids)
         self.log_action(Actions.MESSAGE_DELETE_BULK, event, log=archive.url, channel=channel, count=len(event.ids))
 
