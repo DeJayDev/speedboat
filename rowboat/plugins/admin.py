@@ -147,7 +147,6 @@ class AdminPlugin(Plugin):
 
                 guild.delete_ban(item.user_id)
 
-                # TODO: perhaps join on users above and use username from db
                 self.call(
                     'ModLogPlugin.log_action_ext',
                     Actions.MEMBER_TEMPBAN_EXPIRE,
@@ -680,7 +679,7 @@ class AdminPlugin(Plugin):
 
     @Plugin.command('unmute', '<user:user|snowflake>', aliases=['umute'], level=CommandLevels.MOD)
     def unmute(self, event, user):
-        # TODO: eventually we should pull the role from the GuildMemberBackup if they arent in server
+        # TODO: Modify their GuildMemberBackup if we can't get guild member
         member = event.guild.get_member(user)
 
         if member:

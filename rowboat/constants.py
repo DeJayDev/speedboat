@@ -10,7 +10,7 @@ GREEN_TICK_EMOJI = 'green_tick:{}'.format(GREEN_TICK_EMOJI_ID)
 RED_TICK_EMOJI = 'red_tick:{}'.format(RED_TICK_EMOJI_ID)
 STAR_EMOJI = '\U00002B50'
 
-STATUS_EMOJI = {  # TODO: Update these
+STATUS_EMOJI = {
     Status.ONLINE: ':online:872578963896156252',
     Status.IDLE: ':idle:872578994028023869',
     Status.DND: ':dnd:872578984238546945',

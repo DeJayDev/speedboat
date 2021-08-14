@@ -179,10 +179,10 @@ class UtilitiesPlugin(Plugin):
         except Message.DoesNotExist:
             raise CommandFail("I've never seen {}".format(user))
 
-        raise CommandSuccess('I last saw {} {} (at {})'.format( #TODO: Prettify this timestamp response like in inf latest
+        raise CommandSuccess('I last saw {} {} (at {})'.format(
             user,
             humanize.naturaltime(datetime.utcnow() - msg.timestamp),
-            msg.timestamp
+            msg.timestamp.strftime("%Y-%m-%d %H:%m:%S")
         ))
 
     @Plugin.command('search', '<query:str...>', global_=True)

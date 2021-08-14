@@ -431,7 +431,7 @@ class CorePlugin(Plugin):
         event.user_level = self.get_level(event.guild, event.author) if event.guild else 0
 
         # Grab whether this user is a global admin
-        # TODO: cache this
+        # TODO: Get this from the database instead of Redis
         global_admin = rdb.sismember('global_admins', event.author.id)
 
         # Iterate over commands and find a match
