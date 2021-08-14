@@ -401,7 +401,12 @@ class AdminPlugin(Plugin):
         if query and isinstance(query, list) and isinstance(query[0], DiscoUser):
             query = query[0].id
         elif query:
-            query = ' '.join(query)
+            tmpq = query
+            for i in tmpq:
+                if isinstance(i, DiscoUser):
+                    query = query + i.id
+                elif isinstance(i, str):
+                    query = query + i
 
         if query and (isinstance(query, int) or query.isdigit()):
             q &= (
@@ -1404,7 +1409,7 @@ class AdminPlugin(Plugin):
             Permissions.MANAGE_NICKNAMES,
             Permissions.MANAGE_ROLES,
             Permissions.MANAGE_WEBHOOKS,
-            Permissions.MANAGE_EMOJIS,
+            Permissions.MANAGE_EMOJIS_AND_STICKERS,
         ))
 
         # Sanity check

@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import peewee
 from disco.api.http import APIException
 from disco.bot import CommandLevels
-from disco.types.message import MessageEmbed
+from disco.types.message import ActionRow, ButtonStyles, ComponentTypes, MessageEmbed
 from peewee import fn, JOIN
 
 from rowboat.constants import STAR_EMOJI, ERR_UNKNOWN_MESSAGE
@@ -92,7 +92,9 @@ class StarboardPlugin(Plugin):
             raise CommandFail('No starboard message with that id')
 
         content, embed = self.get_embed(star, source_msg, sb_config)
-        event.msg.reply(content, embed=embed)
+        row = ActionRow()
+        row.add_component(label='Jump to Message', type=ComponentTypes.BUTTON, style=ButtonStyles.LINK, url=source_msg.url)
+        event.msg.reply(content, embed=embed, components=[row.to_dict()])
 
     @Plugin.command('stats', '[user:user]', group='stars', level=CommandLevels.MOD)
     def stars_stats(self, event, user=None):
@@ -562,12 +564,7 @@ class StarboardPlugin(Plugin):
 
         # Generate embed section
         embed = MessageEmbed()
-        embed.description ='{}\n\n[Jump!](https://discord.com/channels/{}/{}/{})'.format(
-            msg.content,
-            msg.guild.id,
-            msg.channel.id,
-            msg.id
-        )
+        embed.description ='{}'.format(msg.content)
 
         if msg.attachments:
             attach = list(msg.attachments.values())[0]
@@ -583,12 +580,12 @@ class StarboardPlugin(Plugin):
         author = msg.guild.get_member(msg.author)
         if author:
             embed.set_author(
-                name=author.name,
+                name=author,
                 icon_url=author.user.avatar_url
             )
         else:
             embed.set_author(
-                name=msg.author.username,
+                name=msg.author,
                 icon_url=msg.author.avatar_url)
 
         embed.timestamp = msg.timestamp.isoformat()

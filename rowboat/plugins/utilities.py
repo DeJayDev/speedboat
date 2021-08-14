@@ -269,7 +269,7 @@ class UtilitiesPlugin(Plugin):
         event.msg.reply('', embed=embed)
 
     @Plugin.command('info', '[user:user|snowflake]', aliases='whois')
-    def info(self, event, user=None):
+    def info(self, event, user: User=None):
         if not user:
             user = event.author
         else:
@@ -299,22 +299,22 @@ class UtilitiesPlugin(Plugin):
 
         member = event.guild.get_member(user.id) if event.guild else None
 
-        if user.presence:  # I couldn't get this to work w/o it lol
-            emoji, status = get_status_emoji(user.presence)
-            content.append('Status: <{}> {}'.format(emoji, status))
-            if user.presence.activity and user.presence.activity.name:
-                if user.presence.activity.type is ActivityTypes.DEFAULT:
-                    content.append('{}'.format(user.presence.activity.name))
-                if user.presence.activity.type is ActivityTypes.STREAMING:
-                    content.append('Streaming: [{}]({})'.format(user.presence.activity.name, user.presence.activity.url))
-                if user.presence.activity.type is ActivityTypes.LISTENING:
-                    content.append('Listening to {} on Spotify'.format(user.presence.activity.details))
-                if user.presence.activity.type is ActivityTypes.WATCHING:
-                    content.append('Watching: {}'.format(user.presence.activity.name))
-                if user.presence.activity.type is ActivityTypes.CUSTOM:
-                    content.append('Custom Status: {}'.format(user.presence.activity.state))
-                if user.presence.activity.type is ActivityTypes.COMPETING:
-                    content.append('Competing: {}'.format(user.presence.activity.name))
+        #if user.presence:  # I couldn't get this to work w/o it lol
+        #    emoji, status = get_status_emoji(user.presence)
+        #    content.append('Status: <{}> {}'.format(emoji, status))
+        #    if user.presence.activity and user.presence.activity.name:
+        #        if user.presence.activity.type is ActivityTypes.DEFAULT:
+        #            content.append('{}'.format(user.presence.activity.name))
+        #        if user.presence.activity.type is ActivityTypes.STREAMING:
+        #            content.append('Streaming: [{}]({})'.format(user.presence.activity.name, user.presence.activity.url))
+        #        if user.presence.activity.type is ActivityTypes.LISTENING:
+        #            content.append('Listening to {} on Spotify'.format(user.presence.activity.details))
+        #        if user.presence.activity.type is ActivityTypes.WATCHING:
+        #            content.append('Watching: {}'.format(user.presence.activity.name))
+        #        if user.presence.activity.type is ActivityTypes.CUSTOM:
+        #            content.append('Custom Status: {}'.format(user.presence.activity.state))
+        #        if user.presence.activity.type is ActivityTypes.COMPETING:
+        #            content.append('Competing: {}'.format(user.presence.activity.name))
 
         if user.public_flags:
             badges = ''
