@@ -15,7 +15,7 @@ ENV = config['ENV']
 DSN = config['DSN']
 REV = str(subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip())
 
-VERSION = f'1.6+{REV}'  # Ladies and gentlemen the only place I will use an fstring.
+VERSION = f'1.9+{REV}'  # Ladies and gentlemen the only place I will use an fstring.
 
 sentry.init(
     dsn=DSN,

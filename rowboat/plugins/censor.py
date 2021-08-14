@@ -162,7 +162,6 @@ class CensorPlugin(Plugin):
         tags = {'guild_id': event.guild.id, 'channel_id': event.channel.id}
         with timed('rowboat.plugin.censor.duration', tags=tags):
             try:
-                # TODO: perhaps imap here? how to raise exception then?
                 for config in configs:
                     if config.filter_zalgo:
                         self.filter_zalgo(event, config)

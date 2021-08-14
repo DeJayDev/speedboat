@@ -1,9 +1,9 @@
 import functools
 import json
+import yaml
 import operator
 from functools import reduce
 
-import yaml
 from flask import Blueprint, request, g, jsonify
 
 from rowboat.models.channel import Channel

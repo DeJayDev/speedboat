@@ -109,8 +109,8 @@ def add_global_admin(user_id):
     from rowboat.models.user import User
     init_db(ENV)
     rdb.sadd('global_admins', user_id)
-    User.update(admin=True).where(User.user_id == user_id).execute()
-    print('Ok, added {} as a global admin'.format(user_id)) # TODO: Show username#discrim
+    user = User.update(admin=True).where(User.user_id == user_id).execute()
+    print('Ok, added {} as a global admin'.format(str(user))) # Not sure if I need to str here
 
 
 @cli.command('wh-add')

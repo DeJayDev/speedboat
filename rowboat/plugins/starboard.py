@@ -91,9 +91,7 @@ class StarboardPlugin(Plugin):
         except:
             raise CommandFail('No starboard message with that id')
 
-        content, embed = self.get_embed(star, source_msg, sb_config)
-        row = ActionRow()
-        row.add_component(label='Jump to Message', type=ComponentTypes.BUTTON, style=ButtonStyles.LINK, url=source_msg.url)
+        content, embed, row = self.get_embed(star, source_msg, sb_config)
         event.msg.reply(content, embed=embed, components=[row.to_dict()])
 
     @Plugin.command('stats', '[user:user]', group='stars', level=CommandLevels.MOD)
@@ -370,7 +368,6 @@ class StarboardPlugin(Plugin):
                     star.message_id)
             except:
                 self.log.exception('Star message went missing %s / %s: ', star.message.channel_id, star.message_id)
-                # TODO: really delete this
                 self.delete_star(star, update=True)
                 continue
 
@@ -410,14 +407,15 @@ class StarboardPlugin(Plugin):
 
     def post_star(self, star, source_msg, starboard_id, config):
         # Generate the embed and post it
-        content, embed = self.get_embed(star, source_msg, config)
+        content, embed, row = self.get_embed(star, source_msg, config)
 
         if not star.star_message_id:
             try:
                 msg = self.client.api.channels_messages_create(
                         starboard_id,
                         content,
-                        embed=embed)
+                        embed=embed,
+                        components=[row.to_dict()])
             except:
                 self.log.exception('Failed to post starboard message: ')
                 return
@@ -427,7 +425,8 @@ class StarboardPlugin(Plugin):
                     star.star_channel_id,
                     star.star_message_id,
                     content,
-                    embed=embed)
+                    embed=embed,
+                    components=[row.to_dict()])
             except APIException as e:
                 # If we get a 10008, assume this message was deleted
                 if e.code == ERR_UNKNOWN_MESSAGE:
@@ -591,4 +590,11 @@ class StarboardPlugin(Plugin):
         embed.timestamp = msg.timestamp.isoformat()
         embed.color = config.get_color(len(star.stars))
 
-        return content, embed
+        row = ActionRow()
+        row.add_component(label='Jump to Message', type=ComponentTypes.BUTTON, style=ButtonStyles.LINK, url='https://discord.com/channels/{}/{}/{}'.format(
+            msg.guild.id,
+            msg.channel_id,
+            msg.id
+        ))
+
+        return content, embed, row
