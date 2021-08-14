@@ -425,8 +425,7 @@ class StarboardPlugin(Plugin):
                     star.star_channel_id,
                     star.star_message_id,
                     content,
-                    embed=embed,
-                    components=[row.to_dict()])
+                    embed=embed)
             except APIException as e:
                 # If we get a 10008, assume this message was deleted
                 if e.code == ERR_UNKNOWN_MESSAGE:
