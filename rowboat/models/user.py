@@ -524,12 +524,12 @@ class Infraction(ModelBase):
 @ModelBase.register
 class StarboardBlock(ModelBase):
     guild_id = BigIntegerField()
-    user_id = BigIntegerField() # Technically this can be a channel too but, I'm not sure how to do that.
+    entity_id = BigIntegerField() # Technically this can be a channel too but, I'm not sure how to do that.
     actor_id = BigIntegerField()
 
     class Meta:
         indexes = (
-            (('guild_id', 'user_id'), True),
+            (('guild_id', 'entity_id'), True),
         )
 
 
