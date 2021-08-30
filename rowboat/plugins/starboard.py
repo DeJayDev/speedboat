@@ -221,7 +221,7 @@ class StarboardPlugin(Plugin):
     def stars_unblock(self, event, entity):
         count = StarboardBlock.delete().where(
             (StarboardBlock.guild_id == event.guild.id) &
-            (StarboardBlock.user_id == entity.id)
+            (StarboardBlock.entity_id == entity.id)
         ).execute()
 
         if not count:
@@ -457,9 +457,9 @@ class StarboardPlugin(Plugin):
                 join_type=JOIN.LEFT_OUTER,
                 on=(
                     (
-                        (Message.author_id == StarboardBlock.user_id) |
-                        (Message.channel_id == StarboardBlock.user_id) | # Shit naming, but it's the best I got
-                        (StarboardBlock.user_id == event.user_id)
+                        (Message.author_id == StarboardBlock.entity_id) |
+                        (Message.channel_id == StarboardBlock.entity_id) | # Shit naming, but it's the best I got
+                        (StarboardBlock.entity_id == event.user_id)
                     ) &
                     (Message.guild_id == StarboardBlock.guild_id)
                 )
@@ -471,7 +471,7 @@ class StarboardPlugin(Plugin):
 
         # If either the reaction or message author is blocked, prevent this action
         try:
-            if msg.starboardblock.user_id:
+            if msg.starboardblock.entity_id:
                 event.delete()
                 return
         except AttributeError:
