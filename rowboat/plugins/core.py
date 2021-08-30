@@ -7,6 +7,7 @@ import pprint
 import signal
 import time
 from datetime import datetime, timedelta
+from disco.gateway.events import MessageCreate
 
 import humanize
 from disco.api.http import APIException
@@ -382,7 +383,7 @@ class CorePlugin(Plugin):
         return user_level
 
     @Plugin.listen('MessageCreate')
-    def on_message_create(self, event):
+    def on_message_create(self, event: MessageCreate):
         """
         This monstrosity of a function handles the parsing and dispatching of
         commands.
@@ -390,7 +391,7 @@ class CorePlugin(Plugin):
         if event.message.author.bot:
             return
 
-        if not event.channel.type == ChannelType.DM:
+        if not event.guild_id:
             if not event.message.channel.get_permissions(self.state.me).can(Permissions.SEND_MESSAGES, Permissions.VIEW_CHANNEL):
                 return
 
