@@ -325,27 +325,27 @@ class StarboardEntry(ModelBase):
         cls.raw(sql, user_id, user_id, message_id, user_id).execute()
 
     @classmethod
-    def block_user(cls, user_id):
+    def block(cls, entity_id):
         sql = '''
             UPDATE starboard_entries
                 SET stars = array_remove(stars, %s),
                     blocked_stars = array_append(blocked_stars, %s),
                 WHERE starboard_entries.stars @> ARRAY[%s]
         '''
-        cls.raw(sql, user_id, user_id, user_id)
+        cls.raw(sql, entity_id, entity_id, entity_id)
 
         StarboardEntry.update(
             blocked=True,
         ).where(
             (StarboardEntry.message_id << (
                 StarboardEntry.select().join(Message).where(
-                    (Message.author_id == user_id)
+                    (Message.author_id == entity_id)
                 )
             ))
         ).execute()
 
     @classmethod
-    def unblock_user(cls, user_id):
+    def unblock(cls, entity_id):
         sql = '''
             UPDATE starboard_entries
                 SET stars = array_append(stars, %s),
@@ -353,7 +353,7 @@ class StarboardEntry(ModelBase):
                     dirty = true
                 WHERE starboard_entries.stars @> ARRAY[%s]
         '''
-        cls.raw(sql, user_id, user_id, user_id)
+        cls.raw(sql, entity_id, entity_id, entity_id)
 
         StarboardEntry.update(
             dirty=True,
@@ -361,7 +361,7 @@ class StarboardEntry(ModelBase):
         ).where(
             (StarboardEntry.message_id << (
                 StarboardEntry.select().join(Message).where(
-                    (Message.author_id == user_id)
+                    (Message.author_id == entity_id)
                 )
             )) & (StarboardEntry.blocked == 1)
         ).execute()
