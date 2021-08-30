@@ -193,50 +193,50 @@ class StarboardPlugin(Plugin):
         self.queue_update(event.guild.id, event.config)
         raise CommandSuccess('Forcing an update on message {}'.format(mid))
 
-    @Plugin.command('block', '<user:user>', group='stars', level=CommandLevels.MOD)
-    def stars_block(self, event, user):
+    @Plugin.command('block', '<entity:user|channel>', group='stars', level=CommandLevels.MOD)
+    def stars_block(self, event, entity):
         _, created = StarboardBlock.get_or_create(
             guild_id=event.guild.id,
-            user_id=user.id,
+            user_id=entity.id,
             defaults={
                 'actor_id': event.author.id,
             })
 
         if not created:
-            raise CommandFail('{} is already blocked from the starboard'.format(
-                user,
+            raise CommandFail('{} is already not allowed on the starboard'.format(
+                entity,
             ))
 
         # Update the starboard, remove stars and posts
-        StarboardEntry.block_user(user.id)
+        StarboardEntry.block(entity.id)
 
         # Finally, queue an update for the guild
         self.queue_update(event.guild.id, event.config)
 
-        raise CommandSuccess('Blocked {} from the starboard'.format(
-            user,
+        raise CommandSuccess('Disallowed {} from the starboard'.format(
+            entity,
         ))
 
-    @Plugin.command('unblock', '<user:user>', group='stars', level=CommandLevels.MOD)
-    def stars_unblock(self, event, user):
+    @Plugin.command('unblock', '<entity:user|channel>', group='stars', level=CommandLevels.MOD)
+    def stars_unblock(self, event, entity):
         count = StarboardBlock.delete().where(
             (StarboardBlock.guild_id == event.guild.id) &
-            (StarboardBlock.user_id == user.id)
+            (StarboardBlock.user_id == entity.id)
         ).execute()
 
         if not count:
-            raise CommandFail('{} was not blocked from the starboard'.format(
-                user,
+            raise CommandFail('{} is already allowed on the starboard'.format(
+                entity,
             ))
 
         # Reenable posts and stars for this user
-        StarboardEntry.unblock_user(user.id)
+        StarboardEntry.unblock(entity.id)
 
         # Finally, queue an update for the guild
         self.queue_update(event.guild.id, event.config)
 
-        raise CommandSuccess('Unblocked {} from the starboard'.format(
-            user,
+        raise CommandSuccess('Allowed {} on the starboard'.format(
+            entity,
         ))
 
     @Plugin.command('unhide', '<mid:snowflake>', group='stars', level=CommandLevels.MOD)
@@ -458,6 +458,7 @@ class StarboardPlugin(Plugin):
                 on=(
                     (
                         (Message.author_id == StarboardBlock.user_id) |
+                        (Message.channel_id == StarboardBlock.user_id) | # Shit naming, but it's the best I got
                         (StarboardBlock.user_id == event.user_id)
                     ) &
                     (Message.guild_id == StarboardBlock.guild_id)
