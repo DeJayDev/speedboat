@@ -524,7 +524,7 @@ class Infraction(ModelBase):
 @ModelBase.register
 class StarboardBlock(ModelBase):
     guild_id = BigIntegerField()
-    user_id = BigIntegerField()
+    user_id = BigIntegerField() # Technically this can be a channel too but, I'm not sure how to do that.
     actor_id = BigIntegerField()
 
     class Meta:
