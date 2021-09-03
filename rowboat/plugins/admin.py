@@ -589,7 +589,7 @@ class AdminPlugin(Plugin):
 
         return True
 
-    @Plugin.command('mute', '<user:user|snowflake> [reason:str...]', level=CommandLevels.MOD)
+    @Plugin.command('mute', '<user:user|snowflake> [duration:str] [reason:str...]', level=CommandLevels.MOD)
     @Plugin.command('tempmute', '<user:user|snowflake> <duration:str> [reason:str...]', level=CommandLevels.MOD, aliases=['timeout'])
     def tempmute(self, event, user, duration=None, reason=None):
         if not duration and reason:
@@ -950,8 +950,8 @@ class AdminPlugin(Plugin):
         raise CommandSuccess('Ok, the running clean was cancelled')
 
     @Plugin.command('all', '[size:int]', level=CommandLevels.MOD, group='clean')
-    @Plugin.command('user', '<user:user> [size:int]', level=CommandLevels.MOD, group='clean')
-    def clean(self, event, user=None, size=25, typ=None, mode='all'):
+    @Plugin.command('user', '<user:user> [size:int]', level=CommandLevels.MOD, group='clean', context={'mode': 'user'})
+    def clean(self, event, user=None, size=25, mode='all'):
         """
         Removes messages
         """

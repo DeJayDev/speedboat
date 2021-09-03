@@ -90,7 +90,7 @@ class Message(ModelBase):
             id=obj.id,
             defaults=dict(
                 channel_id=obj.channel_id,
-                guild_id=(obj.guild and obj.guild.id),
+                guild_id=(obj.guild_id if obj.guild_id else None),
                 author=User.from_disco_user(obj.author),
                 content=obj.with_proper_mentions,
                 timestamp=obj.timestamp,
@@ -120,7 +120,7 @@ class Message(ModelBase):
         return {
             'id': obj.id,
             'channel_id': obj.channel_id,
-            'guild_id': (obj.guild and obj.guild.id),
+            'guild_id': (obj.guild_id if obj.guild_id else None),
             'author': User.from_disco_user(obj.author),
             'content': obj.with_proper_mentions,
             'timestamp': obj.timestamp,
