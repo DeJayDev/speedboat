@@ -247,19 +247,19 @@ class UtilitiesPlugin(Plugin):
         content.append('Text: {}'.format(text_count))
         content.append('Voice: {}'.format(voice_count))
 
-        content.append('\n**\u276F Members**')
-        status_counts = defaultdict(int)
-        for member in list(guild.members.values()):
-            if not member.user.presence:
-                status = Status.OFFLINE
-            else:
-                status = member.user.presence.status
-            status_counts[status] += 1
+        #content.append('\n**\u276F Members**')
+        #status_counts = defaultdict(int)
+        #for member in list(guild.members.values()):
+        #    if not member.user.presence:
+        #        status = Status.OFFLINE
+        #    else:
+        #        status = member.user.presence.status
+        #    status_counts[status] += 1
 
-        for status, count in sorted(list(status_counts.items()), key=lambda i: str(i[0]), reverse=True):
-            content.append('<{}> - {}'.format(
-                STATUS_EMOJI[status], count
-            ))
+        #for status, count in sorted(list(status_counts.items()), key=lambda i: str(i[0]), reverse=True):
+        #    content.append('<{}> - {}'.format(
+        #        STATUS_EMOJI[status], count
+        #    ))
 
         embed = MessageEmbed()
         if guild.icon:

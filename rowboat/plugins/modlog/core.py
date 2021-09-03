@@ -494,12 +494,12 @@ class ModLogPlugin(Plugin):
         if not event.channel or not event.author:
             return
 
-        if event.content is not UNSET and msg.content != event.with_proper_mentions:
+        if event.content is not UNSET and msg.content != event.message.with_proper_mentions:
             self.log_action(
                 Actions.MESSAGE_EDIT,
                 event,
                 before=filter_urls(msg.content),
-                after=filter_urls(event.with_proper_mentions))
+                after=filter_urls(event.message.with_proper_mentions))
 
     @Plugin.listen('MessageDelete')
     def on_message_delete(self, event):
