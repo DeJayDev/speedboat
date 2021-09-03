@@ -145,12 +145,8 @@ class CensorPlugin(Plugin):
         if author.id == self.state.me.id:
             return
 
-        if event.message.author.bot:
+        if event.message.author.bot or event.channel.type is ChannelType.DM:
             return
-
-        if not event.channel.type == ChannelType.DM:
-            if not event.message.channel.get_permissions(self.state.me).can(Permissions.SEND_MESSAGES, Permissions.VIEW_CHANNEL):
-                return
 
         if event.webhook_id:
             return

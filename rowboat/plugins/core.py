@@ -391,7 +391,7 @@ class CorePlugin(Plugin):
         if event.message.author.bot:
             return
 
-        if not event.guild_id:
+        if event.guild_id:
             if not event.message.channel.get_permissions(self.state.me).can(Permissions.SEND_MESSAGES, Permissions.VIEW_CHANNEL):
                 return
 
