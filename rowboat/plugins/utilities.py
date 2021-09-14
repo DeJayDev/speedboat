@@ -200,10 +200,10 @@ class UtilitiesPlugin(Plugin):
 
         if '#' in query:
             username, discrim = query.rsplit('#', 1)
-            if discrim.isdigit():
+            if discrim is not None:
                 queries.append((
                     (User.username == username) &
-                    (User.discriminator == int(discrim))))
+                    (User.discriminator == discrim)))
 
         users = User.select().where(reduce(operator.or_, queries)).limit(10)
         if len(users) == 0:
