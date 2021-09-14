@@ -57,7 +57,7 @@ class SQLPlugin(Plugin):
             updates['username'] = event.user.username
 
         if event.user.discriminator != UNSET:
-            updates['discriminator'] = int(event.user.discriminator)
+            updates['discriminator'] = event.user.discriminator
             
         if event.user.bot:
             return
