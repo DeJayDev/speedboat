@@ -1,4 +1,4 @@
--e git+https://github.com/elderlabs/betterdisco@feb02631a4cbfe2e1be9bd6490596200b847a412#egg=disco-py
+-e git+https://github.com/elderlabs/betterdisco@247608a26bbe3f7484047181086ddc225ca095cc#egg=disco-py
 -e git+https://github.com/DeJayDev/holster#egg=holster
 -e git+https://github.com/elderlabs/pygal#egg=pygal
 -e git+https://github.com/wenmin-wu/dominant-colors-py#egg=dominantcolors

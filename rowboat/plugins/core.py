@@ -755,7 +755,7 @@ class CorePlugin(Plugin):
         ping = (time.time() - pre) * 1000
         msg.edit(":eyes: `BOT: {}ms` `API: {}ms`".format(int(post), int(ping)))
 
-    @Plugin.command('help', '[user:user|snowflake]')
+    @Plugin.command('plsgivehelp', '[user:user|snowflake]')
     def help(self, event, user=None):
         if not user:
             user = event.msg.author
