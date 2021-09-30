@@ -408,7 +408,7 @@ class CorePlugin(Plugin):
 
         # If the guild has configuration, use that (otherwise use defaults)
         if config and config.commands:
-            if config.commands.get('prefixes'):
+            if config.commands.prefixes:
                 commands = list(self.bot.get_commands_for_message(
                 config.commands.mention,
                 {},
