@@ -47,6 +47,7 @@ class CommandOverrideConfig(SlottedModel):
 
 class CommandsConfig(SlottedModel):
     prefix = Field(str, default='')
+    prefixes = Field(list, default=[])
     mention = Field(bool, default=False)
     overrides = Field(raw)
 
