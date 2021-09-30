@@ -408,11 +408,18 @@ class CorePlugin(Plugin):
 
         # If the guild has configuration, use that (otherwise use defaults)
         if config and config.commands:
-            commands = list(self.bot.get_commands_for_message(
+            if config.commands.get('prefixes'):
+                commands = list(self.bot.get_commands_for_message(
                 config.commands.mention,
                 {},
-                config.commands.prefix,
+                config.commands.prefixes, # Might break commands, might not :)
                 event.message))
+            else:
+                commands = list(self.bot.get_commands_for_message(
+                    config.commands.mention,
+                    {},
+                    config.commands.prefix,
+                    event.message))
         elif guild_id:
             # Otherwise, default to requiring mentions
             commands = list(self.bot.get_commands_for_message(True, {}, '', event.message))
