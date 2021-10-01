@@ -389,9 +389,8 @@ class UtilitiesPlugin(Plugin):
         except:
             avatar = user.get_avatar_url()  # This fails if the user has never been seen by speedboat.
 
-        embed.set_author(name='{}#{} ({})'.format(
-            user.username,
-            user.discriminator,
+        embed.set_author(name='{} ({})'.format(
+            str(user),
             user.id,
         ), icon_url=avatar)
 
