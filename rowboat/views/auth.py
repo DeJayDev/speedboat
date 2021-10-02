@@ -74,4 +74,4 @@ def auth_discord_callback():
 @auth.route('/@me')
 @authed
 def auth_me():
-    return jsonify(g.user)
+    return jsonify(g.user.serialize(us=True))
