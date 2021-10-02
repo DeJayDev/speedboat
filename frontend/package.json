@@ -21,7 +21,7 @@
     "css-loader": "^6.3.0",
     "webpack": "^5.56.0",
     "webpack-cli": "^4.8.0",
-    "axios": "^0.22.0",
+    "axios": "^0.21.2",
     "brace": "^0.11.1",
     "eventemitter3": "^4.0.7",
     "express": "^4.17.1",
