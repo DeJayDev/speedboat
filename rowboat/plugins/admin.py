@@ -968,7 +968,7 @@ class AdminPlugin(Plugin):
         ).join(User).order_by(Message.timestamp.desc()).limit(size)
 
         if mode == 'user':
-            query.where((User.user_id == user.id))
+            query = query.where((User.user_id == user.id))
 
         messages = [i[0] for i in query.tuples()]
 
