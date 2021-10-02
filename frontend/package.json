@@ -11,18 +11,17 @@
   "browserslist": [
     "defaults"
   ],
+  "packageManager": "yarn@3.0.2",
   "dependencies": {
     "@babel/cli": "^7.15.7",
     "@babel/core": "^7.15.5",
+    "@babel/plugin-transform-react-jsx": "^7.14.9",
     "@babel/preset-env": "^7.15.6",
     "@babel/preset-react": "^7.14.5",
-    "@babel/plugin-transform-react-jsx": "^7.14.9",
-    "babel-loader": "^8.2.2",
-    "css-loader": "^6.3.0",
-    "webpack": "^5.56.0",
-    "webpack-cli": "^4.8.0",
     "axios": "^0.22.0",
+    "babel-loader": "^8.2.2",
     "brace": "^0.11.1",
+    "css-loader": "^6.3.0",
     "eventemitter3": "^4.0.7",
     "express": "^4.17.1",
     "http-proxy-middleware": "^2.0.1",
@@ -32,7 +31,9 @@
     "react-dom": "^17.0.2",
     "react-router": "^5.2.1",
     "react-router-dom": "^5.3.0",
-    "react-table": "6.11.5"
+    "react-table": "6.11.5",
+    "webpack": "^5.56.0",
+    "webpack-cli": "^4.8.0"
   },
   "scripts": {
     "serve": "node serve.js",

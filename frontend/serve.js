@@ -42,6 +42,4 @@ if (fs.existsSync('./ssl/certificate.pem') && fs.existsSync('./ssl/key.pem')) {
   var listener = app.listen(Number(process.env.PORT || 80));
 }
 
-console.log('Running on: ' + ip + ':' + listener.address().port)
-
-// get a discord token and log into Discord
+console.log('Running on: ' + ip + ':' + listener.address()?.port)
