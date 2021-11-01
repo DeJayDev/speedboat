@@ -7,6 +7,7 @@ from functools import reduce
 
 from disco.util.emitter import Priority
 from gevent.lock import Semaphore
+from holster.enum import Enum
 
 from rowboat.models.message import Message, EMOJI_RE
 from rowboat.models.user import Infraction
@@ -22,13 +23,14 @@ from rowboat.util.stats import timed
 UPPER_RE = re.compile('[A-Z]')
 
 
-class PunishmentType:
-    NONE = 'NONE'
-    MUTE = 'MUTE'
-    KICK = 'KICK'
-    TEMPBAN = 'TEMPBAN'
-    BAN = 'BAN'
-    TEMPMUTE = 'TEMPMUTE'
+PunishmentType = Enum(
+    'NONE',
+    'MUTE',
+    'KICK',
+    'TEMPBAN',
+    'BAN',
+    'TEMPMUTE'
+)
 
 
 class CheckConfig(SlottedModel):
