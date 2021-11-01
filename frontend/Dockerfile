@@ -1,8 +1,8 @@
-FROM node:12
+FROM node:14
 
 WORKDIR /opt/frontend
 
-COPY package.json /opt/frontend
-RUN npm install
+COPY package.json yarn.lock /opt/frontend/
+RUN yarn && yarn
 
 COPY . .
