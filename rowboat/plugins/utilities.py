@@ -317,7 +317,7 @@ class UtilitiesPlugin(Plugin):
         if newest_msg:
             content.append('\n **\u276F Activity**')
             content.append('Last Message: <t:{0}:R> (<t:{0}:f>)'.format(
-                int(to_datetime(newest_msg).timestamp())
+                int((to_datetime(newest_msg) - timedelta(hours=5)).timestamp())
             ))
             # content.append('First Message: {} ({})'.format(
             #    humanize.naturaltime(datetime.utcnow() - to_datetime(oldest_msg)),
