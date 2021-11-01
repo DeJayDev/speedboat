@@ -32,7 +32,7 @@ class SentryPlugin(object):
     """
 
     def handle_exception(self, greenlet, event):
-        extra = { }
+        extra = {}
 
         if isinstance(greenlet.exception, MetaException):
             extra.update(greenlet.exception.metadata)

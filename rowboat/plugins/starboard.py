@@ -40,9 +40,9 @@ class ChannelConfig(SlottedModel):
         ratio = min(count / float(self.star_color_max), 1.0)
 
         return (
-            (255 << 16) +
-            (int((194 * ratio) + (253 * (1 - ratio))) << 8) +
-            int((12 * ratio) + (247 * (1 - ratio))))
+                (255 << 16) +
+                (int((194 * ratio) + (253 * (1 - ratio))) << 8) +
+                int((12 * ratio) + (247 * (1 - ratio))))
 
 
 class StarboardConfig(PluginConfig):
@@ -75,8 +75,8 @@ class StarboardPlugin(Plugin):
                 (Message.guild_id == event.guild.id) &
                 (~(StarboardEntry.star_message_id >> None)) &
                 (
-                    (Message.id == mid) |
-                    (StarboardEntry.star_message_id == mid)
+                        (Message.id == mid) |
+                        (StarboardEntry.star_message_id == mid)
                 )
             ).get()
         except StarboardEntry.DoesNotExist:
@@ -295,9 +295,9 @@ class StarboardPlugin(Plugin):
 
             if set(users) != set(star.stars):
                 self.log.warning('star %s had outdated reactors list (%s vs %s)',
-                    star.message_id,
-                    len(users),
-                    len(star.stars))
+                                 star.message_id,
+                                 len(users),
+                                 len(star.stars))
 
                 StarboardEntry.update(
                     stars=users,
@@ -412,10 +412,10 @@ class StarboardPlugin(Plugin):
         if not star.star_message_id:
             try:
                 msg = self.client.api.channels_messages_create(
-                        starboard_id,
-                        content,
-                        embed=embed,
-                        components=[row.to_dict()])
+                    starboard_id,
+                    content,
+                    embed=embed,
+                    components=[row.to_dict()])
             except:
                 self.log.exception('Failed to post starboard message: ')
                 return
@@ -563,7 +563,7 @@ class StarboardPlugin(Plugin):
 
         # Generate embed section
         embed = MessageEmbed()
-        embed.description ='{}'.format(msg.content)
+        embed.description = '{}'.format(msg.content)
 
         if msg.attachments:
             attach = list(msg.attachments.values())[0]
@@ -591,10 +591,11 @@ class StarboardPlugin(Plugin):
         embed.color = config.get_color(len(star.stars))
 
         row = ActionRow()
-        row.add_component(label='Jump to Message', type=ComponentTypes.BUTTON, style=ButtonStyles.LINK, url='https://discord.com/channels/{}/{}/{}'.format(
-            msg.guild.id,
-            msg.channel_id,
-            msg.id
-        ))
+        row.add_component(label='Jump to Message', type=ComponentTypes.BUTTON, style=ButtonStyles.LINK,
+                          url='https://discord.com/channels/{}/{}/{}'.format(
+                              msg.guild.id,
+                              msg.channel_id,
+                              msg.id
+                          ))
 
         return content, embed, row

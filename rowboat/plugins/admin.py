@@ -75,6 +75,7 @@ class PersistConfig(SlottedModel):
 
     role_ids = ListField(snowflake, default=[])
 
+
 class AdminConfig(PluginConfig):
     confirm_actions = Field(bool, default=True)
 
@@ -306,7 +307,7 @@ class AdminPlugin(Plugin):
                 (GuildBan.guild_id == event.guild.id)
             )
         except (GuildBan.DoesNotExist, APIException) as e:
-            if hasattr(e, 'code') and e.code != 10026: # Unknown Ban
+            if hasattr(e, 'code') and e.code != 10026:  # Unknown Ban
                 raise APIException(e.response)
 
             raise CommandFail('User with id `{}` is not banned'.format(user))
@@ -364,8 +365,8 @@ class AdminPlugin(Plugin):
                 actor,
                 on=((Infraction.actor_id == actor.user_id).alias('actor'))
             ).where(
-                    (Infraction.id == infraction) &
-                    (Infraction.guild_id == event.guild.id)
+                (Infraction.id == infraction) &
+                (Infraction.guild_id == event.guild.id)
             ).get()
         except Infraction.DoesNotExist:
             raise CommandFail('Cannot find an infraction with ID `{}`'.format(infraction))
@@ -409,8 +410,8 @@ class AdminPlugin(Plugin):
 
         if query and (isinstance(query, int) or query.isdigit()):
             q &= (
-                (Infraction.id == int(query)) |
-                (Infraction.user_id == int(query)))
+                    (Infraction.id == int(query)) |
+                    (Infraction.user_id == int(query)))
         elif query:
             q &= (Infraction.reason ** query)
 
@@ -473,9 +474,9 @@ class AdminPlugin(Plugin):
             )
             converted = True
         elif inf.type_ not in [
-                Infraction.Types.TEMPMUTE.index,
-                Infraction.Types.TEMPBAN.index,
-                Infraction.Types.TEMPROLE.index]:
+            Infraction.Types.TEMPMUTE.index,
+            Infraction.Types.TEMPBAN.index,
+            Infraction.Types.TEMPROLE.index]:
             raise CommandFail('Cannot set the duration for that type of infraction')
 
         inf.expires_at = expires_dt
@@ -589,7 +590,7 @@ class AdminPlugin(Plugin):
 
         return True
 
-    @Plugin.command('mute', '<user:user|snowflake> [duration:str] [reason:str...]', level=CommandLevels.MOD)
+    @Plugin.command('mute', '<user:user|snowflake> [reason:str...]', level=CommandLevels.MOD)
     @Plugin.command('tempmute', '<user:user|snowflake> <duration:str> [reason:str...]', level=CommandLevels.MOD, aliases=['timeout'])
     def tempmute(self, event, user, duration=None, reason=None):
         if not duration and reason:
@@ -747,8 +748,8 @@ class AdminPlugin(Plugin):
             members.append(member)
 
         msg = event.msg.reply('Ok, kick {} users for `{}`?'.format(len(members), args.reason or 'no reason'))
-        msg.chain(False).\
-            add_reaction(GREEN_TICK_EMOJI).\
+        msg.chain(False). \
+            add_reaction(GREEN_TICK_EMOJI). \
             add_reaction(RED_TICK_EMOJI)
 
         try:
@@ -756,8 +757,8 @@ class AdminPlugin(Plugin):
                 'MessageReactionAdd',
                 message_id=msg.id,
                 conditional=lambda e: (
-                    e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
-                    e.user_id == event.author.id
+                        e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
+                        e.user_id == event.author.id
                 )).get(timeout=10)
         except gevent.Timeout:
             return
@@ -781,8 +782,8 @@ class AdminPlugin(Plugin):
             members.append(user_id)
 
         msg = event.msg.reply('Ok, ban {} users for `{}`?'.format(len(members), args.reason or 'no reason'))
-        msg.chain(False).\
-            add_reaction(GREEN_TICK_EMOJI).\
+        msg.chain(False). \
+            add_reaction(GREEN_TICK_EMOJI). \
             add_reaction(RED_TICK_EMOJI)
 
         try:
@@ -790,8 +791,8 @@ class AdminPlugin(Plugin):
                 'MessageReactionAdd',
                 message_id=msg.id,
                 conditional=lambda conf: (
-                    conf.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
-                    conf.user_id == event.author.id
+                        conf.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
+                        conf.user_id == event.author.id
                 )).get(timeout=10)
         except gevent.Timeout:
             return
@@ -892,8 +893,10 @@ class AdminPlugin(Plugin):
 
     @Plugin.command('here', '[size:int]', level=CommandLevels.MOD, context={'mode': 'all'}, group='archive')
     @Plugin.command('all', '[size:int]', level=CommandLevels.MOD, context={'mode': 'all'}, group='archive')
-    @Plugin.command('user', '<user:user|snowflake> [size:int]', level=CommandLevels.MOD, context={'mode': 'user'}, group='archive')
-    @Plugin.command('channel', '<channel:channel|snowflake> [size:int]', level=CommandLevels.MOD, context={'mode': 'channel'}, group='archive')
+    @Plugin.command('user', '<user:user|snowflake> [size:int]', level=CommandLevels.MOD, context={'mode': 'user'},
+                    group='archive')
+    @Plugin.command('channel', '<channel:channel|snowflake> [size:int]', level=CommandLevels.MOD,
+                    context={'mode': 'channel'}, group='archive')
     def archive(self, event, size=50, mode=None, user=None, channel=None):
         if size < 1 or size > 15000:
             raise CommandFail('Too many messages must be between 1-15000')
@@ -977,8 +980,8 @@ class AdminPlugin(Plugin):
                 len(messages)
             ))
 
-            msg.chain(False).\
-                add_reaction(GREEN_TICK_EMOJI).\
+            msg.chain(False). \
+                add_reaction(GREEN_TICK_EMOJI). \
                 add_reaction(RED_TICK_EMOJI)
 
             try:
@@ -986,8 +989,8 @@ class AdminPlugin(Plugin):
                     'MessageReactionAdd',
                     message_id=msg.id,
                     conditional=lambda e: (
-                        e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
-                        e.user_id == event.author.id
+                            e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
+                            e.user_id == event.author.id
                     )).get(timeout=10)
             except gevent.Timeout:
                 return
@@ -1152,7 +1155,7 @@ class AdminPlugin(Plugin):
             GROUP BY 1, 2
             ORDER BY 3 DESC
             LIMIT 1
-        ''', (user.id, )).tuples()
+        ''', (user.id,)).tuples()
 
         deleted = Message.select(
             fn.Count('*')
@@ -1248,8 +1251,8 @@ class AdminPlugin(Plugin):
                 sum(i.uses for i in invites)
             ))
 
-        msg.chain(False).\
-            add_reaction(GREEN_TICK_EMOJI).\
+        msg.chain(False). \
+            add_reaction(GREEN_TICK_EMOJI). \
             add_reaction(RED_TICK_EMOJI)
 
         try:
@@ -1257,8 +1260,8 @@ class AdminPlugin(Plugin):
                 'MessageReactionAdd',
                 message_id=msg.id,
                 conditional=lambda e: (
-                    e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
-                    e.user_id == event.author.id
+                        e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
+                        e.user_id == event.author.id
                 )).get(timeout=10)
         except gevent.Timeout:
             msg.reply('Not executing invite prune')

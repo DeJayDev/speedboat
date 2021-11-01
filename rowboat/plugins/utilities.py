@@ -1,6 +1,5 @@
 import operator
 import random
-from collections import defaultdict
 from datetime import datetime, timedelta
 from functools import reduce
 from io import BytesIO
@@ -22,7 +21,6 @@ from rowboat.constants import (
     STATUS_EMOJI, BADGE_EMOJI, SNOOZE_EMOJI, GREEN_TICK_EMOJI, GREEN_TICK_EMOJI_ID,
     EMOJI_RE, USER_MENTION_RE, YEAR_IN_SEC, CDN_URL, WEB_URL
 )
-from rowboat.models.guild import GuildVoiceSession
 from rowboat.models.message import Message, Reminder
 from rowboat.models.user import User, Infraction
 from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
@@ -171,7 +169,7 @@ class UtilitiesPlugin(Plugin):
         return event.msg.reply('', attachments=[('emoji.png', combined)])
 
     @Plugin.command('seen', '<user:user>', global_=True)
-    def seen(self, event, user):
+    def seen(self, event, user: User):
         try:
             msg = Message.select(Message.timestamp).where(
                 Message.author_id == user.id
@@ -179,14 +177,14 @@ class UtilitiesPlugin(Plugin):
         except Message.DoesNotExist:
             raise CommandFail("I've never seen {}".format(user))
 
-        raise CommandSuccess('I last saw {} {} (at {})'.format(
+        raise CommandSuccess('I last saw {} {}'.format(
             user,
             humanize.naturaltime(datetime.utcnow() - msg.timestamp),
-            msg.timestamp.strftime("%Y-%m-%d %H:%m:%S")
+            int(msg.timestamp.timestamp())
         ))
 
     @Plugin.command('search', '<query:str...>', global_=True)
-    def search(self, event, query):
+    def search(self, event, query: str):
         queries = []
 
         if query.isdigit():
@@ -202,8 +200,8 @@ class UtilitiesPlugin(Plugin):
             username, discrim = query.rsplit('#', 1)
             if discrim is not None:
                 queries.append((
-                    (User.username == username) &
-                    (User.discriminator == discrim)))
+                        (User.username == username) &
+                        (User.discriminator == discrim)))
 
         users = User.select().where(reduce(operator.or_, queries)).limit(10)
         if len(users) == 0:
@@ -247,20 +245,6 @@ class UtilitiesPlugin(Plugin):
         content.append('Text: {}'.format(text_count))
         content.append('Voice: {}'.format(voice_count))
 
-        #content.append('\n**\u276F Members**')
-        #status_counts = defaultdict(int)
-        #for member in list(guild.members.values()):
-        #    if not member.user.presence:
-        #        status = Status.OFFLINE
-        #    else:
-        #        status = member.user.presence.status
-        #    status_counts[status] += 1
-
-        #for status, count in sorted(list(status_counts.items()), key=lambda i: str(i[0]), reverse=True):
-        #    content.append('<{}> - {}'.format(
-        #        STATUS_EMOJI[status], count
-        #    ))
-
         embed = MessageEmbed()
         if guild.icon:
             embed.set_thumbnail(url=guild.icon_url)
@@ -269,7 +253,7 @@ class UtilitiesPlugin(Plugin):
         event.msg.reply('', embed=embed)
 
     @Plugin.command('info', '[user:user|snowflake]', aliases='whois')
-    def info(self, event, user: User=None):
+    def info(self, event, user: User = None):
         if not user:
             user = event.author
         else:
@@ -292,29 +276,11 @@ class UtilitiesPlugin(Plugin):
         content.append('Profile: <@{}>'.format(user.id))
 
         created_dt = to_datetime(user.id)
-        content.append('Created: {} ({})'.format(
-            humanize.naturaltime(datetime.utcnow() - created_dt),
-            created_dt.strftime("%b %d %Y %H:%M:%S")
+        content.append('Created: <t:{0}:R> (<t:{0}:f>)'.format(
+            int(created_dt.timestamp())
         ))
 
         member = event.guild.get_member(user.id) if event.guild else None
-
-        #if user.presence:  # I couldn't get this to work w/o it lol
-        #    emoji, status = get_status_emoji(user.presence)
-        #    content.append('Status: <{}> {}'.format(emoji, status))
-        #    if user.presence.activity and user.presence.activity.name:
-        #        if user.presence.activity.type is ActivityTypes.DEFAULT:
-        #            content.append('{}'.format(user.presence.activity.name))
-        #        if user.presence.activity.type is ActivityTypes.STREAMING:
-        #            content.append('Streaming: [{}]({})'.format(user.presence.activity.name, user.presence.activity.url))
-        #        if user.presence.activity.type is ActivityTypes.LISTENING:
-        #            content.append('Listening to {} on Spotify'.format(user.presence.activity.details))
-        #        if user.presence.activity.type is ActivityTypes.WATCHING:
-        #            content.append('Watching: {}'.format(user.presence.activity.name))
-        #        if user.presence.activity.type is ActivityTypes.CUSTOM:
-        #            content.append('Custom Status: {}'.format(user.presence.activity.state))
-        #        if user.presence.activity.type is ActivityTypes.COMPETING:
-        #            content.append('Competing: {}'.format(user.presence.activity.name))
 
         if user.public_flags:
             badges = ''
@@ -330,9 +296,8 @@ class UtilitiesPlugin(Plugin):
             if member.nick:
                 content.append('Nickname: {}'.format(member.nick))
 
-            content.append('Joined: {} ago ({})'.format(
-                humanize.naturaldelta(datetime.utcnow() - member.joined_at),
-                member.joined_at.strftime("%b %d %Y %H:%M:%S"),
+            content.append('Joined: <t:{0}:R> (<t:{0}:f>)'.format(
+                int(member.joined_at.timestamp())
             ))
 
             if member.roles:
@@ -346,24 +311,13 @@ class UtilitiesPlugin(Plugin):
             (Message.guild_id == event.guild.id)
         ).tuples()[0][0]
 
-        # oldest_msg = Message.select(fn.MIN(Message.id)).where(
-        #    (Message.author_id == user.id) & 
-        #    (Message.guild_id == event.guild.id)
-        # ).tuples()[0][0] #Slow Query
-
-        voice = GuildVoiceSession.select(fn.COUNT(GuildVoiceSession.user_id),
-            fn.SUM(GuildVoiceSession.ended_at - GuildVoiceSession.started_at)).where(
-                (GuildVoiceSession.user_id == user.id) & (~(GuildVoiceSession.ended_at >> None)) & (
-                    GuildVoiceSession.guild_id == event.guild.id)).tuples()[0]
-
         infractions = Infraction.select(Infraction.id).where(
             (Infraction.user_id == user.id) & (Infraction.guild_id == event.guild.id)).tuples()
 
         if newest_msg:
             content.append('\n **\u276F Activity**')
-            content.append('Last Message: {} ({})'.format(
-                humanize.naturaltime(datetime.utcnow() - to_datetime(newest_msg)),
-                to_datetime(newest_msg).strftime("%b %d %Y %H:%M:%S"),
+            content.append('Last Message: <t:{0}:R> (<t:{0}:f>)'.format(
+                int(to_datetime(newest_msg).timestamp())
             ))
             # content.append('First Message: {} ({})'.format(
             #    humanize.naturaltime(datetime.utcnow() - to_datetime(oldest_msg)),
@@ -374,13 +328,6 @@ class UtilitiesPlugin(Plugin):
             content.append('\n**\u276F Infractions**')
             total = len(infractions)
             content.append('Total Infractions: **{:,}**'.format(total))
-
-        if voice[0]:
-            content.append('\n**\u276F Voice**')
-            content.append('Sessions: `{:,}`'.format(voice[0]))
-            content.append('Time: `{}`'.format(str(humanize.naturaldelta(
-                voice[1]
-            )).title()))
 
         embed = MessageEmbed()
 
@@ -418,21 +365,21 @@ class UtilitiesPlugin(Plugin):
 
         self.queue_reminders()
 
-    def trigger_reminder(self, reminder):
+    def trigger_reminder(self, reminder: Reminder):
         message = Message.get(reminder.message_id)
         channel = self.state.channels.get(message.channel_id)
         if not channel:
             self.log.warning('Not triggering reminder, channel %s was not found!',
-                message.channel_id)
+                             message.channel_id)
             reminder.delete_instance()
             return
 
-        msg = channel.send_message('<@{}> you asked me at {} ({}) to remind you about: {}'.format(
-            message.author_id,
-            reminder.created_at,
-            humanize.naturaltime(datetime.utcnow() - reminder.created_at),
-            S(reminder.content)
-        ), allowed_mentions={'users': [str(message.author_id)]})
+        msg = channel.send_message(
+            '<@{}> you asked me on <t:{reminder_time}:f> (<t:{reminder_time}:R>) to remind you about: {}'.format(
+                message.author_id,
+                S(reminder.content),
+                reminder_time=int(reminder.remind_at.timestamp()),
+            ), allowed_mentions={'users': [str(message.author_id)]})
 
         # Add the emoji options
         msg.add_reaction(SNOOZE_EMOJI)
@@ -443,8 +390,8 @@ class UtilitiesPlugin(Plugin):
                 'MessageReactionAdd',
                 message_id=msg.id,
                 conditional=lambda e: (
-                    (e.emoji.name == SNOOZE_EMOJI or e.emoji.id == GREEN_TICK_EMOJI_ID) and
-                    e.user_id == message.author_id
+                        (e.emoji.name == SNOOZE_EMOJI or e.emoji.id == GREEN_TICK_EMOJI_ID) and
+                        e.user_id == message.author_id
                 )
             ).get(timeout=30)
         except gevent.Timeout:
@@ -452,8 +399,7 @@ class UtilitiesPlugin(Plugin):
             return
         finally:
             # Cleanup
-            msg.delete_reaction(SNOOZE_EMOJI)
-            msg.delete_reaction(GREEN_TICK_EMOJI)
+            msg.delete_all_reactions()
 
         if mra_event.emoji.name == SNOOZE_EMOJI:
             reminder.remind_at = datetime.utcnow() + timedelta(minutes=20)
@@ -476,7 +422,10 @@ class UtilitiesPlugin(Plugin):
 
         remind_at = parse_duration(duration)
         if remind_at > (datetime.utcnow() + timedelta(seconds=5 * YEAR_IN_SEC)):
-            raise CommandSuccess('Thats too far in the future, I\'ll forget!')
+            raise CommandFail('Thats too far in the future, I\'ll forget!')
+
+        if event.msg.message_reference.message_id:
+            content = event.channel.get_message(event.msg.message_reference.message_id).content
 
         r = Reminder.create(
             message_id=event.msg.id,

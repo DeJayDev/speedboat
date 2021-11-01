@@ -4,10 +4,8 @@ import urllib.parse
 from urllib.parse import unquote
 
 from disco.types.base import cached_property
-from disco.types.permissions import Permissions
 from disco.types.message import ChannelType
 from disco.util.sanitize import S
-from holster.enum import Enum
 
 from rowboat.constants import INVITE_LINK_RE, URL_RE
 from rowboat.models.message import Message
@@ -19,12 +17,12 @@ from rowboat.types.plugin import PluginConfig
 from rowboat.util.stats import timed
 from rowboat.util.zalgo import ZALGO_RE
 
-CensorReason = Enum(
-    'INVITE',
-    'DOMAIN',
-    'WORD',
-    'ZALGO',
-)
+
+class CensorReason:
+    INVITE = 0
+    DOMAIN = 1
+    WORD = 2
+    ZALGO = 3
 
 
 class CensorSubConfig(SlottedModel):
@@ -89,6 +87,8 @@ class Censorship(Exception):
             return 'found zalgo at position `{}` in text'.format(
                 self.ctx['position']
             )
+        else:
+            return '...unsure why this message was censored. Please notify my developer.'
 
 
 @Plugin.with_config(CensorConfig)
@@ -205,8 +205,8 @@ class CensorPlugin(Plugin):
             invite_info = self.get_invite_info(invite)
 
             need_whitelist = (
-                config.invites_guild_whitelist or
-                (config.invites_whitelist or not config.invites_blacklist)
+                    config.invites_guild_whitelist or
+                    (config.invites_whitelist or not config.invites_blacklist)
             )
             whitelisted = False
 

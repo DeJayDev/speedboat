@@ -58,7 +58,7 @@ class SQLPlugin(Plugin):
 
         if event.user.discriminator != UNSET:
             updates['discriminator'] = event.user.discriminator
-            
+
         if event.user.bot:
             return
 
@@ -153,8 +153,8 @@ class SQLPlugin(Plugin):
                 cur.execute(event.codeblock.format(e=event))
                 dur = time.time() - start
                 if not cur.description:
-                    raise CommandSuccess('execution complete (had no return)') 
-                else: 
+                    raise CommandSuccess('execution complete (had no return)')
+                else:
                     tbl.set_header(*[desc[0] for desc in cur.description])
 
                     for row in cur.fetchall():

@@ -11,6 +11,7 @@ def _authed(func):
             return jsonify({'error': 'Authentication Required'}), FORBIDDEN
 
         return func(*args, **kwargs)
+
     return deco
 
 

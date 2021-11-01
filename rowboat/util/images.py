@@ -24,7 +24,7 @@ def get_dominant_colors_user(user, url=None):
         rgbcolor = get_dominant_colors(Image.open(BytesIO(r.content)))[0]
         color = int('%02x%02x%02x' % (rgbcolor[0], rgbcolor[1], rgbcolor[2]), 16) # Math is hard. https://stackoverflow.com/a/8340936
         rdb.set(key, color)
-        
+
         return color
 
 
@@ -47,5 +47,5 @@ def get_dominant_colors_guild(guild, url=None):
         rgbcolor = get_dominant_colors(Image.open(BytesIO(r.content)))[0]
         color = int('%02x%02x%02x' % (rgbcolor[0], rgbcolor[1], rgbcolor[2]), 16) # Math is hard. https://stackoverflow.com/a/8340936
         rdb.set(key, color)
-        
+
         return color

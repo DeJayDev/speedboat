@@ -1,11 +1,11 @@
 import logging
 import os
 import subprocess
-import sentry_sdk as sentry
 
-from yaml import safe_load
-from sentry_sdk.integrations.redis import RedisIntegration
+import sentry_sdk as sentry
 from disco.util.logging import LOG_FORMAT
+from sentry_sdk.integrations.redis import RedisIntegration
+from yaml import safe_load
 
 # Please tell me how to fix this
 with open(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir) + '/config.yaml')) as f:

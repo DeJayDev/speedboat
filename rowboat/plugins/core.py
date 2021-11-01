@@ -7,13 +7,13 @@ import pprint
 import signal
 import time
 from datetime import datetime, timedelta
-from disco.gateway.events import MessageCreate
 
 import humanize
 from disco.api.http import APIException
 from disco.bot import Bot
 from disco.bot.command import CommandEvent
-from disco.types.message import MessageEmbed, ChannelType
+from disco.gateway.events import MessageCreate
+from disco.types.message import MessageEmbed
 from disco.types.permissions import Permissions
 from disco.util.emitter import Priority, Emitter
 from disco.util.sanitize import S
@@ -38,7 +38,7 @@ from rowboat.util.stats import timed
 PY_CODE_BLOCK = '```py\n{}\n```'
 
 BOT_INFO = '''
-Speedboat is a modernized fork of rowboat, a moderation and utilitarian bot built for large Discord servers.
+Speedboat is a moderation and utilitarian bot built for large Discord servers.
 '''
 
 GUILDS_WAITING_SETUP_KEY = 'gws'
@@ -58,7 +58,7 @@ class CorePlugin(Plugin):
         # Overwrite the main bot instances plugin loader so we can magicify events
         self.bot.add_plugin = self.our_add_plugin
 
-        #self.spawn(self.wait_for_plugin_changes)
+        # self.spawn(self.wait_for_plugin_changes)
 
         self._wait_for_actions_greenlet = self.spawn(self.wait_for_actions)
 
@@ -348,8 +348,8 @@ class CorePlugin(Plugin):
         # Ensure we're updated
         self.log.info('Requesting Guild: %s (%s)', event.guild.name, event.guild.id)
         guild.sync(event.guild)
-        
-#       guild.request_guild_members()
+
+        #guild.request_guild_members()
 
         self.guilds[event.id] = guild
 
@@ -361,6 +361,7 @@ class CorePlugin(Plugin):
                         m.set_nickname(config.nickname)
                     except APIException as e:
                         self.log.warning('Failed to set nickname for guild %s (%s)', event.guild, e.content)
+
             self.spawn_later(5, set_nickname)
 
     def get_level(self, guild, user):
@@ -410,10 +411,10 @@ class CorePlugin(Plugin):
         if config and config.commands:
             if config.commands.prefixes:
                 commands = list(self.bot.get_commands_for_message(
-                config.commands.mention,
-                {},
-                config.commands.prefixes, # Might break commands, might not :)
-                event.message))
+                    config.commands.mention,
+                    {},
+                    config.commands.prefixes,
+                    event.message))
             else:
                 commands = list(self.bot.get_commands_for_message(
                     config.commands.mention,
@@ -607,13 +608,15 @@ class CorePlugin(Plugin):
         embed.description = BOT_INFO
         embed.add_field(name='Servers', value=str(len(self.state.guilds)), inline=True)
         embed.add_field(name='Uptime', value=humanize.naturaldelta(datetime.utcnow() - self.startup), inline=True)
-        embed.add_field(name='Version', value=subprocess.check_output(["git", "describe", "--always"]).strip().decode("utf-8"), inline=True)
+        embed.add_field(name='Version',
+                        value=subprocess.check_output(["git", "describe", "--always"]).strip().decode("utf-8"),
+                        inline=True)
         event.msg.reply(embed=embed)
 
     @Plugin.command('uptime', level=-1)
     def command_uptime(self, event):
-        event.msg.reply('Speedboat was started {}'.format(
-            humanize.naturaltime(datetime.utcnow() - self.startup)
+        event.msg.reply('Speedboat was started <t:{}:R>'.format(
+            int(self.startup.timestamp())
         ))
 
     @Plugin.command('source', '<command>', level=-1)
@@ -622,7 +625,8 @@ class CorePlugin(Plugin):
             if command.lower() in cmd.triggers:
                 break
         else:
-            raise CommandFail("Couldn't find command `{}` (try being specific)".format(S(command, escape_codeblocks=True)))
+            raise CommandFail(
+                "Couldn't find command `{}` (try being specific)".format(S(command, escape_codeblocks=True)))
 
         code = cmd.func.__code__
         length, firstline = inspect.getsourcelines(code)
@@ -775,14 +779,15 @@ class CorePlugin(Plugin):
             ungrouped_plugin_cmds = []
             event.level = self.get_level(event.guild, user)
             for command in self.bot.commands:
-                if command.level and (command.level != -1) and (command.level <= event.level) and command.plugin is plugin:
+                if command.level and (command.level != -1) and (
+                        command.level <= event.level) and command.plugin is plugin:
                     if command.group:
                         plugin_cmds.append('{} {}'.format(command.group, command.name))
                     else:
                         ungrouped_plugin_cmds.append(command.name)
             plugin_cmds = sorted(plugin_cmds)
             if not plugin_cmds:
-                continue # No commands? lets go.
+                continue  # No commands? lets go.
             cmds += "**{}**: {}\n".format(plugin.name.capitalize(), ', '.join(plugin_cmds))
             othercmds += "{}".format(', '.join(ungrouped_plugin_cmds))
 

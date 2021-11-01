@@ -51,7 +51,7 @@ class LeakyBucket(object):
                 get_ms_time() - self.time_period,
                 get_ms_time(),
                 int((self.time_period * 2) / 1000),
-                ])
+            ])
 
     def check(self, key, amount=1):
         count = self.incr(key, amount)

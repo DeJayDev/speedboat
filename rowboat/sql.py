@@ -1,9 +1,9 @@
-from peewee import Proxy, OP, Model
-from peewee import Expression
-from playhouse.postgres_ext import PostgresqlExtDatabase
-
 import os
+
 import psycogreen.gevent
+from peewee import Expression
+from peewee import Proxy, OP, Model
+from playhouse.postgres_ext import PostgresqlExtDatabase
 
 psycogreen.gevent.patch_psycopg()
 
@@ -33,7 +33,7 @@ def init_db(env):
     if env == 'docker':
         database.initialize(PostgresqlExtDatabase(
             'rowboat',
-            host='localhost',
+            host='db',
             user='rowboat',
             port=int(os.getenv('PG_PORT', 5432)),
             autorollback=True))

@@ -1,10 +1,12 @@
 import json
 
 import redis
-
 from rowboat import ENV
 
-rdb = redis.Redis(db=0)
+if ENV == 'docker':
+    rdb = redis.Redis(db=0, host='redis')
+else:
+    rdb = redis.Redis(db=0)
 
 
 def emit(typ, **kwargs):

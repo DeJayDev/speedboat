@@ -27,6 +27,7 @@ def task(*args, **kwargs):
     """
     Register a new task.
     """
+
     def deco(f):
         task = Task(f.__name__, f, *args, **kwargs)
 
@@ -35,6 +36,7 @@ def task(*args, **kwargs):
 
         TASKS[f.__name__] = task
         return task
+
     return deco
 
 

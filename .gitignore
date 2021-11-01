@@ -13,8 +13,6 @@ ssl
 __pycache__
 .vscode
 node_modules
-<<<<<<< HEAD
-=======
 .pnp.*
 .yarn
 !.yarn/patches
@@ -22,7 +20,6 @@ node_modules
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
->>>>>>> a62f62dbd3abf21cc136facca9935221fdd16426
 
 # Environments
 src

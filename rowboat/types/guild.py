@@ -1,14 +1,6 @@
 import os
 
-from holster.enum import Enum
-
 from rowboat.types import Model, SlottedModel, Field, DictField, text, raw, rule_matcher
-
-CooldownMode = Enum(
-    'GUILD',
-    'CHANNEL',
-    'USER',
-)
 
 
 class PluginConfigObj(object):

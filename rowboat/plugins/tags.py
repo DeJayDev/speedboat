@@ -16,7 +16,8 @@ class TagsConfig(PluginConfig):
 
 @Plugin.with_config(TagsConfig)
 class TagsPlugin(Plugin):
-    @Plugin.command('create', '<name:str> <content:str...>', group='tag', aliases=['add', 'new'], level=CommandLevels.TRUSTED)
+    @Plugin.command('create', '<name:str> <content:str...>', group='tag', aliases=['add', 'new'],
+                    level=CommandLevels.TRUSTED)
     def on_tags_create(self, event, name, content):
         name = S(name)
         content = S(content)

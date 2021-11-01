@@ -4,7 +4,6 @@ from collections import defaultdict
 import emoji
 import requests
 from disco.types.message import MessageEmbed
-from holster.enum import Enum
 
 from rowboat.models.guild import Guild
 from rowboat.plugins import RowboatPlugin as Plugin
@@ -12,10 +11,10 @@ from rowboat.redis import rdb
 from rowboat.types import SlottedModel, DictField, Field, ChannelField
 from rowboat.types.plugin import PluginConfig
 
-FormatMode = Enum(
-    'PLAIN',
-    'PRETTY'
-)
+
+class FormatMode:
+    PLAIN = 'PLAIN'
+    PRETTY = 'PRETTY'
 
 
 class SubRedditConfig(SlottedModel):

@@ -66,4 +66,5 @@ class JoinPlugin(Plugin):
 
         gevent.spawn_later(length,
                            lambda: event.channel.send_message("Scheduled for {} after trigger, took {}"
-                                                              .format(length, (datetime.now() - to_datetime(msg.id)) / timedelta(seconds=1))))
+                                                              .format(length, (
+                                       datetime.now() - to_datetime(msg.id)) / timedelta(seconds=1))))

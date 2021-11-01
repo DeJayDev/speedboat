@@ -199,9 +199,9 @@ class ModLogPlugin(Plugin):
             channels[chan.id] = channel
 
         self.log.info('Resolved channels for guild %s (%s): %s',
-            guild.id,
-            guild.name,
-            channels)
+                      guild.id,
+                      guild.name,
+                      channels)
 
         if config._channels:
             self.log.warning('Overwriting previously resolved channels %s / %s', config._channels, channels)
@@ -344,8 +344,8 @@ class ModLogPlugin(Plugin):
     def on_guild_member_add(self, event):
         created = humanize.naturaltime(datetime.utcnow() - to_datetime(event.user.id))
         new = (
-            event.config.new_member_threshold and
-            (time.time() - to_unix(event.user.id)) < event.config.new_member_threshold
+                event.config.new_member_threshold and
+                (time.time() - to_unix(event.user.id)) < event.config.new_member_threshold
         )
 
         self.log_action(Actions.GUILD_MEMBER_ADD, event, new=' :new:' if new else '', created=created)
@@ -538,12 +538,12 @@ class ModLogPlugin(Plugin):
             )
 
         self.log_action(Actions.MESSAGE_DELETE, event,
-                author=msg.author,
-                author_id=msg.author.id,
-                channel=channel,
-                msg=contents,
-                attachments='' if not msg.attachments else '({})'.format(
-                    ', '.join('<{}>'.format(i) for i in msg.attachments)))
+                        author=msg.author,
+                        author_id=msg.author.id,
+                        channel=channel,
+                        msg=contents,
+                        attachments='' if not msg.attachments else '({})'.format(
+                            ', '.join('<{}>'.format(i) for i in msg.attachments)))
 
     @Plugin.listen('MessageDeleteBulk')
     def on_message_delete_bulk(self, event):

@@ -47,7 +47,7 @@ class StatsPlugin(Plugin):
             metadata['guild_id'] = event.guild.id
 
         statsd.increment('gateway.events.received', tags=to_tags(metadata))
-    
+
     @Plugin.schedule(180, init=False)
     def track_state(self):
         # Track members across all our guilds
@@ -55,7 +55,7 @@ class StatsPlugin(Plugin):
         #    statsd.gauge('guild.members', len(guild.members), tags=to_tags({
         #        'guild_id': guild.id
         #    }))
-        
+
         # Track some state info
         statsd.gauge('disco.state.guilds', len(self.state.guilds))
         statsd.gauge('disco.state.channels', len(self.state.channels))
@@ -92,7 +92,7 @@ class StatsPlugin(Plugin):
     def on_message_update(self, event):
         if event.message.author.bot:
             return
-        
+
         tags = {
             'channel_id': event.channel_id,
             'author_id': event.author.id,
@@ -131,19 +131,19 @@ class StatsPlugin(Plugin):
         }))
 
     @Plugin.listen('GuildMemberAdd')
-    def on_guild_member_add(self, event): 
+    def on_guild_member_add(self, event):
         if event.member.user.bot:
             return
-        
+
         statsd.increment('guild.members.add', tags=to_tags({
             'guild_id': event.member.guild_id,  # this event fires a GuildMember, so we harvest the guild_id
         }))
 
     @Plugin.listen('GuildMemberRemove')
-    def on_guild_member_remove(self, event): 
+    def on_guild_member_remove(self, event):
         if event.user.bot:
             return
-        
+
         statsd.increment('guild.members.remove', tags=to_tags({
             'guild_id': event.guild_id,  # this event fires the id as it's own variable.
         }))

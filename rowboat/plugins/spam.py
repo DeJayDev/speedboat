@@ -7,7 +7,6 @@ from functools import reduce
 
 from disco.util.emitter import Priority
 from gevent.lock import Semaphore
-from holster.enum import Enum
 
 from rowboat.models.message import Message, EMOJI_RE
 from rowboat.models.user import Infraction
@@ -22,14 +21,14 @@ from rowboat.util.stats import timed
 
 UPPER_RE = re.compile('[A-Z]')
 
-PunishmentType = Enum(
-    'NONE',
-    'MUTE',
-    'KICK',
-    'TEMPBAN',
-    'BAN',
-    'TEMPMUTE'
-)
+
+class PunishmentType:
+    NONE = 'NONE'
+    MUTE = 'MUTE'
+    KICK = 'KICK'
+    TEMPBAN = 'TEMPBAN'
+    BAN = 'BAN'
+    TEMPMUTE = 'TEMPMUTE'
 
 
 class CheckConfig(SlottedModel):
@@ -146,7 +145,7 @@ class SpamPlugin(Plugin):
                     self,
                     violation.event,
                     violation.member,
-                    'Spam Detected',)
+                    'Spam Detected', )
             elif punishment == PunishmentType.TEMPMUTE:
                 Infraction.tempmute(
                     self,
@@ -242,7 +241,7 @@ class SpamPlugin(Plugin):
 
             if not bucket.check(event.author.id, func(event) if callable(func) else func):
                 raise Violation(rule, check, event, member,
-                    name.upper(),
+                                name.upper(),
                     base_text + ' ({} / {}s)'.format(bucket.count(event.author.id), bucket.size(event.author.id)))
 
         check_bucket('max_messages', 'Too Many Messages', 1)
