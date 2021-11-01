@@ -179,7 +179,6 @@ class UtilitiesPlugin(Plugin):
 
         raise CommandSuccess('I last saw {} {}'.format(
             user,
-            humanize.naturaltime(datetime.utcnow() - msg.timestamp),
             int(msg.timestamp.timestamp())
         ))
 
@@ -433,7 +432,6 @@ class UtilitiesPlugin(Plugin):
             content=content
         )
         self.reminder_task.set_next_schedule(r.remind_at)
-        raise CommandSuccess('I\'ll remind you at {} ({})'.format(
-            r.remind_at.isoformat(),
-            humanize.naturaldelta(r.remind_at - datetime.utcnow()),
+        raise CommandSuccess('I\'ll remind you at <t:{0}:f> (<t:{0}:R>)'.format(
+            int(r.remind_at.timestamp())
         ))
