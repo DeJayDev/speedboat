@@ -444,5 +444,5 @@ class UtilitiesPlugin(Plugin):
         )
         self.reminder_task.set_next_schedule(r.remind_at)
         raise CommandSuccess('I\'ll remind you at <t:{0}:f> (<t:{0}:R>)'.format(
-            int(r.remind_at.timestamp())
+            int(r.remind_at.replace(tzinfo=pytz.UTC).timestamp())
         ))
