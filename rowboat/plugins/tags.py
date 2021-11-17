@@ -36,6 +36,26 @@ class TagsPlugin(Plugin):
 
         raise CommandSuccess('ok, your tag named `{}` has been created'.format(name))
 
+    @Plugin.command('list', group='tag', level=CommandLevels.TRUSTED)
+    def on_tags_list(self, event):
+        tags = Tag.select(Tag, User).join(
+            User, on=(User.user_id == Tag.author_id)
+        ).where(
+            (Tag.guild_id == event.guild.id)
+        ).order_by(Tag.name)
+
+        if not tags:
+            raise CommandFail('No tags exist')
+
+        embed = MessageEmbed()
+        embed.title = 'Tags for {}'.format(event.guild.name)
+        embed.description = '\n'.join(
+            '- `{}` by {}'.format(tag.name, tag.user.name)
+            for tag in tags
+        )
+
+        event.msg.reply(embed=embed)
+
     @Plugin.command('tags', '<name:str>', aliases=['tag'], level=CommandLevels.TRUSTED)
     @Plugin.command('show', '<name:str>', group='tag', level=CommandLevels.TRUSTED)
     def on_tags(self, event, name):

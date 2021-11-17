@@ -6,10 +6,12 @@ from io import BytesIO
 
 import gevent
 import humanize
+import pytz
 import requests
 from PIL import Image
 from disco.api.http import APIException
-from disco.types.message import MessageEmbed
+from disco.types.guild import Guild
+from disco.types.message import MessageEmbed, MessageEmbedAuthor, MessageEmbedField
 from disco.types.user import ActivityTypes, Status
 from disco.types.user import User as DiscoUser
 from disco.util.sanitize import S
@@ -216,39 +218,48 @@ class UtilitiesPlugin(Plugin):
 
     @Plugin.command('server', '[guild_id:snowflake]', aliases=['guild'], global_=True)
     def server(self, event, guild_id=None):
-        guild = self.state.guilds.get(guild_id) if guild_id else event.guild
+        guild: Guild = self.state.guilds.get(guild_id) if guild_id else event.guild
         if not guild:
             raise CommandFail('Invalid server')
 
-        content = []
-        content.append('**\u276F Server Information**')
-        content.append('Owner: {} ({})'.format(
-            guild.owner,
-            guild.owner.id
-        ))
-
-        created_at = to_datetime(guild.id)
-        content.append('Created: {} ({})'.format(
-            humanize.naturaltime(datetime.utcnow() - created_at),
-            created_at.isoformat(),
-        ))
-
-        content.append('Members: {:,}'.format(len(guild.members)))
-        if guild.features:
-            content.append('Features: {}'.format(', '.join(guild.features)))
-
-        content.append('\n**\u276F Counts**')
-        text_count = sum(1 for c in list(guild.channels.values()) if not c.is_voice)
-        voice_count = len(guild.channels) - text_count
-        content.append('Roles: {}'.format(len(guild.roles)))
-        content.append('Text: {}'.format(text_count))
-        content.append('Voice: {}'.format(voice_count))
-
         embed = MessageEmbed()
+        embed.set_author(MessageEmbedAuthor(name=guild.name, icon_url=guild.icon_url()))
+
+        # General Abouts
+        about_field = MessageEmbedField()
+        about_field.name = '**\u276F About**'
+        about_text = 'Created by {} ({}) — <t:{}:R>'.format(guild.owner, guild.owner.id, int(to_datetime(guild.id).replace(tzinfo=pytz.UTC).timestamp()))
+        about_text += '\nMembers: {:,}/{:,}'.format(guild.approximate_presence_count, guild.member_count)
+        about_text += '\nRegion: {}'.format(guild.region)
+        about_field.value = about_text
+        embed.add_field(about_field)
+
+        # General Counts
+        counts_field = MessageEmbedField()
+        counts_field.name = '\n**\u276F Counts**'
+        text_count = sum(1 for c in list(guild.channels.values()) if not c.is_voice and not c.is_thread)
+        voice_count = len(guild.channels) - text_count
+
+        counts_field.value = 'Roles: {:,}\nText: {:,}\nVoice: {:,}'.format(len(guild.roles), text_count, voice_count)
+        embed.add_field(counts_field)
+
+        # Security
+        security_field = MessageEmbedField()
+        security_field.name = '\n**\u276F Security**'
+        security_field.value = 'Verification: {}\nExplicit Content: {}'.format(
+            guild.verification_level,
+            guild.explicit_content_filter
+        )
+        embed.add_field(security_field)
+
+        # Features
+        features_field = MessageEmbedField()
+        features_field.name = '\n**\u276F Features**'
+        features_field.value = 'Features: {}'.format(', '.join(guild.features))
+        embed.add_field(features_field)
+
         if guild.icon:
-            embed.set_thumbnail(url=guild.icon_url)
             embed.color = get_dominant_colors_guild(guild)
-        embed.description = '\n'.join(content)
         event.msg.reply('', embed=embed)
 
     @Plugin.command('info', '[user:user|snowflake]', aliases='whois')
@@ -276,7 +287,7 @@ class UtilitiesPlugin(Plugin):
 
         created_dt = to_datetime(user.id)
         content.append('Created: <t:{0}:R> (<t:{0}:f>)'.format(
-            int(created_dt.timestamp())
+            int(created_dt.replace(tzinfo=pytz.UTC).timestamp())
         ))
 
         member = event.guild.get_member(user.id) if event.guild else None
@@ -296,7 +307,7 @@ class UtilitiesPlugin(Plugin):
                 content.append('Nickname: {}'.format(member.nick))
 
             content.append('Joined: <t:{0}:R> (<t:{0}:f>)'.format(
-                int(member.joined_at.timestamp())
+                int(member.joined_at.replace(tzinfo=pytz.UTC).timestamp())
             ))
 
             if member.roles:
@@ -316,7 +327,7 @@ class UtilitiesPlugin(Plugin):
         if newest_msg:
             content.append('\n **\u276F Activity**')
             content.append('Last Message: <t:{0}:R> (<t:{0}:f>)'.format(
-                int((to_datetime(newest_msg) - timedelta(hours=5)).timestamp())
+                int((to_datetime(newest_msg).replace(tzinfo=pytz.UTC)).timestamp())
             ))
             # content.append('First Message: {} ({})'.format(
             #    humanize.naturaltime(datetime.utcnow() - to_datetime(oldest_msg)),
@@ -332,7 +343,7 @@ class UtilitiesPlugin(Plugin):
 
         try:
             avatar = User.with_id(user.id).get_avatar_url()
-        except:
+        except User:
             avatar = user.get_avatar_url()  # This fails if the user has never been seen by speedboat.
 
         embed.set_author(name='{} ({})'.format(
@@ -377,7 +388,7 @@ class UtilitiesPlugin(Plugin):
             '<@{}> you asked me on <t:{reminder_time}:f> (<t:{reminder_time}:R>) to remind you about: {}'.format(
                 message.author_id,
                 S(reminder.content),
-                reminder_time=int(reminder.remind_at.timestamp()),
+                reminder_time=int(reminder.remind_at.replace(tzinfo=pytz.UTC).timestamp()),
             ), allowed_mentions={'users': [str(message.author_id)]})
 
         # Add the emoji options
@@ -421,7 +432,7 @@ class UtilitiesPlugin(Plugin):
 
         remind_at = parse_duration(duration)
         if remind_at > (datetime.utcnow() + timedelta(seconds=5 * YEAR_IN_SEC)):
-            raise CommandFail('Thats too far in the future, I\'ll forget!')
+            raise CommandFail('I can\'t remember too in the future, I\'ll forget!')
 
         if event.msg.message_reference.message_id:
             content = event.channel.get_message(event.msg.message_reference.message_id).content
