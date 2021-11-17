@@ -37,7 +37,11 @@ class JoinPlugin(Plugin):
         if not event.config.security:
             # Let's assume that if the server has join roles enabled and security disabled,
             # they don't care about email verification.
-            event.member.add_role(event.config.join_role)
+            try:
+                event.member.add_role(event.config.join_role)
+            except:
+                print("Failed to add_role in join plugin for user {} in {}. join_role may be None? It is currently: {}".format(
+                    event.member.id, event.guild.id, event.config.join_role))
             return
 
         if verification_level is VerificationLevel.LOW:  # "Must have a verified email on their Discord account"
