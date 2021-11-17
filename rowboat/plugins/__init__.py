@@ -96,9 +96,9 @@ class RowboatPlugin(SentryPlugin, Plugin):
     def with_config(cls, config_cls):
         def deco(plugin_cls):
             name = plugin_cls.__name__.replace('Plugin', '').lower()
-            #PluginsConfig._fields[name] = Field(config_cls, default=None)
+            PluginsConfig._fields[name] = Field(config_cls)
             PluginsConfig._fields[name].name = name
-            PluginsConfig._fields[name].default = None
+            # PluginsConfig._fields[name].default = None
             return plugin_cls
 
         return deco
