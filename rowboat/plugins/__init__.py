@@ -3,7 +3,6 @@ from disco.bot import Plugin
 from disco.bot.command import CommandEvent
 from disco.bot.plugin import register_plugin_base_class
 from disco.gateway.events import GatewayEvent
-from disco.types.base import Unset
 
 from rowboat import sentry
 from rowboat.types import Field
@@ -97,7 +96,7 @@ class RowboatPlugin(SentryPlugin, Plugin):
     def with_config(cls, config_cls):
         def deco(plugin_cls):
             name = plugin_cls.__name__.replace('Plugin', '').lower()
-            PluginsConfig._fields[name] = Field(config_cls, default=Unset)
+            PluginsConfig._fields[name] = Field(config_cls, default=None)
             PluginsConfig._fields[name].name = name
             # PluginsConfig._fields[name].default = None
             return plugin_cls

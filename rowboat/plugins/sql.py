@@ -6,7 +6,6 @@ import gevent
 import markovify
 import psycopg2
 import pygal
-from disco.types.base import UNSET
 from disco.types.channel import Channel as DiscoChannel, MessageIterator, ChannelType
 from disco.types.guild import Guild as DiscoGuild
 from disco.types.message import MessageTable
@@ -50,13 +49,13 @@ class SQLPlugin(Plugin):
     def on_presence_update(self, event):
         updates = {}
 
-        if event.user.avatar != UNSET:
+        if event.user.avatar is not None:
             updates['avatar'] = event.user.avatar
 
-        if event.user.username != UNSET:
+        if event.user.username is not None:
             updates['username'] = event.user.username
 
-        if event.user.discriminator != UNSET:
+        if event.user.discriminator is not None:
             updates['discriminator'] = event.user.discriminator
 
         if event.user.bot:

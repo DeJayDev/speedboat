@@ -4,7 +4,6 @@ import traceback
 import uuid
 from datetime import datetime, timedelta
 
-from disco.types.base import UNSET
 from peewee import (
     BigIntegerField, ForeignKeyField, TextField, DateTimeField,
     BooleanField, UUIDField
@@ -72,14 +71,14 @@ class Message(ModelBase):
             'mentions': list(obj.mentions.keys()),
         }
 
-        if obj.content is not UNSET:
+        if obj.content is not None:
             to_update['content'] = obj.with_proper_mentions
             to_update['emojis'] = list(map(int, EMOJI_RE.findall(obj.content)))
 
-        if obj.attachments is not UNSET:
+        if obj.attachments is not None:
             to_update['attachments'] = [i.url for i in list(obj.attachments.values())]
 
-        if obj.embeds is not UNSET:
+        if obj.embeds is not None:
             to_update['embeds'] = [json.dumps(i.to_dict(), default=default_json) for i in obj.embeds]
 
         cls.update(**to_update).where(cls.id == obj.id).execute()

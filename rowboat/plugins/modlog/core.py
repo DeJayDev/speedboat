@@ -9,7 +9,7 @@ from functools import reduce
 import humanize
 import pytz
 from disco.bot import CommandLevels
-from disco.types.base import UNSET, cached_property
+from disco.types.base import cached_property
 from disco.util.emitter import Priority
 from disco.util.sanitize import S
 from disco.util.snowflake import to_unix, to_datetime
@@ -463,7 +463,7 @@ class ModLogPlugin(Plugin):
         before = str(pre_user)
 
         if Actions.CHANGE_USERNAME in subscribed_guilds:
-            if event.user.username is not UNSET and event.user.username != pre_user.username:
+            if event.user.username is not None and event.user.username != pre_user.username:
                 for guild, config in subscribed_guilds[Actions.CHANGE_USERNAME]:
                     self.log_action_raw(
                         Actions.CHANGE_USERNAME,
@@ -494,7 +494,7 @@ class ModLogPlugin(Plugin):
         if not event.channel or not event.author:
             return
 
-        if event.content is not UNSET and msg.content != event.message.with_proper_mentions:
+        if event.content is not None and msg.content != event.message.with_proper_mentions:
             self.log_action(
                 Actions.MESSAGE_EDIT,
                 event,
