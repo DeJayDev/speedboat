@@ -14,6 +14,8 @@
   </component>
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src/betterdisco-py" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/holster" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
       <excludeFolder url="file://$MODULE_DIR$/src/disco/.eggs" />
       <excludeFolder url="file://$MODULE_DIR$/src" />

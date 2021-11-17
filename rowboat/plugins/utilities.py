@@ -5,13 +5,12 @@ from functools import reduce
 from io import BytesIO
 
 import gevent
-import humanize
 import pytz
 import requests
 from PIL import Image
 from disco.api.http import APIException
 from disco.types.guild import Guild
-from disco.types.message import MessageEmbed, MessageEmbedAuthor, MessageEmbedField
+from disco.types.message import MessageEmbed, MessageEmbedAuthor, MessageEmbedField, Message as DiscoMessage
 from disco.types.user import ActivityTypes, Status
 from disco.types.user import User as DiscoUser
 from disco.util.sanitize import S
@@ -424,9 +423,9 @@ class UtilitiesPlugin(Plugin):
         count = Reminder.delete_for_user(event.author.id)
         raise CommandSuccess('I cleared {} reminders for you'.format(count))
 
-    @Plugin.command('add', '<duration:str> <content:str...>', group='r', global_=True)
-    @Plugin.command('remind', '<duration:str> <content:str...>', global_=True)
-    def cmd_remind(self, event, duration, content):
+    @Plugin.command('add', '<duration:str> [content:str...]', group='r', global_=True)
+    @Plugin.command('remind', '<duration:str> [content:str...]', global_=True)
+    def cmd_remind(self, event, duration, content=None):
         if Reminder.count_for_user(event.author.id) > 15:
             raise CommandFail('You can only have 15 reminders going at once!')
 
@@ -435,7 +434,13 @@ class UtilitiesPlugin(Plugin):
             raise CommandFail('I can\'t remember too in the future, I\'ll forget!')
 
         if event.msg.message_reference.message_id:
-            content = event.channel.get_message(event.msg.message_reference.message_id).content
+            referenced_msg: DiscoMessage = event.channel.get_message(event.msg.message_reference.message_id)
+            content = 'https://discord.com/channels/{}/{}/{}'.format(
+                referenced_msg.guild_id,
+                referenced_msg.channel_id,
+                referenced_msg.id)
+        elif not content:
+            raise CommandFail('You need to provide content for the reminder, or, reply to a message. :(')
 
         r = Reminder.create(
             message_id=event.msg.id,
