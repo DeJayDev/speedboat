@@ -387,7 +387,7 @@ class UtilitiesPlugin(Plugin):
             '<@{}> you asked me on <t:{reminder_time}:f> (<t:{reminder_time}:R>) to remind you about: {}'.format(
                 message.author_id,
                 S(reminder.content),
-                reminder_time=int(reminder.remind_at.replace(tzinfo=pytz.UTC).timestamp()),
+                reminder_time=int(reminder.created_at.replace(tzinfo=pytz.UTC).timestamp()),
             ), allowed_mentions={'users': [str(message.author_id)]})
 
         # Add the emoji options
@@ -431,7 +431,7 @@ class UtilitiesPlugin(Plugin):
 
         remind_at = parse_duration(duration)
         if remind_at > (datetime.utcnow() + timedelta(seconds=5 * YEAR_IN_SEC)):
-            raise CommandFail('I can\'t remember too in the future, I\'ll forget!')
+            raise CommandFail('I that\'s too far in the future... I\'ll forget!')
 
         if event.msg.message_reference.message_id:
             referenced_msg: DiscoMessage = event.channel.get_message(event.msg.message_reference.message_id)
@@ -440,7 +440,7 @@ class UtilitiesPlugin(Plugin):
                 referenced_msg.channel_id,
                 referenced_msg.id)
         elif not content:
-            raise CommandFail('You need to provide content for the reminder, or, reply to a message. :(')
+            raise CommandFail('You need to provide content for the reminder, or reply to a message!')
 
         r = Reminder.create(
             message_id=event.msg.id,
