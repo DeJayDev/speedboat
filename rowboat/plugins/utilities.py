@@ -431,7 +431,7 @@ class UtilitiesPlugin(Plugin):
 
         remind_at = parse_duration(duration)
         if remind_at > (datetime.utcnow() + timedelta(seconds=5 * YEAR_IN_SEC)):
-            raise CommandFail('I that\'s too far in the future... I\'ll forget!')
+            raise CommandFail('That\'s too far in the future... I\'ll forget!')
 
         if event.msg.message_reference.message_id:
             referenced_msg: DiscoMessage = event.channel.get_message(event.msg.message_reference.message_id)
