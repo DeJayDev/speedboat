@@ -120,7 +120,7 @@ class UtilitiesPlugin(Plugin):
             otter = requests.get(URL)
             otter.raise_for_status()
 
-            fext = otter.headers['f-file-ext'] 
+            fext = otter.headers['x-file-ext'] 
             event.msg.reply('', attachments=[('otter.{}'.format(fext), otter.content)])
         except:
             return event.msg.reply('{} Otter not found :('.format(otter.status_code))
