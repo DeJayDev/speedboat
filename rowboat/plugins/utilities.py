@@ -10,7 +10,7 @@ import requests
 from PIL import Image
 from disco.api.http import APIException
 from disco.types.guild import Guild
-from disco.types.message import MessageEmbed, MessageEmbedAuthor, MessageEmbedField, Message as DiscoMessage
+from disco.types.message import MessageEmbed, MessageEmbedAuthor, MessageEmbedField, MessageReference
 from disco.types.user import ActivityTypes, Status
 from disco.types.user import User as DiscoUser
 from disco.util.sanitize import S
@@ -94,25 +94,37 @@ class UtilitiesPlugin(Plugin):
 
         raise CommandSuccess(str(random.randint(start, end)))
 
-    @Plugin.command('cat', global_=True)
-    def cat(self, event):
+    @Plugin.command('cat', '{bentley}',global_=True)
+    def cat(self, event, bentley=False):
         try:
-            r = requests.get('https://api.thecatapi.com/v1/images/search?format=src')
-            r.raise_for_status()
-            ext = r.headers['content-type'].split('/')[-1].split(';')[0]
-            event.msg.reply('', attachments=[('cat.{}'.format(ext), r.content)])
+            if bentley:
+                URL = 'https://bentley.tadhg.sh/'
+                cat = requests.get(URL)
+                fname = 'bentley'
+            else:
+                URL = 'https://api.thecatapi.com/v1/images/search'
+                data = requests.get(URL).json()
+                fname = data[0]['id']
+                cat = requests.get(data[0]['url'])
+            cat.raise_for_status()
+            fext = cat.headers['content-type'].split('/')[-1].split(';')[0]
+            event.msg.reply('', attachments=[('cat-{}.{}'.format(fname, fext), cat.content)])
         except:
-            return event.msg.reply('{} Cat not found :('.format(r.status_code))
+            return event.msg.reply('{} Cat not found :('.format(cat.status_code))
 
     @Plugin.command('dog', global_=True)
     def dog(self, event):
         try:
-            r = requests.get('https://api.thedogapi.com/v1/images/search?format=src')
-            r.raise_for_status()
-            ext = r.headers['content-type'].split('/')[-1].split(';')[0]
-            event.msg.reply('', attachments=[('dog.{}'.format(ext), r.content)])
+            URL = 'https://api.thedogapi.com/v1/images/search'
+            data = requests.get(URL).json()
+            dog = requests.get(data[0]['url'])
+            dog.raise_for_status()
+
+            fname = data[0]['id']
+            fext = dog.headers['content-type'].split('/')[-1].split(';')[0]
+            event.msg.reply('', attachments=[('dog-{}.{}'.format(fname, fext), dog.content)])
         except Exception as e:
-            return event.msg.reply(e.with_traceback + ' Dog not found :(')
+            return event.msg.reply('{} Dog not found :('.format(dog.status_code))
 
     @Plugin.command('emoji', '<emoji:str>', global_=True)
     def emoji(self, event, emoji):
@@ -342,7 +354,7 @@ class UtilitiesPlugin(Plugin):
 
         try:
             avatar = User.with_id(user.id).get_avatar_url()
-        except User:
+        except APIException:
             avatar = user.get_avatar_url()  # This fails if the user has never been seen by speedboat.
 
         embed.set_author(name='{} ({})'.format(
@@ -408,12 +420,15 @@ class UtilitiesPlugin(Plugin):
             return
         finally:
             # Cleanup
-            msg.delete_all_reactions()
+            try:
+                msg.delete_all_reactions()
+            except APIException: # We don't have permission to remove reactions, but, we don't want to fail the reminder.
+                pass
 
         if mra_event.emoji.name == SNOOZE_EMOJI:
             reminder.remind_at = datetime.utcnow() + timedelta(minutes=20)
             reminder.save()
-            msg.edit('Ok, I\'ve snoozed that reminder for 20 minutes.')
+            msg.edit('Ok, I\'ve snoozed that reminder. You\'ll get another notification in 20 minutes.')
             return
 
         reminder.delete_instance()
@@ -434,9 +449,9 @@ class UtilitiesPlugin(Plugin):
             raise CommandFail('That\'s too far in the future... I\'ll forget!')
 
         if event.msg.message_reference.message_id:
-            referenced_msg: DiscoMessage = event.channel.get_message(event.msg.message_reference.message_id)
+            referenced_msg: MessageReference = event.channel.get_message(event.msg.message_reference.message_id)
             content = 'https://discord.com/channels/{}/{}/{}'.format(
-                referenced_msg.guild_id,
+                self.state.channels.get(referenced_msg.channel_id).guild_id,
                 referenced_msg.channel_id,
                 referenced_msg.id)
         elif not content:

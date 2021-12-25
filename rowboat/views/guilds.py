@@ -5,6 +5,7 @@ from functools import reduce
 
 import yaml
 from flask import Blueprint, request, g, jsonify
+from yaml.cyaml import CDumper
 
 from rowboat.models.channel import Channel
 from rowboat.models.guild import Guild, GuildConfigChange
@@ -63,7 +64,7 @@ def guild_get(guild):
 @with_guild
 def guild_config(guild):
     return jsonify({
-        'contents': guild.config_raw.tobytes().decode("utf-8") if guild.config_raw else yaml.safe_dump(guild.config),
+        'contents': guild.config_raw.tobytes().decode("utf-8") if guild.config_raw else yaml.dump(guild.config, allow_unicode=True, dumper=CDumper),
     })
 
 
