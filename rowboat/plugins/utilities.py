@@ -114,6 +114,16 @@ class UtilitiesPlugin(Plugin):
         except Exception as e:
             return event.msg.reply(e.with_traceback + ' Dog not found :(')
 
+    @Plugin.command('otter', global_=True)
+    def otter(self, event):
+      try:
+        r = requests.get('https://otter.bruhmomentlol.repl.co/random')
+        r.raise_for_status()
+        ext = r.headers['x-file-ext']
+        event.msg.reply('', attachments=[('otter.{}'.format(ext), r.content)])
+      except:
+        return event.msg.reply('{} Otter not found :('.format(r.status_code))
+
     @Plugin.command('emoji', '<emoji:str>', global_=True)
     def emoji(self, event, emoji):
         if not EMOJI_RE.match(emoji):
