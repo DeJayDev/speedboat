@@ -1,6 +1,7 @@
 import functools
 import json
 import operator
+import chardet
 from functools import reduce
 
 import yaml
@@ -63,8 +64,9 @@ def guild_get(guild):
 @guilds.route('/<gid>/config')
 @with_guild
 def guild_config(guild):
+    encoding = chardet.detect(guild.config_raw.to_bytes())['encoding']
     return jsonify({
-        'contents': guild.config_raw.tobytes().decode("utf-8") if guild.config_raw else yaml.dump(guild.config, allow_unicode=True, dumper=CDumper),
+        'contents': guild.config_raw.tobytes().decode(encoding) if guild.config_raw else yaml.dump(guild.config, allow_unicode=True, dumper=CDumper),
     })
 
 
