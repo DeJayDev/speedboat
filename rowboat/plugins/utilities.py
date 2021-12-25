@@ -98,9 +98,10 @@ class UtilitiesPlugin(Plugin):
     def cat(self, event, bentley=False):
         try:
             if bentley:
-                URL = 'https://bentley.tadhg.sh/'
-                cat = requests.get(URL)
-                fname = 'bentley'
+                URL = 'https://bentley.tadhg.sh/api/random'
+                data = requests.get(URL).json()
+                fname = 'bentley-' + str(data['id']) # Probably don't have to, but gonna.
+                cat = requests.get(data['url'])
             else:
                 URL = 'https://api.thecatapi.com/v1/images/search'
                 data = requests.get(URL).json()
