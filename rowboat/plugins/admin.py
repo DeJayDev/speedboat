@@ -681,40 +681,48 @@ class AdminPlugin(Plugin):
 
     @Plugin.command('unmute', '<user:user|snowflake>', aliases=['umute'], level=CommandLevels.MOD)
     def unmute(self, event, user):
-        # TODO: Modify their GuildMemberBackup if we can't get guild member
         member = event.guild.get_member(user)
 
-        if member:
-            self.can_act_on(event, member.id)
-            if not event.config.mute_role:
-                raise CommandFail('Mute is not setup on this server')
-
-            if event.config.mute_role not in member.roles:
-                raise CommandFail('{} is not muted'.format(member.user))
-
-            Infraction.clear_active(event, member.id, [Infraction.Types.MUTE, Infraction.Types.TEMPMUTE])
-
-            self.call(
-                'ModLogPlugin.create_debounce',
-                event,
-                ['GuildMemberUpdate'],
-                role_id=event.config.mute_role,
-            )
-
-            member.remove_role(event.config.mute_role)
-
-            self.call(
-                'ModLogPlugin.log_action_ext',
-                Actions.MEMBER_UNMUTED,
-                event.guild.id,
-                member=member,
-                actor=str(event.author) if event.author.id != member.id else 'Automatic',
-            )
-
-            if event.config.confirm_actions:
-                raise CommandSuccess('{} is now unmuted'.format(member.user))
-        else:
+        # TODO: In the future, we should try to get their GuildMemberBackup and delete the muted role.
+        if not member:
+            if not event.config.native_mute: # If we are using native mute, we can't delete the mute role
+                try:
+                    GuildMemberBackup.remove_role(
+                        event.guild.id,
+                        user if isinstance(user, int) else user.id,
+                        event.config.mute_role)
+                except BaseException:
+                    pass # noop
             raise CommandFail('Invalid user')
+
+        self.can_act_on(event, member.id)
+        if not event.config.mute_role:
+            raise CommandFail('Mute is not setup on this server')
+
+        if event.config.mute_role not in member.roles:
+            raise CommandFail('{} is not muted'.format(member.user))
+
+        Infraction.clear_active(event, member.id, [Infraction.Types.MUTE, Infraction.Types.TEMPMUTE])
+
+        self.call(
+            'ModLogPlugin.create_debounce',
+            event,
+            ['GuildMemberUpdate'],
+            role_id=event.config.mute_role,
+        )
+
+        member.remove_role(event.config.mute_role)
+
+        self.call(
+            'ModLogPlugin.log_action_ext',
+            Actions.MEMBER_UNMUTED,
+            event.guild.id,
+            member=member,
+            actor=str(event.author) if event.author.id != member.id else 'Automatic',
+        )
+
+        if event.config.confirm_actions:
+            raise CommandSuccess('{} is now unmuted'.format(member.user))
 
     @Plugin.command('kick', '<user:user|snowflake> [reason:str...]', level=CommandLevels.MOD)
     def kick(self, event, user, reason=None):

@@ -219,18 +219,19 @@ class GuildConfigChange(ModelBase):
             (('user_id', 'guild_id'), False),
         )
 
-    # TODO: dispatch guild change events
     def rollback_to(self):
         Guild.update(
             config_raw=self.after_raw,
             config=yaml.safe_load(self.after_raw)
         ).where(Guild.guild_id == self.guild_id).execute()
+        Guild.emit_update()
 
     def revert(self):
         Guild.update(
             config_raw=self.before_raw,
             config=yaml.safe_load(self.before_raw)
         ).where(Guild.guild_id == self.guild_id).execute()
+        Guild.emit_update()
 
 
 @ModelBase.register

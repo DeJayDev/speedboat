@@ -1,6 +1,7 @@
 import time
 
 from datadog import initialize, statsd
+from disco.types.channel import ChannelType
 
 from rowboat import ENV
 from rowboat.plugins import RowboatPlugin as Plugin
@@ -66,13 +67,14 @@ class StatsPlugin(Plugin):
         if event.author.bot:
             return
 
+        if event.channel.type is ChannelType.DM:
+            return
+
         tags = {
             'channel_id': event.channel_id,
             'author_id': event.author.id,
+            'guild_id': event.guild.id
         }
-
-        if event.guild:
-            tags['guild_id'] = event.guild.id
 
         if event.author.id == self.client.state.me.id:
             if event.nonce in self.nonces:
@@ -93,13 +95,14 @@ class StatsPlugin(Plugin):
         if event.message.author.bot:
             return
 
+        if event.channel.type is ChannelType.DM:
+            return
+
         tags = {
             'channel_id': event.channel_id,
             'author_id': event.author.id,
+            'guild_id': event.guild.id
         }
-
-        if event.guild:
-            tags['guild_id'] = event.guild.id
 
         statsd.increment('guild.messages.update', tags=to_tags(tags))
 
