@@ -4,7 +4,6 @@ rowboat/constants.py
 rowboat-*.json
 *.pyc
 *.log
-ssl
 
 # Junk
 */*.DS_Store
@@ -14,12 +13,7 @@ __pycache__
 .vscode
 node_modules
 .pnp.*
-.yarn
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions
+
 
 # Environments
 src

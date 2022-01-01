@@ -246,8 +246,8 @@ class SQLPlugin(Plugin):
         else:
             chlist = list(event.guild.channels.values())
         for gch in chlist:
-            if self.state.channels[gch.id].type is not ChannelType.DM:
-                if self.state.channels[gch.id].get_permissions(self.state.me.id).can(Permissions.VIEW_CHANNEL):
+            if self.state.channels[gch.id].type is ChannelType.GUILD_TEXT:
+                if self.state.channels[gch.id].get_permissions(self.state.me.id).can(Permissions.VIEW_CHANNEL, Permissions.READ_MESSAGE_HISTORY):
                     channels.append(self.state.channels[gch.id])
 
         start_at = parse_duration(duration, negative=True)
@@ -264,7 +264,7 @@ class SQLPlugin(Plugin):
                 if last != len(recoveries):
                     last = len(recoveries)
                     msg.edit('Recovery Status: {}/{}'.format(len(recoveries), total))
-                gevent.sleep(5)
+                gevent.sleep(2)
 
         u = self.spawn(updater)
 
@@ -420,10 +420,6 @@ class Recovery(object):
             for msg in chunk:
                 if msg.author.bot:
                     break
-
-                if msg.channel.type is not ChannelType.DM:
-                    if not msg.channel.get_permissions(351776065477279745).can(Permissions.SEND_MESSAGES, Permissions.VIEW_CHANNEL):
-                        break
 
             self._recovered += len(Message.from_disco_message_many(chunk, safe=True))
 

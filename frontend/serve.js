@@ -1,7 +1,5 @@
 const {createProxyMiddleware} = require('http-proxy-middleware')
 const express = require('express')
-const fs = require('fs')
-const https = require('https')
 const ip = Object.values(require('os').networkInterfaces()).flat().find(i => i.family == 'IPv4' && !i.internal).address // lol
 const app = express()
 
@@ -33,13 +31,6 @@ const proxyOptions = {
 app.use(express.static('src'))
 app.use('/api', createProxyMiddleware(proxyOptions))
 
-if (fs.existsSync('./ssl/certificate.pem') && fs.existsSync('./ssl/key.pem')) {
-  var listener = https.createServer({
-    key: fs.readFileSync('./ssl/key.pem'),
-    cert: fs.readFileSync('./ssl/certificate.pem')
-  }, app).listen(443)
-} else {
-  var listener = app.listen(Number(process.env.PORT || 80));
-}
+var listener = app.listen(Number(process.env.PORT || 8443));
 
 console.log('Running on: ' + ip + ':' + listener.address()?.port)

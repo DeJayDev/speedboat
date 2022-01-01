@@ -92,9 +92,10 @@ class AdminConfig(PluginConfig):
     # Locked roles cannot be changed unless they are unlocked w/ command
     locked_roles = ListField(snowflake)
 
-    # The mute role
+    # Mute Settings
     mute_role = Field(snowflake, default=None)
     reason_edit_level = Field(int, default=int(CommandLevels.ADMIN))
+    native_mute = Field(bool, default=False)
 
 
 @Plugin.with_config(AdminConfig)

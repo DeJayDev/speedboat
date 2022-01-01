@@ -1,7 +1,7 @@
 import functools
 import json
 import operator
-import chardet
+import cchardet as chardet
 from functools import reduce
 
 import yaml

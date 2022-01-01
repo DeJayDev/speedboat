@@ -5,6 +5,7 @@ git+https://github.com/wenmin-wu/dominant-colors-py#egg=dominantcolors
 arrow==1.2.1
 CairoSVG==2.5.2
 click==8.0.3
+cchardet==2.1.7
 dill==0.3.4
 emoji==1.6.1
 Earl-ETF==2.1.2
