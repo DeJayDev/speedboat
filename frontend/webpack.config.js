@@ -10,6 +10,7 @@ module.exports = {
     // entry file - starting point for the app
     entry: './src',
 
+    mode: 'development',
     // where to dump the output of a production build
     output: {
         path: path.join(__dirname, 'src'),

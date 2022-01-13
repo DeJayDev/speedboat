@@ -10,47 +10,56 @@ import GuildInfractions from './guild_infractions';
 import GuildStats from './guild_stats';
 import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 
-function AppWrapper(props) {
+class AppWrapper extends Component {
+  constructor() {
+    super();
 
-  const [ready, setReady] = React.useState(globalState.ready);
-  const [user, setUser] = React.useState(null);
+    this.state = {
+      ready: globalState.ready,
+      user: globalState.user,
+    };
 
-  useEffect(() => {
     if (!globalState.ready) {
       globalState.events.on('ready', () => {
-        setReady(true);
+        this.setState({
+          ready: true,
+        });
       });
 
       globalState.events.on('user.set', (user) => {
-        setUser(user);
+        this.setState({
+          user: user,
+        });
       });
 
       globalState.init();
     }
-  }, []);
+  }
 
-  if (!ready) {
+  render() {
+    if (!this.state.ready) {
+      return (
+      <div className="card align-middle">
+        <div className="card-header">
+          <h1 className="font-weight-bold text-center text-primary">Loading...</h1>
+        </div>
+        <div className="card-body">
+          <h1 className="text-center text-primary">This doesn't take long... <sup>(usually)</sup></h1>
+        </div>
+      </div>);
+    }
+
+    if (this.state.ready && !this.state.user) {
+      return <Redirect to='/login' />;
+    }
+
     return (
-    <div className='card align-middle'>
-      <div className='card-header'>
-        <h1 className='font-weight-bold text-center text-primary'>Loading...</h1>
+      <div id="content-wrapper">
+        <Topbar />
+        <this.props.view params={this.props.params}/>
       </div>
-      <div className='card-body'>
-        <h1 className='text-center text-primary'>This doesn't take long... <sup>(usually)</sup></h1>
-      </div>
-    </div>);
+    );
   }
-
-  if (ready && user == null) {
-    return <Redirect to='/login' />;
-  }
-
-  return (
-    <div id='content-wrapper'>
-      <Topbar />
-      <props.view params={props.params}/>
-    </div>
-  );
 }
 
 function wrapped(component) {
