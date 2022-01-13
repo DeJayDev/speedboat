@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 
-import PageHeader from './page_header';
 import GuildsTable from './guilds_table';
 import {globalState} from '../state';
 
@@ -35,7 +34,6 @@ class DashboardGuildsList extends Component {
 function Dashboard(props) {
 	return (
     <div>
-      <PageHeader name='Dashboard' />
       <DashboardGuildsList />
     </div>
   );
