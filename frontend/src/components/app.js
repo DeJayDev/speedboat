@@ -13,7 +13,7 @@ import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 function AppWrapper(props) {
 
   const [ready, setReady] = React.useState(globalState.ready);
-  const [user, setUser] = React.useState(globalState.user);
+  const [user, setUser] = React.useState(null);
 
   useEffect(() => {
     if (!globalState.ready) {
