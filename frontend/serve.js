@@ -3,9 +3,6 @@ const express = require('express')
 const ip = Object.values(require('os').networkInterfaces()).flat().find(i => i.family == 'IPv4' && !i.internal).address // lol
 const app = express()
 
-app.use('/build', express.static(require('path').join(__dirname, 'build')))
-app.use(express.static('src'))
-
 let proxyURL = 'http://localhost:8686';
 
 if (process.env.NODE_ENV === 'docker') {
@@ -29,6 +26,13 @@ const proxyOptions = {
 }
 
 app.use(express.static('src'))
+app.use('/*', function(req, res) {
+  res.sendFile(path.join(__dirname, 'src/index.html'), function(err) {
+    if (err) {
+      res.status(500).send(err)
+    }
+ })
+})
 app.use('/api', createProxyMiddleware(proxyOptions))
 
 var listener = app.listen(Number(process.env.PORT || 8443));

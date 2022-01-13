@@ -41,7 +41,7 @@ function AppWrapper(props) {
     </div>);
   }
 
-  if (ready && !user) {
+  if (ready && user == null) {
     return <Redirect to='/login' />;
   }
 

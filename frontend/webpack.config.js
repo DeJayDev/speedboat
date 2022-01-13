@@ -53,7 +53,7 @@ module.exports = {
 
         // enable pushState() routing, as used by preact-router et al:
         historyApiFallback: true,
-
+        publicPath: '/',    
         proxy: {
             '/api': {
                 target: proxyURL,
