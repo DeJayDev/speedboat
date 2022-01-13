@@ -14,7 +14,7 @@ greenlet==1.1.2
 humanize==3.13.1
 markovify==0.9.3
 oauthlib==3.1.1
-Pillow==8.4.0
+Pillow==9.0.0
 psycogreen==1.0.2
 psycopg2-binary==2.9.3
 pytz==2021.3
