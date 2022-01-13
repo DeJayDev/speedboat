@@ -2,8 +2,9 @@ const {createProxyMiddleware} = require('http-proxy-middleware')
 const express = require('express')
 const ip = Object.values(require('os').networkInterfaces()).flat().find(i => i.family == 'IPv4' && !i.internal).address // lol
 const app = express()
+const path = require('path')
 
-let proxyURL = 'http://localhost:8686';
+let proxyURL = 'http://direct.speedboat.rocks:8686';
 
 if (process.env.NODE_ENV === 'docker') {
   proxyURL = 'http://web:8686'
@@ -25,6 +26,7 @@ const proxyOptions = {
   }
 }
 
+app.use('/api', createProxyMiddleware(proxyOptions))
 app.use(express.static('src'))
 app.use('/*', function(req, res) {
   res.sendFile(path.join(__dirname, 'src/index.html'), function(err) {
@@ -33,7 +35,6 @@ app.use('/*', function(req, res) {
     }
  })
 })
-app.use('/api', createProxyMiddleware(proxyOptions))
 
 var listener = app.listen(Number(process.env.PORT || 8443));
 
