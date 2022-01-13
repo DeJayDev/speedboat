@@ -1,135 +1,122 @@
 import React, { Component } from 'react';
 import debounce from 'lodash/debounce';
 import {globalState} from '../state';
-import ReactTable from "react-table";
+import ReactTable from 'react-table-6';
 
-class InfractionTable extends Component {
-  render() {
-    const inf = this.props.infraction;
+function InfractionTable(props) {
+  const inf = this.props.infraction;
 
-    return (
-      <table className="table table-striped table-bordered table-hover">
-        <tbody>
-          <tr>
-            <td>ID</td>
-            <td>{inf.id}</td>
-          </tr>
-          <tr>
-            <td>Target User</td>
-            <td>{inf.user.username}#{inf.user.discriminator} ({inf.user.id})</td>
-          </tr>
-          <tr>
-            <td>Actor User</td>
-            <td>{inf.actor.username}#{inf.actor.discriminator} ({inf.actor.id})</td>
-          </tr>
-          <tr>
-            <td>Created At</td>
-            <td>{inf.created_at}</td>
-          </tr>
-          <tr>
-            <td>Expires At</td>
-            <td>{inf.expires_at}</td>
-          </tr>
-          <tr>
-            <td>Type</td>
-            <td>{inf.type.name}</td>
-          </tr>
-          <tr>
-            <td>Reason</td>
-            <td>{inf.reason}</td>
-          </tr>
-          <tr>
-            <td>Messaged?</td>
-            <td>{inf.messaged ? 'Yes' : 'No'}</td>
-          </tr>
-        </tbody>
-      </table>
-    );
-  }
+  return (
+    <table className='table table-striped table-bordered table-hover'>
+      <tbody>
+        <tr>
+          <td>ID</td>
+          <td>{inf.id}</td>
+        </tr>
+        <tr>
+          <td>Target User</td>
+          <td>{inf.user.username}#{inf.user.discriminator} ({inf.user.id})</td>
+        </tr>
+        <tr>
+          <td>Actor User</td>
+          <td>{inf.actor.username}#{inf.actor.discriminator} ({inf.actor.id})</td>
+        </tr>
+        <tr>
+          <td>Created At</td>
+          <td>{inf.created_at}</td>
+        </tr>
+        <tr>
+          <td>Expires At</td>
+          <td>{inf.expires_at}</td>
+        </tr>
+        <tr>
+          <td>Type</td>
+          <td>{inf.type.name}</td>
+        </tr>
+        <tr>
+          <td>Reason</td>
+          <td>{inf.reason}</td>
+        </tr>
+        <tr>
+          <td>Messaged?</td>
+          <td>{inf.messaged ? 'Yes' : 'No'}</td>
+        </tr>
+      </tbody>
+    </table>
+  );
 }
 
-class GuildInfractionInfo extends Component {
-  render() {
-    return (
-      <div className="card">
-        <div className="card-header">Infraction Info</div>
-        <div className="card-body">
-          <InfractionTable infraction={this.props.infraction} />
-        </div>
+function GuildInfractionInfo(props) {
+  return (
+    <div className='card'>
+      <div className='card-header'>Infraction Info</div>
+      <div className='card-body'>
+        <InfractionTable infraction={props.infraction} />
       </div>
-    );
-  }
+    </div>
+  );
 }
 
-class GuildInfractionsTable extends Component {
-  constructor() {
-    super();
+function GuildInfractionsTable(props) {
 
-    this.state = {
-      data: [],
-      loading: true,
-    };
-  }
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  render() {
-    return (
-      <ReactTable
-        data={this.state.data}
-        columns={[
-          {Header: "ID", accessor: "id"},
-          {Header: "User", columns: [
-            {Header: "ID", accessor: "user.id", id: "user_id"},
-            {
-              Header: "Tag",
-              id: "user_tag",
-              accessor: d => d.user.username + '#' + d.user.discriminator,
-              filterable: false,
-              sortable: false,
-            }
-          ]},
-          {Header: "Actor", columns: [
-            {Header: "ID", accessor: "actor.id", id: "actor_id"},
-            {
-              Header: "Tag",
-              id: "actor_tag",
-              accessor: d => d.actor.username + '#' + d.actor.discriminator,
-              filterable: false,
-              sortable: false,
-            }
-          ]},
-          {Header: "Created At", accessor: "created_at", filterable: false},
-          {Header: "Expires At", accessor: "expires_at", filterable: false},
-          {Header: "Type", accessor: "type.name", id: "type"},
-          {Header: "Reason", accessor: "reason", sortable: false},
-          {Header: "Active", id: "active", accessor: d => d.active ? 'Active' : 'Inactive', sortable: false, filterable: false},
-        ]}
-        pages={10000}
-        loading={this.state.loading}
-        manual
-        onFetchData={debounce(this.onFetchData.bind(this), 500)}
-        filterable
-        className="-striped -highlight"
-        getTdProps={(state, rowInfo, column, instance) => {
-          return {
-            onClick: () => {
-              this.props.onSelectInfraction(rowInfo.original);
-            }
-          };
-        }}
-      />
-    );
-  }
+  function onFetchData(state, instance) {
+    setLoading(true);
 
-  onFetchData(state, instance) {
-    this.setState({loading: true});
-
-    this.props.guild.getInfractions(state.page + 1, state.pageSize, state.sorted, state.filtered).then((data) => {
-      this.setState({
-        data: data,
-        loading: false,
-      });
+    props.guild.getInfractions(state.page + 1, state.pageSize, state.sorted, state.filtered).then((data) => {
+      setData(data);
+      setLoading(false);
     });
   }
+
+  return (
+    <ReactTable
+      data={data}
+      columns={[
+        {Header: 'ID', accessor: 'id'},
+        {Header: 'User', columns: [
+          {Header: 'ID', accessor: 'user.id', id: 'user_id'},
+          {
+            Header: 'Tag',
+            id: 'user_tag',
+            accessor: d => d.user.username + '#' + d.user.discriminator,
+            filterable: false,
+            sortable: false,
+          }
+        ]},
+        {Header: 'Actor', columns: [
+          {Header: 'ID', accessor: 'actor.id', id: 'actor_id'},
+          {
+            Header: 'Tag',
+            id: 'actor_tag',
+            accessor: d => d.actor.username + '#' + d.actor.discriminator,
+            filterable: false,
+            sortable: false,
+          }
+        ]},
+        {Header: 'Created At', accessor: 'created_at', filterable: false},
+        {Header: 'Expires At', accessor: 'expires_at', filterable: false},
+        {Header: 'Type', accessor: 'type.name', id: 'type'},
+        {Header: 'Reason', accessor: 'reason', sortable: false},
+        {Header: 'Active', id: 'active', accessor: d => d.active ? 'Active' : 'Inactive', sortable: false, filterable: false},
+      ]}
+      pages={10000}
+      loading={loading}
+      manual
+      onFetchData={() => debounce(onFetchData.bind(this), 500)}
+      filterable
+      className='-striped -highlight'
+      getTdProps={(state, rowInfo, column, instance) => {
+        return {
+          onClick: () => {
+            props.onSelectInfraction(rowInfo.original);
+          }
+        };
+      }}
+    />
+  );
 }
 
 export default class GuildInfractions extends Component {
@@ -166,10 +153,10 @@ export default class GuildInfractions extends Component {
     }
 
     return (
-      <div className="col-lg-12">
-        <div className="card">
-          <div className="card-header">Infractions</div>
-          <div className="card-body">
+      <div className='col-lg-12'>
+        <div className='card'>
+          <div className='card-header'>Infractions</div>
+          <div className='card-body'>
             <GuildInfractionsTable guild={this.state.guild} onSelectInfraction={this.onSelectInfraction.bind(this)} />
           </div>
         </div>

@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import AceEditor from 'react-ace';
 import {globalState} from '../state';
 
-import 'brace/mode/yaml'
-import 'brace/theme/monokai'
+import 'ace-builds/src-noconflict/mode-yaml'
+import 'ace-builds/src-noconflict/theme-monokai'
 
 export default class GuildConfigEdit extends Component {
   constructor() {
@@ -81,26 +81,26 @@ export default class GuildConfigEdit extends Component {
 
   render() {
     return (<div>
-      {this.state.message && <div className={"alert alert-" + this.state.message.type}>{this.state.message.contents}</div>}
-        <div className="card">
-          <div className="card-header">
+      {this.state.message && <div className={'alert alert-' + this.state.message.type}>{this.state.message.contents}</div>}
+        <div className='card'>
+          <div className='card-header'>
             Configuration Editor
           </div>
-          <div className="card-body">
+          <div className='card-body'>
             <AceEditor
-              mode="yaml"
-              theme="monokai"
-              width="100%"
-              height="75vh"
+              mode='yaml'
+              theme='monokai'
+              width='100%'
+              height='75vh'
               value={this.state.contents == null ? '' : this.state.contents}
               onChange={(newValue) => this.onEditorChange(newValue)}
             />
           </div>
-          <div className="card-footer">
+          <div className='card-footer'>
             {
               this.state.guild && this.state.guild.role != 'viewer' &&
-                <button onClick={() => this.onSave()} type="button" className="btn btn-success btn-circle btn-lg">
-                <i className="fa fa-check"></i>
+                <button onClick={() => this.onSave()} type='button' className='btn btn-success btn-circle btn-lg'>
+                <i className='fa fa-check'></i>
               </button>
             }
             { this.state.hasUnsavedChanges && <i style={{paddingLeft: '10px'}}>Unsaved Changes!</i>}

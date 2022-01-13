@@ -1,8 +1,7 @@
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
 
 import {globalState} from '../state';
 import Topbar from './topbar';
-import Sidebar from './sidebar';
 import Dashboard from './dashboard';
 import Login from './login';
 import GuildOverview from './guild_overview';
@@ -11,56 +10,47 @@ import GuildInfractions from './guild_infractions';
 import GuildStats from './guild_stats';
 import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 
-class AppWrapper extends Component {
-  constructor() {
-    super();
+function AppWrapper(state) {
 
-    this.state = {
-      ready: globalState.ready,
-      user: globalState.user,
-    };
+  const [ready, setReady] = React.useState(globalState.ready);
+  const [user, setUser] = React.useState(globalState.user);
 
+  useEffect(() => {
     if (!globalState.ready) {
       globalState.events.on('ready', () => {
-        this.setState({
-          ready: true,
-        });
+        setReady(true);
       });
 
       globalState.events.on('user.set', (user) => {
-        this.setState({
-          user: user,
-        });
+        setUser(user);
       });
 
       globalState.init();
     }
-  }
+  }, []);
 
-  render() {
-    if (!this.state.ready) {
-      return (
-      <div className="card align-middle">
-        <div className="card-header">
-          <h1 className="font-weight-bold text-center text-primary">Loading...</h1>
-        </div>
-        <div className="card-body">
-          <h1 className="text-center text-primary">This doesn't take long... <sup>(usually)</sup></h1>
-        </div>
-      </div>);
-    }
-
-    if (this.state.ready && !this.state.user) {
-      return <Redirect to='/login' />;
-    }
-
+  if (!this.state.ready) {
     return (
-      <div id="content-wrapper">
-        <Topbar />
-        <this.props.view params={this.props.params}/>
+    <div className='card align-middle'>
+      <div className='card-header'>
+        <h1 className='font-weight-bold text-center text-primary'>Loading...</h1>
       </div>
-    );
+      <div className='card-body'>
+        <h1 className='text-center text-primary'>This doesn't take long... <sup>(usually)</sup></h1>
+      </div>
+    </div>);
   }
+
+  if (this.state.ready && !this.state.user) {
+    return <Redirect to='/login' />;
+  }
+
+  return (
+    <div id='content-wrapper'>
+      <Topbar />
+      <this.props.view params={this.props.params}/>
+    </div>
+  );
 }
 
 function wrapped(component) {

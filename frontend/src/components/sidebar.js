@@ -2,41 +2,37 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom'
 import {globalState} from '../state';
 
-class SidebarLink extends Component {
-  render () {
-    const iconClass = `fas fa-${this.props.icon}`;
+function SidebarLink(props) {
+  const iconClass = `fas fa-${props.icon}`;
 
-    return (
-      <li>
-        <Link className="nav-link" to={this.props.to}>
-          <i className={iconClass}></i> 
-          {this.props.text}</Link>
-      </li>
-    );
-  }
+  return (
+    <li>
+      <Link className='nav-link' to={props.to}>
+        <i className={iconClass}></i> 
+        {props.text}</Link>
+    </li>
+  );
 }
 
 
-class GuildLinks extends Component {
-  render() {
-    let links = [];
+function GuildLinks(props) {
+  let links = [];
 
-    if (this.props.active) {
-      links.push(
-        <SidebarLink icon='info' to={'/guilds/' + this.props.guild.id} text='Information' key='info' />
-      );
+  if (props.active) {
+    links.push(
+      <SidebarLink icon='info' to={'/guilds/' + props.guild.id} text='Information' key='info' />
+    );
 
-      links.push(
-        <SidebarLink icon='cog' to={'/guilds/' + this.props.guild.id + '/config'} text='Config' key='config' />
-      );
+    links.push(
+      <SidebarLink icon='cog' to={'/guilds/' + props.guild.id + '/config'} text='Config' key='config' />
+    );
 
-      links.push(
-        <SidebarLink icon='ban' to={'/guilds/' + this.props.guild.id + '/infractions'} text='Infractions' key='infractions' />
-      );
-    }
+    links.push(
+      <SidebarLink icon='ban' to={'/guilds/' + props.guild.id + '/infractions'} text='Infractions' key='infractions' />
+    );
 
-    return links;
   }
+  return links;
 }
 
 
@@ -83,7 +79,7 @@ class Sidebar extends Component {
     }
 
     return (
-      <div className="sidenav">
+      <div className='sidenav'>
         {sidebarLinks}
       </div>
     );

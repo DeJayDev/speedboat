@@ -2,65 +2,57 @@ import React, { Component } from 'react';
 import {globalState} from '../state';
 import {withRouter} from 'react-router';
 
-class GuildWidget extends Component {
-  render() {
-    const source = `https://discord.com/api/guilds/${this.props.guildID}/widget.png?style=banner2`;
-    return (<img src={source} alt="(Guild must have widget enabled)" />);
+function GuildWidget(props) {
+  const source = `https://discord.com/api/guilds/${props.guildID}/widget.png?style=banner2`;
+  return (<img src={source} alt='(Guild must have widget enabled)' />);
+}
+
+function GuildIcon(props) {
+  if (props.guildIcon) {
+    const source = `https://cdn.discordapp.com/icons/${props.guildID}/${props.guildIcon}.png`;
+    return <img src={source} alt='No Icon' />;
+  } else {
+    return <i>No Icon</i>;
   }
 }
 
-class GuildIcon extends Component {
-  render() {
-    if (this.props.guildIcon) {
-      const source = `https://cdn.discordapp.com/icons/${this.props.guildID}/${this.props.guildIcon}.png`;
-      return <img src={source} alt="No Icon" />;
-    } else {
-      return <i>No Icon</i>;
-    }
+function GuildSplash(props) {
+  if (props.guildSplash) {
+    const source = `https://cdn.discordapp.com/splashes/${props.guildID}/${props.guildSplash}.png`;
+    return <img src={source} alt='No Splash' />;
+  } else {
+    return <i>No Splash</i>;
   }
 }
 
-class GuildSplash extends Component {
-  render() {
-    if (this.props.guildSplash) {
-      const source = `https://cdn.discordapp.com/splashes/${this.props.guildID}/${this.props.guildSplash}.png`;
-      return <img src={source} alt="No Splash" />;
-    } else {
-      return <i>No Splash</i>;
-    }
-  }
-}
-
-class GuildOverviewInfoTable extends Component {
-  render() {
-    return (
-      <table className="table table-striped table-bordered">
-        <thead></thead>
-        <tbody>
-          <tr>
-            <td>ID</td>
-            <td>{this.props.guild.id}</td>
-          </tr>
-          <tr>
-            <td>Owner</td>
-            <td>{this.props.guild.ownerID}</td>
-          </tr>
-          <tr>
-            <td>Region</td>
-            <td>{this.props.guild.region}</td>
-          </tr>
-          <tr>
-            <td>Icon</td>
-            <td><GuildIcon guildID={this.props.guild.id} guildIcon={this.props.guild.icon} /></td>
-          </tr>
-          <tr>
-            <td>Splash</td>
-            <td><GuildSplash guildID={this.props.guild.id} guildSplash={this.props.guild.splash} /></td>
-          </tr>
-        </tbody>
-      </table>
-    );
-  }
+function GuildOverviewInfoTable(props) {
+  return (
+    <table className='table table-striped table-bordered'>
+      <thead></thead>
+      <tbody>
+        <tr>
+          <td>ID</td>
+          <td>{props.guild.id}</td>
+        </tr>
+        <tr>
+          <td>Owner</td>
+          <td>{props.guild.ownerID}</td>
+        </tr>
+        <tr>
+          <td>Region</td>
+          <td>{props.guild.region}</td>
+        </tr>
+        <tr>
+          <td>Icon</td>
+          <td><GuildIcon guildID={props.guild.id} guildIcon={props.guild.icon} /></td>
+        </tr>
+        <tr>
+          <td>Splash</td>
+          <td><GuildSplash guildID={props.guild.id} guildSplash={props.guild.splash} /></td>
+        </tr>
+      </tbody>
+    </table>
+  );
 }
 
 export default class GuildOverview extends Component {
@@ -95,18 +87,18 @@ export default class GuildOverview extends Component {
     const OverviewTable = withRouter(GuildOverviewInfoTable);
 
     return (<div>
-      <div className="row">
-        <div className="col-lg-12">
-          <div className="card">
-            <div className="card-header">Guild Banner</div>
-            <div className="card-body">
+      <div className='row'>
+        <div className='col-lg-12'>
+          <div className='card'>
+            <div className='card-header'>Guild Banner</div>
+            <div className='card-body'>
               <GuildWidget guildID={this.state.guild.id} />
             </div>
           </div>
-          <div className="card">
-            <div className="card-header">Guild Info</div>
-            <div className="card-body">
-              <div className="table-responsive">
+          <div className='card'>
+            <div className='card-header'>Guild Info</div>
+            <div className='card-body'>
+              <div className='table-responsive'>
                 <OverviewTable guild={this.state.guild} />
               </div>
             </div>

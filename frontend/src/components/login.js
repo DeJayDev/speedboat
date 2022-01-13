@@ -1,41 +1,36 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom'
 import {globalState} from '../state';
 
-export default class Login extends Component {
-  constructor() {
-    super();
+export default function Login(props) {
 
-    this.state = {
-      user: globalState.user,
-    };
+  const [user, setUser] = useState(globalState.user);
 
+  useEffect(() => {
     globalState.events.on('user.set', (user) => {
-      this.setState({user: user});
+      setUser(user);
     });
 
     globalState.init();
+  }, []);
+
+  if (user) {
+    return <Redirect to='/' />;
   }
 
-  render() {
-    if (this.state.user) {
-      return <Redirect to='/' />;
-    }
-
-    return (
-      <div className="card">
-        <div className="card-header">
-          <h2 className="card-title text-primary text-center">Login with Discord</h2>
-        </div>
-        <div className="card-body">
-          <a href="/api/auth/discord">
-            <img src="https://dejay.dev/assets/discord.svg" height="256" width="256" style={{
-              margin: 'auto',
-              display: 'block',
-            }} />
-          </a>
-        </div>
+  return (
+    <div className='card'>
+      <div className='card-header'>
+        <h2 className='card-title text-primary text-center'>Login with Discord</h2>
       </div>
-    );
-  }
+      <div className='card-body'>
+        <a href='/api/auth/discord'>
+          <img src='https://dejay.dev/assets/discord.svg' height='256' width='256' style={{
+            margin: 'auto',
+            display: 'block',
+          }} />
+        </a>
+      </div>
+    </div>
+  );
 }

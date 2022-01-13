@@ -20,11 +20,11 @@ class DashboardGuildsList extends Component {
 
   render() {
     return (
-      <div className="card">
-        <div className="card-header">
+      <div className='card'>
+        <div className='card-header'>
           Guilds
         </div>
-        <div className="card-body">
+        <div className='card-body'>
           <GuildsTable guilds={this.state.guilds}/>
         </div>
       </div>
@@ -32,14 +32,13 @@ class DashboardGuildsList extends Component {
   }
 }
 
-class Dashboard extends Component {
-  render() {
-		return (
-      <div>
-        <DashboardGuildsList />
-      </div>
-    );
-  }
+function Dashboard(props) {
+	return (
+    <div>
+      <PageHeader name='Dashboard' />
+      <DashboardGuildsList />
+    </div>
+  );
 }
 
 export default Dashboard;

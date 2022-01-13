@@ -3,7 +3,7 @@ const express = require('express')
 const ip = Object.values(require('os').networkInterfaces()).flat().find(i => i.family == 'IPv4' && !i.internal).address // lol
 const app = express()
 
-app.use('/build', express.static(require("path").join(__dirname, 'build')))
+app.use('/build', express.static(require('path').join(__dirname, 'build')))
 app.use(express.static('src'))
 
 let proxyURL = 'http://localhost:8686';
