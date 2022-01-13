@@ -10,7 +10,7 @@ import GuildInfractions from './guild_infractions';
 import GuildStats from './guild_stats';
 import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 
-function AppWrapper(state) {
+function AppWrapper(props) {
 
   const [ready, setReady] = React.useState(globalState.ready);
   const [user, setUser] = React.useState(globalState.user);
@@ -29,7 +29,7 @@ function AppWrapper(state) {
     }
   }, []);
 
-  if (!this.state.ready) {
+  if (!ready) {
     return (
     <div className='card align-middle'>
       <div className='card-header'>
@@ -41,14 +41,14 @@ function AppWrapper(state) {
     </div>);
   }
 
-  if (this.state.ready && !this.state.user) {
+  if (ready && !user) {
     return <Redirect to='/login' />;
   }
 
   return (
     <div id='content-wrapper'>
       <Topbar />
-      <this.props.view params={this.props.params}/>
+      <props.view params={props.params}/>
     </div>
   );
 }
