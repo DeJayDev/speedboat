@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import {globalState} from '../state';
-import {withRouter} from 'react-router';
 
-class Topbar extends Component {
+export default class Topbar extends Component {
   constructor() {
     super();
     this.state = {
@@ -43,5 +42,5 @@ class Topbar extends Component {
   }
 }
 
-export default withRouter(Topbar);
+// Topbar;
 //        <div className='topbar-divider d-none d-sm-block'></div>

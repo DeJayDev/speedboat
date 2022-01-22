@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 
 import GuildsTable from './guilds_table';
 import {globalState} from '../state';
@@ -31,12 +31,9 @@ class DashboardGuildsList extends Component {
   }
 }
 
-function Dashboard(props) {
-	return (
-    <div>
+export default function Dashboard(props) {
+	return <Fragment>
       <DashboardGuildsList />
-    </div>
-  );
+    </Fragment>
 }
 
-export default Dashboard;

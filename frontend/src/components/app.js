@@ -1,42 +1,45 @@
-import React, { useEffect } from 'react';
+// noinspection JSValidateTypes
 
+import React, {Component, Fragment, useEffect, useState} from 'react';
+import {Redirect, Route, Switch} from 'react-router-dom';
 import {globalState} from '../state';
 import Topbar from './topbar';
 import Dashboard from './dashboard';
 import Login from './login';
-import GuildOverview from './guild_overview';
-import GuildConfigEdit from './guild_config_edit';
-import GuildInfractions from './guild_infractions';
-import GuildStats from './guild_stats';
-import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
+import GuildOverview from "./guild_overview";
+import GuildStats from "./guild_stats";
+import GuildConfigEdit from "./guild_config_edit";
+import GuildInfractions from "./guild_infractions";
 
-class AppWrapper extends Component {
-  constructor() {
-    super();
+export default function AppWrapper() {
 
-    this.state = {
-      ready: globalState.ready,
-      user: globalState.user,
-    };
+    const [ready, setReady] = useState(globalState.ready)
+    const [user, setUser] = useState(globalState.user)
 
-    if (!globalState.ready) {
-      globalState.events.on('ready', () => {
-        this.setState({
-          ready: true,
-        });
-      });
+    useEffect(() => {
+        globalState.events.on('ready', () => {
+            setReady(true);
+        })
 
-      globalState.events.on('user.set', (user) => {
-        this.setState({
-          user: user,
-        });
-      });
+        globalState.events.on('user.set', () => {
+            setUser(user);
+        })
 
-      globalState.init();
+        if(user) {
+            console.log('User exists, running init')
+            globalState.init();
+        }
+
+    }, [ready]);
+
+    if (user === null) {
+        console.log('Redirecting to login, no user.')
+    } else {
+        console.log('fuck it, heres state: ' + globalState)
+        return "hey :)"
     }
-  }
 
-  render() {
+    /*
     if (!this.state.ready) {
       return (
       <div className="card align-middle">
@@ -49,37 +52,44 @@ class AppWrapper extends Component {
       </div>);
     }
 
-    if (this.state.ready && !this.state.user) {
+    if (this.state.ready && (this.state.user === null)) {
       return <Redirect to='/login' />;
-    }
+    }*/
 
-    return (
-      <div id="content-wrapper">
+    return <Fragment>
         <Topbar />
-        <this.props.view params={this.props.params}/>
-      </div>
-    );
-  }
+        <Switch>
+          <Route exact path='/' component={Dashboard}/>
+          <Route path='/login' component={Login}/>
+          <Route path='/guilds/:gid' component={authenticatedPage(GuildOverview)}/>
+          <Route path='/guilds/:gid/stats' component={authenticatedPage(GuildStats)}/>
+          <Route path='/guilds/:gid/config' component={authenticatedPage(GuildConfigEdit)}/>
+          <Route path='/guilds/:gid/infractions' component={authenticatedPage(GuildInfractions)}/>
+        </Switch>
+    </Fragment>
+
 }
 
-function wrapped(component) {
-  function result(props) {
-    return <AppWrapper view={component} params={props.match.params} />;
-  }
-  return result;
+function authenticatedPage(Component) {
+    const componentName = Component.displayName || Component.name || 'Component'
+
+    return class extends React.Component {
+        static displayName = `Route(${componentName})`
+
+        renderPage() {
+            return (
+                <Component {...this.props} />
+            )
+        }
+
+        render() {
+            if (globalState.user !== null) {
+                return this.renderPage()
+            } else {
+                console.log('User is not logged in, redirecting to login page');
+                return <Redirect to='/login'/>
+            }
+        }
+    }
 }
 
-export default function router() {
-  return (
-    <BrowserRouter>
-      <Switch>
-        <Route exact path='/login' component={Login} />
-        <Route exact path='/guilds/:gid/stats' component={wrapped(GuildStats)} />
-        <Route exact path='/guilds/:gid/infractions' component={wrapped(GuildInfractions)} />
-        <Route exact path='/guilds/:gid/config' component={wrapped(GuildConfigEdit)} />
-        <Route exact path='/guilds/:gid' component={wrapped(GuildOverview)} />
-        <Route exact path='/' component={wrapped(Dashboard)} />
-      </Switch>
-    </BrowserRouter>
-  );
-}
