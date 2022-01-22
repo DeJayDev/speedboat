@@ -60,11 +60,11 @@ export default function AppWrapper() {
         <Topbar />
         <Switch>
           <Route exact path='/' component={Dashboard}/>
-          <Route path='/login' component={Login}/>
-          <Route path='/guilds/:gid' component={authenticatedPage(GuildOverview)}/>
-          <Route path='/guilds/:gid/stats' component={authenticatedPage(GuildStats)}/>
-          <Route path='/guilds/:gid/config' component={authenticatedPage(GuildConfigEdit)}/>
-          <Route path='/guilds/:gid/infractions' component={authenticatedPage(GuildInfractions)}/>
+          <Route exact path='/login' component={Login}/>
+          <Route exact path='/guilds/:gid' component={authenticatedPage(GuildOverview)}/>
+          <Route exact path='/guilds/:gid/stats' component={authenticatedPage(GuildStats)}/>
+          <Route exact path='/guilds/:gid/config' component={authenticatedPage(GuildConfigEdit)}/>
+          <Route exact path='/guilds/:gid/infractions' component={authenticatedPage(GuildInfractions)}/>
         </Switch>
     </Fragment>
 
