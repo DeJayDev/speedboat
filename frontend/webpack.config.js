@@ -46,6 +46,7 @@ module.exports = {
     devServer: {
         host: '0.0.0.0',
         disableHostCheck: true,
+        host: true,
         // serve up any static files from src/
         contentBase: path.join(__dirname, 'src'),
 

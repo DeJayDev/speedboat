@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import {globalState} from '../state';
-import {withRouter} from 'react-router';
 
 function GuildWidget(props) {
   const source = `https://discord.com/api/guilds/${props.guildID}/widget.png?style=banner2`;
@@ -65,12 +64,12 @@ export default class GuildOverview extends Component {
   }
 
   ensureGuild() {
-    globalState.getGuild(this.props.params.gid).then((guild) => {
+    globalState.getGuild(this.props.match.params.gid).then((guild) => {
       guild.events.on('update', (guild) => this.setState({guild}));
       globalState.currentGuild = guild;
       this.setState({guild});
     }).catch((err) => {
-      console.error('Failed to load guild', this.props.params.gid, err);
+      console.error('Failed to load guild', this.props.match.params.gid, err);
     });
   }
 
@@ -79,12 +78,10 @@ export default class GuildOverview extends Component {
   }
 
   render() {
-    if (!this.state.guild || this.state.guild.id != this.props.params.gid) {
+    if (!this.state.guild || this.state.guild.id != this.props.match.params.gid) {
       this.ensureGuild();
       return <h3>Loading...</h3>;
     }
-
-    const OverviewTable = withRouter(GuildOverviewInfoTable);
 
     return (<div>
       <div className='row'>
@@ -99,7 +96,7 @@ export default class GuildOverview extends Component {
             <div className='card-header'>Guild Info</div>
             <div className='card-body'>
               <div className='table-responsive'>
-                <OverviewTable guild={this.state.guild} />
+                <GuildOverviewInfoTable guild={this.state.guild} />
               </div>
             </div>
           </div>
