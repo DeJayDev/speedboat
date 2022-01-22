@@ -2,7 +2,7 @@ var path = require('path');
 
 let proxyURL = 'http://localhost:8686';
 
-if (process.env.NODE_ENV == 'docker') {
+if (process.env.NODE_ENV === 'docker') {
     proxyURL = 'http://web:8686';
 }
 
