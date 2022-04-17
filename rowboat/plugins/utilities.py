@@ -333,6 +333,13 @@ class UtilitiesPlugin(Plugin):
             content.append('Joined: <t:{0}:R> (<t:{0}:f>)'.format(
                 int(member.joined_at.replace(tzinfo=pytz.UTC).timestamp())
             ))
+            
+            content.append('Messages: {}'.format(
+                int(Message.select(fn.Count(Message.id)).where(
+                        (Message.author_id == user.id) &
+                        (Message.guild_id == event.guild.id)
+                   ).tuples()[0][0])
+            ))
 
             if member.roles:
                 content.append('Roles: {}'.format(
