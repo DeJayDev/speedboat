@@ -1,4 +1,5 @@
-from flask import Blueprint, g, current_app, session, jsonify, redirect, request
+from flask import (Blueprint, current_app, g, jsonify, redirect, request,
+                   session)
 from requests_oauthlib import OAuth2Session
 
 from rowboat.models.user import User

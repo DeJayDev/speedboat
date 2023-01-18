@@ -1,9 +1,10 @@
 import os
 
 import psycogreen.gevent
-from peewee import Expression
-from peewee import Proxy, OP, Model
+from peewee import OP, Expression, Model, Proxy
 from playhouse.postgres_ext import PostgresqlExtDatabase
+
+from rowboat import ENV
 
 psycogreen.gevent.patch_psycopg()
 
@@ -52,7 +53,7 @@ def init_db(env):
 
 
 def reset_db():
-    init_db()
+    init_db(ENV)
 
     for model in REGISTERED_MODELS:
         model.drop_table(True)

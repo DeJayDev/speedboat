@@ -6,14 +6,14 @@ from disco.bot import CommandLevels
 from disco.types.message import MessageTable
 from disco.util.sanitize import S
 
-from rowboat.constants import (
-    GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID, GREEN_TICK_EMOJI, RED_TICK_EMOJI
-)
+from rowboat.constants import (GREEN_TICK_EMOJI, GREEN_TICK_EMOJI_ID,
+                               RED_TICK_EMOJI, RED_TICK_EMOJI_ID)
 from rowboat.models.guild import GuildMemberLevel
 from rowboat.models.message import Message
 from rowboat.models.user import User, XPBlock
-from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
-from rowboat.types import Field, DictField, SlottedModel, snowflake
+from rowboat.plugins import CommandFail, CommandSuccess
+from rowboat.plugins import RowboatPlugin as Plugin
+from rowboat.types import DictField, Field, SlottedModel, snowflake
 from rowboat.types.plugin import PluginConfig
 
 

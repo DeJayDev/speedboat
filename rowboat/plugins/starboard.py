@@ -3,14 +3,17 @@ from datetime import datetime, timedelta
 import peewee
 from disco.api.http import APIException
 from disco.bot import CommandLevels
-from disco.types.message import ActionRow, ButtonStyles, ComponentTypes, MessageEmbed
-from peewee import fn, JOIN
+from disco.types.message import (ActionRow, ButtonStyles, ComponentTypes,
+                                 MessageEmbed)
+from peewee import JOIN, fn
 
-from rowboat.constants import STAR_EMOJI, ERR_UNKNOWN_MESSAGE
-from rowboat.models.message import StarboardEntry, Message
+from rowboat.constants import ERR_UNKNOWN_MESSAGE, STAR_EMOJI
+from rowboat.models.message import Message, StarboardEntry
 from rowboat.models.user import StarboardBlock, User
-from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
-from rowboat.types import ChannelField, Field, SlottedModel, ListField, DictField
+from rowboat.plugins import CommandFail, CommandSuccess
+from rowboat.plugins import RowboatPlugin as Plugin
+from rowboat.types import (ChannelField, DictField, Field, ListField,
+                           SlottedModel)
 from rowboat.types.plugin import PluginConfig
 from rowboat.util.timing import Debounce
 

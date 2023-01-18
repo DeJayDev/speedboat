@@ -14,7 +14,6 @@ __pycache__
 node_modules
 .pnp.*
 
-
 # Environments
 src
 .env
@@ -27,3 +26,6 @@ venv.bak/
 
 # Prevent forks from spawning too easily.
 start.json5
+
+# Keep this for a little bit...
+frontendlegacy

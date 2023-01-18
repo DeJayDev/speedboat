@@ -7,27 +7,30 @@ from io import BytesIO
 import gevent
 import pytz
 import requests
-from PIL import Image
 from disco.api.http import APIException
 from disco.types.guild import Guild
-from disco.types.message import MessageEmbed, MessageEmbedAuthor, MessageEmbedField, MessageReference
+from disco.types.message import (MessageEmbed, MessageEmbedAuthor,
+                                 MessageEmbedField, MessageReference)
 from disco.types.user import ActivityTypes, Status
 from disco.types.user import User as DiscoUser
 from disco.util.sanitize import S
 from disco.util.snowflake import to_datetime
 from gevent.pool import Pool
-from peewee import fn
+from peewee import DoesNotExist, fn
+from PIL import Image
 
-from rowboat.constants import (
-    STATUS_EMOJI, BADGE_EMOJI, SNOOZE_EMOJI, GREEN_TICK_EMOJI, GREEN_TICK_EMOJI_ID,
-    EMOJI_RE, USER_MENTION_RE, YEAR_IN_SEC, CDN_URL, WEB_URL
-)
+from rowboat.constants import (BADGE_EMOJI, CDN_URL, EMOJI_RE,
+                               GREEN_TICK_EMOJI, GREEN_TICK_EMOJI_ID,
+                               SNOOZE_EMOJI, STATUS_EMOJI, USER_MENTION_RE,
+                               WEB_URL, YEAR_IN_SEC)
 from rowboat.models.message import Message, Reminder
-from rowboat.models.user import User, Infraction
-from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
+from rowboat.models.user import Infraction, User
+from rowboat.plugins import CommandFail, CommandSuccess
+from rowboat.plugins import RowboatPlugin as Plugin
 from rowboat.types.plugin import PluginConfig
 from rowboat.util.badges import UserFlags
-from rowboat.util.images import get_dominant_colors_user, get_dominant_colors_guild
+from rowboat.util.images import (get_dominant_colors_guild,
+                                 get_dominant_colors_user)
 from rowboat.util.input import parse_duration
 from rowboat.util.timing import Eventual
 
@@ -67,7 +70,7 @@ class UtilitiesPlugin(Plugin):
             next_reminder = Reminder.select().order_by(
                 Reminder.remind_at.asc()
             ).limit(1).get()
-        except Reminder.DoesNotExist:
+        except DoesNotExist:
             return
 
         self.reminder_task.set_next_schedule(next_reminder.remind_at)
@@ -200,7 +203,7 @@ class UtilitiesPlugin(Plugin):
             msg = Message.select(Message.timestamp).where(
                 Message.author_id == user.id
             ).order_by(Message.timestamp.desc()).limit(1).get()
-        except Message.DoesNotExist:
+        except DoesNotExist:
             raise CommandFail("I've never seen {}".format(user))
 
         raise CommandSuccess('I last saw {} {}'.format(

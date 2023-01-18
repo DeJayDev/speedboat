@@ -1,12 +1,13 @@
 from datetime import datetime
-from rowboat.plugins.modlog.core import Actions
 
 from disco.api.http import APIException
 from disco.types.guild import GuildMember
-from holster.enum import Enum
-from peewee import BigIntegerField, IntegerField, TextField, BooleanField, DateTimeField
+from peewee import (BigIntegerField, BooleanField, DateTimeField, IntegerField,
+                    TextField)
 from playhouse.postgres_ext import BinaryJSONField
 
+from holster.enum import Enum
+from rowboat.plugins.modlog.core import Actions
 from rowboat.sql import ModelBase
 from rowboat.util.input import human_time
 

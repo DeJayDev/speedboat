@@ -1,21 +1,22 @@
 #!/usr/bin/env python
 from gevent import monkey; monkey.patch_all()
 
-from werkzeug.serving import run_with_reloader
-from gevent import pywsgi as wsgi
-from rowboat import ENV
-from rowboat.web import rowboat
-from rowboat.sql import init_db
+import copy
+import logging
+import os
+import signal
+import subprocess
+
+import click
+import gevent
 from disco.util.logging import LOG_FORMAT
+from gevent import pywsgi as wsgi
+from werkzeug._reloader import run_with_reloader
 from yaml import safe_load
 
-import os
-import copy
-import click
-import signal
-import logging
-import gevent
-import subprocess
+from rowboat import ENV
+from rowboat.sql import init_db
+from rowboat.web import rowboat
 
 
 class BotSupervisor(object):
@@ -105,8 +106,8 @@ def workers(worker_id):
 @cli.command('add-global-admin')
 @click.argument('user-id')
 def add_global_admin(user_id):
-    from rowboat.redis import rdb
     from rowboat.models.user import User
+    from rowboat.redis import rdb
     init_db(ENV)
     rdb.sadd('global_admins', user_id)
     user = User.get_id(user_id)

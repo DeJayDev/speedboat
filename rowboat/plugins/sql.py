@@ -6,20 +6,22 @@ import gevent
 import markovify
 import psycopg2
 import pygal
-from disco.types.channel import Channel as DiscoChannel, MessageIterator, ChannelType
+from disco.types.channel import Channel as DiscoChannel
+from disco.types.channel import ChannelType, MessageIterator
 from disco.types.guild import Guild as DiscoGuild
 from disco.types.message import MessageTable
 from disco.types.permissions import Permissions
 from disco.types.user import User as DiscoUser
 from disco.util.emitter import Priority
-from disco.util.snowflake import to_datetime, from_datetime
+from disco.util.snowflake import from_datetime, to_datetime
 from gevent.pool import Pool
 
 from rowboat.models.channel import Channel
 from rowboat.models.guild import GuildEmoji, GuildVoiceSession
 from rowboat.models.message import Message, Reaction
 from rowboat.models.user import User
-from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
+from rowboat.plugins import CommandFail, CommandSuccess
+from rowboat.plugins import RowboatPlugin as Plugin
 from rowboat.sql import database
 from rowboat.tasks.backfill import backfill_channel, backfill_guild
 from rowboat.util.input import parse_duration
