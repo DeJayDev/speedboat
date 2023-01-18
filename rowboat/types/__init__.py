@@ -1,6 +1,7 @@
 import fnmatch
 
-from disco.types.base import Model, SlottedModel, Field, ListField, DictField, text, snowflake
+from disco.types.base import (DictField, Field, ListField, Model, SlottedModel,
+                              snowflake, text)
 
 __all__ = [
     'Model', 'SlottedModel', 'Field', 'ListField', 'DictField', 'text', 'snowflake', 'channel', 'raw',

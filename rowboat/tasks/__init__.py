@@ -15,7 +15,8 @@ TASKS = {}
 
 
 def get_client():
-    from disco.client import ClientConfig, Client
+    from disco.client import Client, ClientConfig
+
     from rowboat.config import token
 
     config = ClientConfig()

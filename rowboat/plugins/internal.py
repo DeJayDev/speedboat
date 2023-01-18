@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
 
 import gevent
-from disco.gateway.packets import OPCode, RECV
-from disco.types.message import MessageTable, MessageEmbed
+from disco.gateway.packets import RECV, OPCode
+from disco.types.message import MessageEmbed, MessageTable
 from gevent.lock import Semaphore
 from peewee import fn
 
@@ -10,7 +10,8 @@ from rowboat.models.channel import Channel
 from rowboat.models.event import Event
 from rowboat.models.message import Command, Message
 from rowboat.models.user import User
-from rowboat.plugins import RowboatPlugin as Plugin, CommandSuccess
+from rowboat.plugins import CommandSuccess
+from rowboat.plugins import RowboatPlugin as Plugin
 from rowboat.redis import rdb
 from rowboat.util.redis import RedisSet
 

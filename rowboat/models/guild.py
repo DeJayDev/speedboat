@@ -2,10 +2,11 @@ import logging
 from datetime import datetime
 
 import yaml
-from holster.enum import Enum
-from peewee import (BigIntegerField, CharField, TextField, BooleanField, DateTimeField, CompositeKey, BlobField)
-from playhouse.postgres_ext import BinaryJSONField, ArrayField
+from peewee import (BigIntegerField, BlobField, BooleanField, CharField,
+                    CompositeKey, DateTimeField, TextField)
+from playhouse.postgres_ext import ArrayField, BinaryJSONField
 
+from holster.enum import Enum
 from rowboat.redis import emit
 from rowboat.sql import ModelBase
 
@@ -319,7 +320,7 @@ class GuildVoiceSession(ModelBase):
                 channel_id=after.channel_id,
                 user_id=after.user_id,
                 started_at=datetime.utcnow(),
-            ).returning(GuildVoiceSession.id).on_conflict_ignore().execute()
+            ).returning(GuildVoiceSession.session_id).on_conflict_ignore().execute()
 
 
 @ModelBase.register

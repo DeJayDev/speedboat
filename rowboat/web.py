@@ -1,22 +1,20 @@
-import os;
+import os
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 import logging
 
 from flask import Flask, g, session
+from yaml import safe_load
+
 from holster.flask_ext import Holster
-
 from rowboat import ENV
-from rowboat.sql import init_db
 from rowboat.models.user import User
-
+from rowboat.sql import init_db
 from rowboat.views.auth import auth
 from rowboat.views.dashboard import dashboard
 from rowboat.views.guilds import guilds
 from rowboat.views.users import users
-
-from yaml import safe_load
 
 rowboat = Holster(Flask(__name__))
 logging.getLogger('peewee').setLevel(logging.DEBUG)

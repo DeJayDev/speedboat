@@ -1,17 +1,17 @@
 import functools
 import json
 import operator
-import cchardet as chardet
 from functools import reduce
 
+import cchardet as chardet
 import yaml
-from flask import Blueprint, request, g, jsonify
+from flask import Blueprint, g, jsonify, request
 from yaml.cyaml import CDumper
 
 from rowboat.models.channel import Channel
 from rowboat.models.guild import Guild, GuildConfigChange
 from rowboat.models.message import Message
-from rowboat.models.user import User, Infraction
+from rowboat.models.user import Infraction, User
 from rowboat.util.decos import authed
 
 guilds = Blueprint('guilds', __name__, url_prefix='/api/guilds')

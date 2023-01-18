@@ -1,1 +1,1 @@
-from .core import ModLogPlugin, Actions
+from .core import Actions, ModLogPlugin

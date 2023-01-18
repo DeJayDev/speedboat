@@ -7,15 +7,15 @@ from functools import reduce
 
 from disco.util.emitter import Priority
 from gevent.lock import Semaphore
-from holster.enum import Enum
 
-from rowboat.models.message import Message, EMOJI_RE
+from holster.enum import Enum
+from rowboat.models.message import EMOJI_RE, Message
 from rowboat.models.user import Infraction
 from rowboat.plugins import RowboatPlugin as Plugin
 from rowboat.plugins.censor import URL_RE
 from rowboat.plugins.modlog import Actions
 from rowboat.redis import rdb
-from rowboat.types import SlottedModel, DictField, Field
+from rowboat.types import DictField, Field, SlottedModel
 from rowboat.types.plugin import PluginConfig
 from rowboat.util.leakybucket import LeakyBucket
 from rowboat.util.stats import timed

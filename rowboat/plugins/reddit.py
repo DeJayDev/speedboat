@@ -8,7 +8,7 @@ from disco.types.message import MessageEmbed
 from rowboat.models.guild import Guild
 from rowboat.plugins import RowboatPlugin as Plugin
 from rowboat.redis import rdb
-from rowboat.types import SlottedModel, DictField, Field, ChannelField
+from rowboat.types import ChannelField, DictField, Field, SlottedModel
 from rowboat.types.plugin import PluginConfig
 
 

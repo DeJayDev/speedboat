@@ -10,7 +10,7 @@ services:
       - ENV=production
     stop_grace_period: 1m
   redis:
-    image: redis:6.2.5-alpine
+    image: redis:7-alpine
     command: redis-server --appendonly yes
     ports:
       - "6379:6379"
@@ -26,17 +26,6 @@ services:
     depends_on:
       - db
       - redis
-  frontend:
-    build: ./frontend/
-    environment:
-      - NODE_ENV=docker
-    command: yarn serve
-    volumes:
-      - ./frontend:/opt/frontend
-    ports:
-      - "80:80"
-    depends_on:
-      - web
   bot:
     build: .
     command: python manage.py bot -e docker

@@ -1,8 +1,6 @@
 from datetime import datetime, timedelta
 
-from peewee import (
-    BigIntegerField, CharField, DateTimeField, CompositeKey
-)
+from peewee import BigIntegerField, CharField, CompositeKey, DateTimeField
 from playhouse.postgres_ext import BinaryJSONField
 
 from rowboat.sql import ModelBase

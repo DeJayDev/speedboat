@@ -1,6 +1,7 @@
 import json
 
 import redis
+
 from rowboat import ENV
 
 if ENV == 'docker':

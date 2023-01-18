@@ -1,7 +1,9 @@
 import React from 'react'
 
-export default function GuildStats(props) {
+function GuildStats() {
     return <>
         <h1>Coming Soon 😉</h1>
     </>;
 }
+
+export default GuildStats
