@@ -377,7 +377,7 @@ class UtilitiesPlugin(Plugin):
 
         try:
             avatar = User.with_id(user.id).get_avatar_url()
-        except APIException:
+        except:
             avatar = user.get_avatar_url()  # This fails if the user has never been seen by speedboat.
 
         embed.set_author(name='{} ({})'.format(
