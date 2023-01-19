@@ -10,7 +10,6 @@ export default class User {
   admin: boolean;
   guilds: Guild[] | undefined;
 
-  // write a constructor that takes all the fields in json
   constructor({ id, username, discriminator, avatar, bot, admin }: User) {
     this.id = id;
     this.username = username;
@@ -18,13 +17,6 @@ export default class User {
     this.avatar = avatar;
     this.bot = bot;
     this.admin = admin;
-  }
-
-  // write a create function that populates the guilds field
-  async create() {
-    const res = await API.get<Guild[]>('/users/@me/guilds');
-    this.guilds = res.data.map((guild: Guild) => new Guild(guild));
-    return this;
   }
 
   get() {
@@ -36,6 +28,17 @@ export default class User {
       bot: this.bot,
       admin: this.admin,
     } as User
+  }
+
+  async create() {
+    const res = await API.get<Guild[]>('/users/@me/guilds');
+    this.guilds = res.data.map((guild: Guild) => new Guild(guild));
+    return this;
+  }
+
+  static async fromID(id: string | number) {
+    const res = await API.get<User>(`/users/${id}`);
+    return new User(res.data);
   }
 
 
