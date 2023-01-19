@@ -64,7 +64,7 @@ def guild_get(guild):
 @guilds.route('/<gid>/config')
 @with_guild
 def guild_config(guild):
-    encoding = chardet.detect(guild.config_raw.to_bytes())['encoding']
+    encoding = chardet.detect(guild.config_raw.tobytes())['encoding']
     return jsonify({
         'contents': guild.config_raw.tobytes().decode(encoding) if guild.config_raw else yaml.dump(guild.config, allow_unicode=True, dumper=CDumper),
     })

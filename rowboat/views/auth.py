@@ -71,8 +71,3 @@ def auth_discord_callback():
 
     return redirect('/')
 
-
-@auth.route('/@me')
-@authed
-def auth_me():
-    return jsonify(g.user.serialize(us=True))

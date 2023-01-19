@@ -64,7 +64,7 @@ def cli():
 @click.option('--reloader/--no-reloader', '-r', default=False)
 def serve(reloader):
     def run():
-        wsgi.WSGIServer(('0.0.0.0', 8686), rowboat.app).serve_forever()
+        wsgi.WSGIServer(('0.0.0.0', 8686), rowboat).serve_forever()
 
     if reloader:
         run_with_reloader(run)
