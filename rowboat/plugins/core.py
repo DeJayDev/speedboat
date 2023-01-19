@@ -8,7 +8,6 @@ import signal
 import time
 from datetime import datetime, timedelta
 
-import humanize
 from disco.api.http import APIException
 from disco.bot import Bot
 from disco.bot.command import CommandEvent
@@ -25,7 +24,6 @@ from rowboat.constants import (GREEN_TICK_EMOJI, RED_TICK_EMOJI,
                                ROWBOAT_USER_ROLE_ID, WEB_URL)
 from rowboat.models.guild import Guild, GuildBan
 from rowboat.models.message import Command
-from rowboat.models.notification import Notification
 from rowboat.models.user import Infraction
 from rowboat.plugins import CommandFail, CommandResponse, CommandSuccess
 from rowboat.plugins import RowboatPlugin as Plugin
@@ -298,11 +296,6 @@ class CorePlugin(Plugin):
 
     @Plugin.listen('Resumed')
     def on_resumed(self, event):
-        Notification.dispatch(
-            Notification.Types.RESUME,
-            env=ENV,
-        )
-
         with self.send_control_message() as embed:
             embed.title = 'Resumed'
             embed.color = 0xFEE75C
@@ -311,11 +304,7 @@ class CorePlugin(Plugin):
     @Plugin.listen('Ready', priority=Priority.SEQUENTIAL)
     def on_ready(self, event):
         reconnects = self.client.gw.reconnects
-        self.log.info('Started session %s', event.session_id)
-        Notification.dispatch(
-            Notification.Types.CONNECT,
-            env=ENV,
-        )
+        self.log.info('Started session {} (reconnects {})'.format(event.session_id, event.reconnects))
 
         with self.send_control_message() as embed:
             if reconnects:
@@ -607,7 +596,7 @@ class CorePlugin(Plugin):
         embed.set_author(name='Speedboat', icon_url=self.client.state.me.avatar_url, url=WEB_URL)
         embed.description = BOT_INFO
         embed.add_field(name='Servers', value=str(len(self.state.guilds)), inline=True)
-        embed.add_field(name='Uptime', value=humanize.naturaldelta(datetime.utcnow() - self.startup), inline=True)
+        embed.add_field(name='Last Started', value='<t:{}:R>'.format(datetime.utcnow() - self.startup), inline=True)
         embed.add_field(name='Version',
                         value=subprocess.check_output(["git", "describe", "--always"]).strip().decode("utf-8"),
                         inline=True)
@@ -632,7 +621,7 @@ class CorePlugin(Plugin):
         length, firstline = inspect.getsourcelines(code)
 
         event.msg.reply('<https://github.com/DeJayDev/speedboat/blob/master/{}#L{}-L{}>'.format(
-            code.co_filename.replace('/home/speedboat/', ''),
+            code.co_filename.replace('/home/speedboat/speedboat/', ''),
             firstline,
             firstline + len(length)  # length length
         ))

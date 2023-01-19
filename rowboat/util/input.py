@@ -9,6 +9,7 @@ UNITS = {
     'h': lambda v: v * 60 * 60,
     'd': lambda v: v * 60 * 60 * 24,
     'w': lambda v: v * 60 * 60 * 24 * 7,
+    'y': lambda v: v * 60 * 60 * 24 * 365,
 }
 
 
