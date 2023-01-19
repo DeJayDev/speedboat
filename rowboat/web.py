@@ -7,7 +7,6 @@ import logging
 from flask import Flask, g, session
 from yaml import safe_load
 
-from holster.flask_ext import Holster
 from rowboat import ENV
 from rowboat.models.user import User
 from rowboat.sql import init_db
@@ -16,29 +15,24 @@ from rowboat.views.dashboard import dashboard
 from rowboat.views.guilds import guilds
 from rowboat.views.users import users
 
-rowboat = Holster(Flask(__name__))
+with open('config.yaml', 'r') as f:
+    data = safe_load(f)
+
+rowboat = Flask(__name__)
 logging.getLogger('peewee').setLevel(logging.DEBUG)
-rowboat.app.register_blueprint(auth)
-rowboat.app.register_blueprint(dashboard)
-rowboat.app.register_blueprint(guilds)
-rowboat.app.register_blueprint(users)
+rowboat.register_blueprint(auth)
+rowboat.register_blueprint(dashboard)
+rowboat.register_blueprint(guilds)
+rowboat.register_blueprint(users)
+rowboat.config.update(data['web'])
+rowboat.secret_key = data['web']['SECRET_KEY']
 
+init_db(ENV)
 
-@rowboat.app.before_first_request
-def before_first_request():
-    init_db(ENV)
+# PluginsConfig.force_load_plugin_configs()
+# rowboat.config['token'] = data.get('token')
 
-    # PluginsConfig.force_load_plugin_configs()
-
-    with open('config.yaml', 'r') as f:
-        data = safe_load(f)
-
-    rowboat.app.config.update(data['web'])
-    rowboat.app.secret_key = data['web']['SECRET_KEY']
-    rowboat.app.config['token'] = data.get('token')
-
-
-@rowboat.app.before_request
+@rowboat.before_request
 def check_auth():
     g.user = None
 
@@ -46,7 +40,7 @@ def check_auth():
         g.user = User.with_id(session['uid'])
 
 
-@rowboat.app.after_request
+@rowboat.after_request
 def save_auth(response):
     if g.user and 'uid' not in session:
         session['uid'] = g.user.id
@@ -56,6 +50,6 @@ def save_auth(response):
     return response
 
 
-@rowboat.app.context_processor
+@rowboat.context_processor
 def inject_data():
     return {'user': g.user}
