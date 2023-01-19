@@ -16,6 +16,7 @@ node_modules
 
 # Environments
 src
+!frontend/src
 .env
 .venv
 env/
