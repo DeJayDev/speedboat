@@ -1,0 +1,15 @@
+[project]
+name = speedboat
+version = 1.0.0
+description = "A Discord bot for managing large communities"
+readme = "README.md" # confirm
+requires-python = ">=3.10.6"
+license = {file = "LICENSE.md"}
+maintainers = [ 
+    { name = "Dj Isaac", email = "<contact@dejay.dev>" }
+]
+dynamic = ["dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+

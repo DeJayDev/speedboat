@@ -336,7 +336,7 @@ class StarboardEntry(ModelBase):
         ).where(
             (StarboardEntry.message.id << (
                 StarboardEntry.select().join(Message).where(
-                    (Message.author.id == entity_id)
+                    (Message.author_id == entity_id)
                 )
             ))
         ).execute()
@@ -358,7 +358,7 @@ class StarboardEntry(ModelBase):
         ).where(
             (StarboardEntry.message.id << (
                 StarboardEntry.select().join(Message).where(
-                    (Message.author.id == entity_id)
+                    (Message.author_id == entity_id)
                 )
             )) & (StarboardEntry.blocked == 1)
         ).execute()
@@ -386,14 +386,14 @@ class Reminder(ModelBase):
     @classmethod
     def count_for_user(cls, user_id):
         return cls.with_message_join().where(
-            (Message.author.id == user_id)
+            (Message.author_id == user_id)
         ).count()
 
     @classmethod
     def delete_for_user(cls, user_id):
         return cls.delete().where(
             (cls.message_id << cls.with_message_join((Message.id, )).where(
-                (Message.author.id == user_id)
+                (Message.author_id == user_id)
             ))
         ).execute()
 
