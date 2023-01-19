@@ -55,8 +55,8 @@ class Guild {
     return res.data.contents;
   }
 
-  set config(config: any) {
-    API.put(`guilds/${this.id}/config`, config).catch((err) => {
+  async setConfig(config: any) {
+    API.post(`guilds/${this.id}/config`, {config: config}).catch((err) => {
       console.log("Error while getting guild: " + err)
     });
   }

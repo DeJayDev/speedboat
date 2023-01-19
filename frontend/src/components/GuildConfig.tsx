@@ -24,9 +24,12 @@ function GuildConfig() {
   const [newConfig, setNewConfig] = useState(initialConfig);
 
   useEffect(() => {
+    if(!match) return;
     Guild.fromID(params?.gid!!).then(async g => {
       setGuild(g)
-      setInitialConfig(await g.getConfig());
+      const config = await g.getConfig();
+      setInitialConfig(config);
+      setNewConfig(config);
     });
   }, [params?.gid]);
 
@@ -39,7 +42,7 @@ function GuildConfig() {
   }
 
   function onSave() {
-    guild?.config(newConfig).then(() => {
+    guild?.setConfig(newConfig).then(() => {
       setInitialConfig(newConfig);
       setHasUnsavedChanges(false);
       renderMessage('success', 'Saved Configuration!');
@@ -74,7 +77,7 @@ function GuildConfig() {
             theme='monokai'
             width='100%'
             height='75vh'
-            value={initialConfig == null ? '' : initialConfig}
+            value={newConfig == null ? '' : newConfig}
             onChange={(newValue) => onEditorChange(newValue)}
           />
         </div>

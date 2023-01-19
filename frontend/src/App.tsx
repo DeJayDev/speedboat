@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Route, Switch } from 'wouter'
+import { Route, Switch, useLocation } from 'wouter'
 import Dashboard from './components/Dashboard'
 import GuildConfig from './components/GuildConfig'
 import GuildOverview from './components/GuildOverview'
@@ -11,6 +11,7 @@ import API from './util'
 
 function App() {
 
+  const [location, setLocation] = useLocation()
   const user = useStore(state => state.user)
   const setUser = useStore(state => state.setUser)
 
@@ -21,7 +22,10 @@ function App() {
         setUser(apiUser)
       })
       .catch(err => {
-        console.log("Error while getting user: " + err)
+        console.log("Failed to get current user. The user may not be logged in? (or the API is down)")
+        console.error(err)
+        console.log("Attempting a relogin...")
+        setLocation('/login')
       })
   }, [setUser])
 
