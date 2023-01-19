@@ -377,7 +377,7 @@ class UtilitiesPlugin(Plugin):
 
         try:
             avatar = User.with_id(user.id).get_avatar_url()
-        except APIException:
+        except:
             avatar = user.get_avatar_url()  # This fails if the user has never been seen by speedboat.
 
         embed.set_author(name='{} ({})'.format(
@@ -471,7 +471,7 @@ class UtilitiesPlugin(Plugin):
         if remind_at > (datetime.utcnow() + timedelta(seconds=5 * YEAR_IN_SEC)):
             raise CommandFail('That\'s too far in the future... I\'ll forget!')
 
-        if event.msg.message_reference.message_id:
+        if event.msg.message_reference:
             referenced_msg: MessageReference = event.channel.get_message(event.msg.message_reference.message_id)
             content = 'https://discord.com/channels/{}/{}/{}'.format(
                 self.state.channels.get(referenced_msg.channel_id).guild_id,
