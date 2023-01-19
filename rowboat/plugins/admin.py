@@ -11,7 +11,8 @@ import humanize
 from disco.api.http import APIException
 from disco.bot import CommandLevels
 from disco.types.guild import GuildMember
-from disco.types.message import MessageTable, MessageEmbed, MessageEmbedField, MessageEmbedThumbnail
+from disco.types.message import (MessageEmbed, MessageEmbedField,
+                                 MessageEmbedThumbnail, MessageTable)
 from disco.types.permissions import Permissions
 from disco.types.user import User as DiscoUser
 from disco.util.emitter import Priority
@@ -20,16 +21,17 @@ from disco.util.sanitize import S
 from peewee import fn
 from rapidfuzz import fuzz
 
-from rowboat.constants import (
-    GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID, GREEN_TICK_EMOJI, RED_TICK_EMOJI
-)
-from rowboat.models.guild import GuildMemberBackup, GuildBan, GuildEmoji, GuildVoiceSession
-from rowboat.models.message import Message, Reaction, MessageArchive
-from rowboat.models.user import User, Infraction
-from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
+from rowboat.constants import (GREEN_TICK_EMOJI, GREEN_TICK_EMOJI_ID,
+                               RED_TICK_EMOJI, RED_TICK_EMOJI_ID)
+from rowboat.models.guild import (GuildBan, GuildEmoji, GuildMemberBackup,
+                                  GuildVoiceSession)
+from rowboat.models.message import Message, MessageArchive, Reaction
+from rowboat.models.user import Infraction, User
+from rowboat.plugins import CommandFail, CommandSuccess
+from rowboat.plugins import RowboatPlugin as Plugin
 from rowboat.plugins.modlog import Actions
 from rowboat.redis import rdb
-from rowboat.types import Field, DictField, ListField, snowflake, SlottedModel
+from rowboat.types import DictField, Field, ListField, SlottedModel, snowflake
 from rowboat.types.plugin import PluginConfig
 from rowboat.util.images import get_dominant_colors_user
 from rowboat.util.input import parse_duration

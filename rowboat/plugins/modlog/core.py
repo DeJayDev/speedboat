@@ -12,14 +12,17 @@ from disco.bot import CommandLevels
 from disco.types.base import cached_property
 from disco.util.emitter import Priority
 from disco.util.sanitize import S
-from disco.util.snowflake import to_unix, to_datetime
-from holster.enum import Enum
+from disco.util.snowflake import to_datetime, to_unix
 
+from holster.enum import Enum
 from rowboat.models.guild import Guild
-from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
-from rowboat.types import SlottedModel, Field, ListField, DictField, ChannelField, snowflake
+from rowboat.plugins import CommandFail, CommandSuccess
+from rowboat.plugins import RowboatPlugin as Plugin
+from rowboat.types import (ChannelField, DictField, Field, ListField,
+                           SlottedModel, snowflake)
 from rowboat.types.plugin import PluginConfig
-from rowboat.util import ordered_load, MetaException
+from rowboat.util import MetaException, ordered_load
+
 from .pump import ModLogPump
 
 # Dynamically updated by the plugin

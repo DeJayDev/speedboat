@@ -1,6 +1,7 @@
 import os
 
-from rowboat.types import Model, SlottedModel, Field, DictField, text, raw, rule_matcher
+from rowboat.types import (DictField, Field, Model, SlottedModel, raw,
+                           rule_matcher, text)
 
 
 class PluginConfigObj(object):

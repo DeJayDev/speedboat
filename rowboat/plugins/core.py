@@ -15,20 +15,20 @@ from disco.bot.command import CommandEvent
 from disco.gateway.events import MessageCreate
 from disco.types.message import MessageEmbed
 from disco.types.permissions import Permissions
-from disco.util.emitter import Priority, Emitter
+from disco.util.emitter import Emitter, Priority
 from disco.util.sanitize import S
 from disco.util.snowflake import to_datetime
 
 from rowboat import ENV
-from rowboat.constants import (
-    GREEN_TICK_EMOJI, RED_TICK_EMOJI, ROWBOAT_GUILD_ID, ROWBOAT_USER_ROLE_ID,
-    ROWBOAT_CONTROL_CHANNEL, WEB_URL
-)
+from rowboat.constants import (GREEN_TICK_EMOJI, RED_TICK_EMOJI,
+                               ROWBOAT_CONTROL_CHANNEL, ROWBOAT_GUILD_ID,
+                               ROWBOAT_USER_ROLE_ID, WEB_URL)
 from rowboat.models.guild import Guild, GuildBan
 from rowboat.models.message import Command
 from rowboat.models.notification import Notification
 from rowboat.models.user import Infraction
-from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess, CommandResponse
+from rowboat.plugins import CommandFail, CommandResponse, CommandSuccess
+from rowboat.plugins import RowboatPlugin as Plugin
 from rowboat.plugins.modlog import Actions
 from rowboat.redis import rdb
 from rowboat.sql import init_db

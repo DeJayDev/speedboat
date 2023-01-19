@@ -2,10 +2,10 @@ import json
 from datetime import datetime
 
 import arrow
-from holster.enum import Enum
-from peewee import IntegerField, DateTimeField
+from peewee import DateTimeField, IntegerField
 from playhouse.postgres_ext import BinaryJSONField, BooleanField
 
+from holster.enum import Enum
 from rowboat.redis import rdb
 from rowboat.sql import ModelBase
 

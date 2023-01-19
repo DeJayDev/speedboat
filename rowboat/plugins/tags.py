@@ -4,7 +4,8 @@ from disco.util.sanitize import S
 
 from rowboat.models.tags import Tag
 from rowboat.models.user import User
-from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
+from rowboat.plugins import CommandFail, CommandSuccess
+from rowboat.plugins import RowboatPlugin as Plugin
 from rowboat.types import Field
 from rowboat.types.plugin import PluginConfig
 

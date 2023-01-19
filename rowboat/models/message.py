@@ -4,11 +4,9 @@ import traceback
 import uuid
 from datetime import datetime, timedelta
 
-from peewee import (
-    BigIntegerField, ForeignKeyField, TextField, DateTimeField,
-    BooleanField, UUIDField
-)
-from playhouse.postgres_ext import BinaryJSONField, ArrayField
+from peewee import (BigIntegerField, BooleanField, DateTimeField,
+                    ForeignKeyField, TextField, UUIDField)
+from playhouse.postgres_ext import ArrayField, BinaryJSONField
 
 from rowboat import REV
 from rowboat.constants import WEB_URL
@@ -136,11 +134,11 @@ class Message(ModelBase):
         return cls.select().where(cls.channel_id == channel.id)
 
     @classmethod
-    def create_message_link(self):
+    def create_message_link(cls):
         return 'https://discord.com/channels/{}/{}/{}'.format(
-            self.guild_id,
-            self.channel_id,
-            self.id
+            cls.guild_id,
+            cls.channel_id,
+            cls.id
         )
 
 @ModelBase.register
@@ -336,9 +334,9 @@ class StarboardEntry(ModelBase):
         StarboardEntry.update(
             blocked=True,
         ).where(
-            (StarboardEntry.message_id << (
+            (StarboardEntry.message.id << (
                 StarboardEntry.select().join(Message).where(
-                    (Message.author_id == entity_id)
+                    (Message.author.id == entity_id)
                 )
             ))
         ).execute()
@@ -358,9 +356,9 @@ class StarboardEntry(ModelBase):
             dirty=True,
             blocked=False,
         ).where(
-            (StarboardEntry.message_id << (
+            (StarboardEntry.message.id << (
                 StarboardEntry.select().join(Message).where(
-                    (Message.author_id == entity_id)
+                    (Message.author.id == entity_id)
                 )
             )) & (StarboardEntry.blocked == 1)
         ).execute()
@@ -388,14 +386,14 @@ class Reminder(ModelBase):
     @classmethod
     def count_for_user(cls, user_id):
         return cls.with_message_join().where(
-            (Message.author_id == user_id)
+            (Message.author.id == user_id)
         ).count()
 
     @classmethod
     def delete_for_user(cls, user_id):
         return cls.delete().where(
             (cls.message_id << cls.with_message_join((Message.id, )).where(
-                Message.author_id == user_id
+                (Message.author.id == user_id)
             ))
         ).execute()
 

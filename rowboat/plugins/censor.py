@@ -4,7 +4,7 @@ import urllib.parse
 from urllib.parse import unquote
 
 from disco.types.base import cached_property
-from disco.types.message import ChannelType
+from disco.types.channel import ChannelType
 from disco.util.sanitize import S
 
 from rowboat.constants import INVITE_LINK_RE, URL_RE
@@ -12,7 +12,8 @@ from rowboat.models.message import Message
 from rowboat.plugins import RowboatPlugin as Plugin
 from rowboat.plugins.modlog import Actions
 from rowboat.redis import rdb
-from rowboat.types import SlottedModel, Field, ListField, DictField, ChannelField, snowflake, lower
+from rowboat.types import (ChannelField, DictField, Field, ListField,
+                           SlottedModel, lower, snowflake)
 from rowboat.types.plugin import PluginConfig
 from rowboat.util.stats import timed
 from rowboat.util.zalgo import ZALGO_RE
