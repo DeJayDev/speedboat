@@ -1,21 +1,18 @@
 import logging
 import os
-import subprocess
+from subprocess import check_output
 
 import sentry_sdk as sentry
 from disco.util.logging import LOG_FORMAT
 from sentry_sdk.integrations.redis import RedisIntegration
 from yaml import safe_load
 
-# Please tell me how to fix this
-with open(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir) + '/config.yaml')) as f:
-    config = safe_load(f)
+with open("./config.yaml") as config_file:
+    config = safe_load(config_file)
 
 ENV = config['ENV']
 DSN = config['DSN']
-REV = str(subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip())
-
-VERSION = f'1.9+{REV}'  # Ladies and gentlemen the only place I will use an fstring.
+REV = check_output(["git", "describe", "--always"]).strip().decode("utf-8")
 
 sentry.init(
     dsn=DSN,
