@@ -18,7 +18,7 @@ from disco.util.emitter import Emitter, Priority
 from disco.util.sanitize import S
 from disco.util.snowflake import to_datetime
 
-from rowboat import ENV
+from rowboat import ENV, REV
 from rowboat.constants import (GREEN_TICK_EMOJI, RED_TICK_EMOJI,
                                ROWBOAT_CONTROL_CHANNEL, ROWBOAT_GUILD_ID,
                                ROWBOAT_USER_ROLE_ID, WEB_URL)
@@ -591,14 +591,19 @@ class CorePlugin(Plugin):
 
     @Plugin.command('about')
     def command_about(self, event):
-        import subprocess
+        now = datetime.utcnow()
+    
         embed = MessageEmbed()
         embed.set_author(name='Speedboat', icon_url=self.client.state.me.avatar_url, url=WEB_URL)
         embed.description = BOT_INFO
-        embed.add_field(name='Servers', value=str(len(self.state.guilds)), inline=True)
-        embed.add_field(name='Last Started', value='<t:{}:R>'.format(datetime.utcnow() - self.startup), inline=True)
+        embed.add_field(name='Servers', 
+                        value=str(len(self.state.guilds)), 
+                        inline=True)
+        embed.add_field(name='Last Started', 
+                        value='<t:{}:R>'.format((now - (now - self.startup)).timestamp()), 
+                        inline=True)
         embed.add_field(name='Version',
-                        value=subprocess.check_output(["git", "describe", "--always"]).strip().decode("utf-8"),
+                        value=REV,
                         inline=True)
         event.msg.reply(embed=embed)
 
