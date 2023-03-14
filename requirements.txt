@@ -1,4 +1,4 @@
--e git+ssh://git@github.com/DeJayDev/betterdisco@44be70149ce29706b0edaa65f311eeb11b7eb5db#egg=betterdisco-py[performance]
+-e git+ssh://git@github.com/DeJayDev/betterdisco@49483c75475a9db794602ed92c6c0c65167018ab#egg=betterdisco-py[performance]
 -e git+ssh://git@github.com/elderlabs/holster#egg=holster
 -e git+ssh://git@github.com/wenmin-wu/dominant-colors-py#egg=dominantcolors
 CairoSVG==2.6.0
