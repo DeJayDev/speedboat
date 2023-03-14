@@ -98,7 +98,7 @@ class UtilitiesPlugin(Plugin):
         raise CommandSuccess(str(random.randint(start, end)))
 
     @Plugin.command('cat', '{bentley} {void} {rory}', global_=True)
-    def cat(self, event, bentley=False):
+    def cat(self, event, bentley=False, void=False, rory=False):
         try:
             if bentley:
                 URL = 'https://bentley.tadhg.sh/api/random'
