@@ -88,31 +88,42 @@ class UtilitiesPlugin(Plugin):
         Returns a random number
         """
 
-        # Because someone will be an idiot
-        if end > 9223372036854775807:
-            raise CommandSuccess('Ending number too big!')
+        # this is the future :pray:
+        #if end > 9223372036854775807:
+        #    raise CommandSuccess('Ending number too big!')
 
         if end <= start:
-            raise CommandSuccess('Ending number must be larger than starting number!')
+            raise CommandSuccess('Ending number cannot be smaller than the starting number!')
 
         raise CommandSuccess(str(random.randint(start, end)))
 
-    @Plugin.command('cat', '{bentley}',global_=True)
+    @Plugin.command('cat', '{bentley} {void} {rory}', global_=True)
     def cat(self, event, bentley=False):
         try:
             if bentley:
                 URL = 'https://bentley.tadhg.sh/api/random'
                 data = requests.get(URL).json()
-                fname = 'bentley-' + str(data['id']) # Probably don't have to, but gonna.
+                fname = 'bentley-' + str(data['id'])
+                cat = requests.get(data['url'])
+            elif void:
+                URL = 'https://void.penple.dev/manifest.json'
+                data = requests.get(URL).json()
+                selection = random.choice(list(data))
+                fname = 'void-' + selection
+                cat = requests.get('https://void.penple.dev/{}.jpg'.format(selection))
+            elif rory:
+                URL = 'https://rory.cat/purr'
+                data = requests.get(URL).json()
+                fname = 'rory-' + str(data['id'])
                 cat = requests.get(data['url'])
             else:
                 URL = 'https://api.thecatapi.com/v1/images/search'
                 data = requests.get(URL).json()
-                fname = data[0]['id']
+                fname = 'random-' + data[0]['id']
                 cat = requests.get(data[0]['url'])
             cat.raise_for_status()
             fext = cat.headers['content-type'].split('/')[-1].split(';')[0]
-            event.msg.reply('', attachments=[('cat-{}.{}'.format(fname, fext), cat.content)])
+            event.msg.reply('', attachments=[('{}.{}'.format(fname, fext), cat.content)])
         except:
             return event.msg.reply('{} Cat not found :('.format(cat.status_code))
 
@@ -199,6 +210,7 @@ class UtilitiesPlugin(Plugin):
 
     @Plugin.command('seen', '<user:user>', global_=True)
     def seen(self, event, user: User):
+        # TODO: fuzzy matching! :(
         try:
             msg = Message.select(Message.timestamp).where(
                 Message.author_id == user.id
@@ -206,7 +218,7 @@ class UtilitiesPlugin(Plugin):
         except DoesNotExist:
             raise CommandFail("I've never seen {}".format(user))
 
-        raise CommandSuccess('I last saw {} {}'.format(
+        raise CommandSuccess('I last saw {} <t:{}:R>'.format(
             user,
             int(msg.timestamp.timestamp())
         ))
@@ -291,6 +303,7 @@ class UtilitiesPlugin(Plugin):
 
     @Plugin.command('info', '[user:user|snowflake]', aliases='whois')
     def info(self, event, user: User = None):
+        # TODO: Fuzzy matching
         if not user:
             user = event.author
         else:
