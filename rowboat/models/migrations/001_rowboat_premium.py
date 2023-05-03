@@ -3,4 +3,4 @@ from rowboat.models.migrations import Migrate
 
 @Migrate.always()
 def remove_premium(m):
-    m.execute('ALTAR TABLE guilds DROP COLUMN premium_sub_id')
+    m.execute('ALTER TABLE guilds DROP COLUMN premium_sub_id')
