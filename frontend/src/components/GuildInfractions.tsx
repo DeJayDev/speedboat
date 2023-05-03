@@ -15,11 +15,11 @@ function InfractionTable(props: {infraction: Infraction}) {
         </tr>
         <tr>
           <td>Target User</td>
-          <td>{inf.user.username}#{inf.user.discriminator} ({inf.user.id})</td>
+          <td>@{inf.user.username} ({inf.user.id})</td>
         </tr>
         <tr>
           <td>Actor User</td>
-          <td>{inf.actor.username}#{inf.actor.discriminator} ({inf.actor.id})</td>
+          <td>@{inf.actor.username} ({inf.actor.id})</td>
         </tr>
         <tr>
           <td>Created At</td>

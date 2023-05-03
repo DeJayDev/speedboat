@@ -224,13 +224,6 @@ class UtilitiesPlugin(Plugin):
         else:
             queries.append((User.username ** '%{}%'.format(query.replace('%', ''))))
 
-        if '#' in query:
-            username, discrim = query.rsplit('#', 1)
-            if discrim is not None:
-                queries.append((
-                        (User.username == username) &
-                        (User.discriminator == discrim)))
-
         users = User.select().where(reduce(operator.or_, queries)).limit(10)
         if len(users) == 0:
             raise CommandFail('No users found for query `{}`'.format(S(query, escape_codeblocks=True)))

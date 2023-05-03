@@ -4,16 +4,14 @@ import Guild from "./guild";
 export default class User {
   id: string;
   username: string;
-  discriminator: string;
   avatar: string;
   bot: boolean;
   admin: boolean;
   guilds: Guild[] | undefined;
 
-  constructor({ id, username, discriminator, avatar, bot, admin }: User) {
+  constructor({ id, username, avatar, bot, admin }: User) {
     this.id = id;
     this.username = username;
-    this.discriminator = discriminator;
     this.avatar = avatar;
     this.bot = bot;
     this.admin = admin;
@@ -23,7 +21,6 @@ export default class User {
     return {
       id: this.id,
       username: this.username,
-      discriminator: this.discriminator,
       avatar: this.avatar,
       bot: this.bot,
       admin: this.admin,

@@ -57,9 +57,6 @@ class SQLPlugin(Plugin):
         if event.user.username is not None:
             updates['username'] = event.user.username
 
-        if event.user.discriminator is not None:
-            updates['discriminator'] = event.user.discriminator
-
         if event.user.bot:
             return
 

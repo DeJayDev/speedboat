@@ -34,7 +34,7 @@ def init_db(env):
     if env == 'docker':
         database.initialize(PostgresqlExtDatabase(
             'rowboat',
-            host='localhost',
+            host='db',
             user='rowboat',
             port=int(os.getenv('PG_PORT', 5432)),
             autorollback=True))

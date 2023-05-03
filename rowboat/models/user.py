@@ -16,7 +16,6 @@ from rowboat.util.input import human_time
 class User(ModelBase):
     user_id = BigIntegerField(primary_key=True)
     username = TextField()
-    discriminator = TextField()
     avatar = TextField(null=True)
     bot = BooleanField()
 
@@ -32,14 +31,13 @@ class User(ModelBase):
         table_name = 'users'
 
         indexes = (
-            (('user_id', 'username', 'discriminator'), True),
+            (('user_id', 'username'), True),
         )
 
     def serialize(self, us=False):
         base = {
             'id': str(self.user_id),
             'username': self.username,
-            'discriminator': self.discriminator,
             'avatar': self.avatar,
             'bot': self.bot,
         }
@@ -71,7 +69,6 @@ class User(ModelBase):
             user_id=user.id,
             defaults={
                 'username': user.username,
-                'discriminator': user.discriminator,
                 'avatar': user.avatar,
                 'bot': user.bot
             })
@@ -81,9 +78,6 @@ class User(ModelBase):
 
             if obj.username != user.username:
                 updates['username'] = user.username
-
-            if obj.discriminator != user.discriminator:
-                updates['discriminator'] = user.discriminator
 
             if obj.avatar != user.avatar:
                 updates['avatar'] = user.avatar
@@ -105,7 +99,10 @@ class User(ModelBase):
         )
 
     def __str__(self):
-        return '{}#{}'.format(self.username, str(self.discriminator).zfill(4))
+        return '@{} ({})'.format(self.username, self.user_id)
+
+    def __repr__(self):
+        return '<SpeedboatUser {} ({})>'.format(self.username, self.user_id)
 
 
 @ModelBase.register

@@ -15,7 +15,7 @@ services:
     ports:
       - "6379:6379"
     volumes:
-      - ./.data:/data
+      - ~/.speedboatdata:/data
   web:
     build: .
     command: python manage.py serve -r

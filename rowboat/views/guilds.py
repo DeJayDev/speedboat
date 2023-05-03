@@ -21,7 +21,6 @@ def serialize_user(u):
     return {
         'user_id': str(u.user_id),
         'username': u.username,
-        'discriminator': str(u.discriminator),
     }
 
 

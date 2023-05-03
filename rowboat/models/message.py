@@ -262,7 +262,6 @@ class MessageArchive(ModelBase):
             timestamp=str(msg.timestamp),
             author_id=str(msg.author.id),
             username=msg.author.username,
-            discriminator=msg.author.discriminator,
             content=msg.content,
             deleted=msg.deleted,
             attachments=msg.attachments)
