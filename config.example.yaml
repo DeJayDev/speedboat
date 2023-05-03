@@ -6,7 +6,7 @@ max_reconnects: 0
 manhole_enable: true
 manhole_bind: 0.0.0.0:7171
 
-DSN: 'https://776a77e724ba480cb3f97b54202487d2:a5b8ea4a91d94db4957bd04e2b9b80c1@sentry.io/209448'
+DSN: ''
 
 web:
     CLIENT_SECRET: ''
