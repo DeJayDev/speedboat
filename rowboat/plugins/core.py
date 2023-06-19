@@ -20,7 +20,7 @@ from disco.util.sanitize import S
 from disco.util.snowflake import to_datetime
 
 from rowboat import ENV, REV
-from rowboat.constants import (GREEN_TICK_EMOJI, RED_TICK_EMOJI,
+from rowboat.constants import (GREEN_TICK_EMOJI, RED_TICK_EMOJI, GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID,
                                ROWBOAT_CONTROL_CHANNEL, ROWBOAT_GUILD_ID,
                                ROWBOAT_USER_ROLE_ID, WEB_URL)
 from rowboat.models.guild import Guild, GuildBan
