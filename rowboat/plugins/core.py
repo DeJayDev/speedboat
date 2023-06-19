@@ -9,6 +9,7 @@ import time
 from datetime import datetime, timedelta
 
 from disco.api.http import APIException
+from disco.api.client import APIClient
 from disco.bot import Bot
 from disco.bot.command import CommandEvent
 from disco.gateway.events import MessageCreate
@@ -23,7 +24,7 @@ from rowboat.constants import (GREEN_TICK_EMOJI, RED_TICK_EMOJI,
                                ROWBOAT_CONTROL_CHANNEL, ROWBOAT_GUILD_ID,
                                ROWBOAT_USER_ROLE_ID, WEB_URL)
 from rowboat.models.guild import Guild, GuildBan
-from rowboat.models.message import Command
+from rowboat.models.message import Command, Message
 from rowboat.models.user import Infraction
 from rowboat.plugins import CommandFail, CommandResponse, CommandSuccess
 from rowboat.plugins import RowboatPlugin as Plugin
@@ -790,3 +791,74 @@ class CorePlugin(Plugin):
     @Plugin.command('config')
     def config_cmd(self, event):
         raise CommandSuccess('{}/guilds/{}/config'.format(WEB_URL, event.guild.id))
+
+    # extract the msg selecting and confirmation bit to a function
+    # allow me to purge messages from the database specifically w/o discord 
+    # allow me to purge messages from the database that are only marked deleted in the db
+    @Plugin.command('gdpr', '<user:snowflake> [target:snowflake] {channel} {guild} {everywhere}', group='control', level=-1)
+    def gdpr_cmd(self, event, user, target, channel=False, guild=False, everywhere=False):
+        if not any([channel, guild, everywhere]):
+            raise CommandFail("Please flag either channel, guild, or everywhere.")
+
+        bot_reply = event.channel.send_message("Loading user messages...")
+
+        q = Message.select().where(
+            Message.author == user
+        )
+        
+        if channel:
+            q.where(Message.channel_id == target)
+        if guild:
+            q.where(Message.guild_id == target)
+        if everywhere:
+            event.msg.reply(":rotating_light: **HEY!** You are using everywhere mode. Proceed with caution.").after(10).delete()
+
+        messages = list(q)
+
+        bot_reply.delete()
+
+        confirm_msg = event.msg.reply(':warning: You have selected {} messages from {} in {}. Are you sure you wish to continue deleting?'.format(
+            len(messages),
+            user,
+            target if target else 'all known channels (everywhere)'
+        ))
+
+        confirm_msg.chain(False). \
+            add_reaction(GREEN_TICK_EMOJI). \
+            add_reaction(RED_TICK_EMOJI)
+
+        try:
+            mra_event = self.wait_for_event(
+                'MessageReactionAdd',
+                message_id=confirm_msg.id,
+                conditional=lambda e: (
+                        e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
+                        e.user_id == event.author.id
+                )).get(timeout=30)
+        except gevent.Timeout:
+            return
+        finally:
+            confirm_msg.delete()
+
+        if mra_event.emoji.id != GREEN_TICK_EMOJI_ID:
+            return
+        
+        event.msg.reply(':wastebasket: Ok. Please hold on, this may take a while - but I\'ll be back...')
+        deleted = 0
+
+        for message in messages:
+            m: Message = message
+            if message.deleted:
+                message.delete_instance()
+                continue # moving on.
+
+            if state.channels[message.channel_id]:
+                self.bot.client.api.channels_messages_delete(message.channel_id, message.id)
+            
+            message.delete_instance()
+            deleted = deleted + 1
+
+        raise CommandSuccess("Done {} messages were deleted from Discord and the Speedboat Database.".format(
+            deleted
+        ))
+        
