@@ -9,7 +9,7 @@ class ModLogPump(LoggingClass):
     def __init__(self, channel, sleep_duration=5):
         self.channel = channel
         self.sleep_duration = sleep_duration
-        self._buffer = []
+        self._buffer = list()
         self._have = gevent.event.Event()
         self._quiescent_period = None
         self._lock = gevent.lock.Semaphore()

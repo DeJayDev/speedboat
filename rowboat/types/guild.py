@@ -1,7 +1,6 @@
 import os
 
-from rowboat.types import (DictField, Field, Model, SlottedModel, raw,
-                           rule_matcher, text)
+from rowboat.types import DictField, Field, Model, SlottedModel, raw, rule_matcher, text
 
 
 class PluginConfigObj(object):
@@ -26,11 +25,11 @@ class PluginsConfig(Model):
         attributes properly loaded, as they are dynamically set when plugin configs
         are defined.
         """
-        plugins = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'plugins')
+        plugins = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)), "..", "plugins"
+        )
         for name in os.listdir(plugins):
-            __import__('rowboat.plugins.{}'.format(
-                name.rsplit('.', 1)[0]
-            ))
+            __import__("rowboat.plugins.{}".format(name.rsplit(".", 1)[0]))
 
 
 class CommandOverrideConfig(SlottedModel):
@@ -39,7 +38,7 @@ class CommandOverrideConfig(SlottedModel):
 
 
 class CommandsConfig(SlottedModel):
-    prefix = Field(str, default='')
+    prefix = Field(str, default="")
     prefixes = Field(list, default=[])
     mention = Field(bool, default=False)
     overrides = Field(raw)

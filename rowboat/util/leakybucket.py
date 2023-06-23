@@ -6,7 +6,7 @@ def get_ms_time():
 
 
 # function(keys=[rl_key], args=[time.time() - (time_period * max_actions), time.time()]
-INCR_SCRIPT = '''
+INCR_SCRIPT = """
 local key = KEYS[1]
 
 -- Clear out expired water drops
@@ -20,16 +20,16 @@ end
 redis.call("EXPIRE", KEYS[1], ARGV[4])
 
 return redis.call("ZCOUNT", KEYS[1], "-inf", "+inf")
-'''
+"""
 
-GET_SCRIPT = '''
+GET_SCRIPT = """
 local key = KEYS[1]
 
 -- Clear out expired water drops
 redis.call("ZREMRANGEBYSCORE", KEYS[1], "-inf", ARGV[1])
 
 return redis.call("ZCOUNT", KEYS[1], "-inf", "+inf")
-'''
+"""
 
 
 class LeakyBucket(object):
@@ -51,7 +51,8 @@ class LeakyBucket(object):
                 get_ms_time() - self.time_period,
                 get_ms_time(),
                 int((self.time_period * 2) / 1000),
-            ])
+            ],
+        )
 
     def check(self, key, amount=1):
         count = self.incr(key, amount)
@@ -63,13 +64,15 @@ class LeakyBucket(object):
         return int(self._get_script(self.key_fmt.format(key)))
 
     def clear(self, key):
-        self.redis.zremrangebyscore(self.key_fmt.format(key), '-inf', '+inf')
+        self.redis.zremrangebyscore(self.key_fmt.format(key), "-inf", "+inf")
 
     def count(self, key):
-        return self.redis.zcount(self.key_fmt.format(key), '-inf', '+inf')
+        return self.redis.zcount(self.key_fmt.format(key), "-inf", "+inf")
 
     def size(self, key):
-        res = list(map(int, self.redis.zrangebyscore(self.key_fmt.format(key), '-inf', '+inf')))
+        res = list(
+            map(int, self.redis.zrangebyscore(self.key_fmt.format(key), "-inf", "+inf"))
+        )
         if len(res) <= 1:
             return 0
         return (res[-1] - res[0]) / 1000.0

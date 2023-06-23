@@ -1,5 +1,4 @@
 import logging
-import os
 from subprocess import check_output
 
 import sentry_sdk as sentry
@@ -10,19 +9,13 @@ from yaml import safe_load
 with open("./config.yaml") as config_file:
     config = safe_load(config_file)
 
-ENV = config['ENV']
-DSN = config['DSN']
+ENV = config["ENV"]
 REV = check_output(["git", "describe", "--always"]).strip().decode("utf-8")
 
-sentry.init(
-    dsn=DSN,
-    release=REV,
-    environment=ENV,
-    integrations=[RedisIntegration()]
-)
+sentry.init(dsn=config["DSN"], release=REV, environment=ENV, integrations=[RedisIntegration()])
 
 # Log things to file
-file_handler = logging.FileHandler('rowboat.log')
+file_handler = logging.FileHandler("rowboat.log")
 log = logging.getLogger()
 file_handler.setFormatter(logging.Formatter(LOG_FORMAT))
 log.addHandler(file_handler)

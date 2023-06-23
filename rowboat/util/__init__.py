@@ -1,15 +1,16 @@
 import re
 from collections import OrderedDict
 from datetime import datetime
+from rowboat.constants import INVITE_LINK_RE
 
 import yaml
 from gevent.local import local
 
 # Invisible space that can be used to escape mentions
-ZERO_WIDTH_SPACE = '\u200B'
+ZERO_WIDTH_SPACE = "\u200B"
 
 # Replacement grave accent that can be used to escape codeblocks
-MODIFIER_GRAVE_ACCENT = '\u02CB'
+MODIFIER_GRAVE_ACCENT = "\u02CB"
 
 
 def ordered_load(stream, Loader=yaml.SafeLoader, object_pairs_hook=OrderedDict):
@@ -21,27 +22,22 @@ def ordered_load(stream, Loader=yaml.SafeLoader, object_pairs_hook=OrderedDict):
         return object_pairs_hook(loader.construct_pairs(node))
 
     OrderedLoader.add_constructor(
-        yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
-        construct_mapping)
+        yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, construct_mapping
+    )
     return yaml.safe_load(stream)
-
-
-# Shoutout Fire https://git.io/JUh3b
-INVITE_DOMAIN_RE = re.compile(r'(?:http|https)?(?::)?(?:\/\/)?((?:dsc|dis|discord|invite).(?:gd|gg|io|me)\/([a-zA-Z0-9\-]+))')
-
 
 def C(txt, codeblocks=False):
     # Do some basic safety checks:
-    txt = txt.replace('@', '@' + ZERO_WIDTH_SPACE)
+    txt = txt.replace("@", "@" + ZERO_WIDTH_SPACE)
 
     if codeblocks:
         txt = escape_codeblocks(txt)
 
-    return INVITE_DOMAIN_RE.sub('\g<0>' + ZERO_WIDTH_SPACE, txt)
+    return INVITE_LINK_RE.sub("\g<0>" + ZERO_WIDTH_SPACE, txt)
 
 
 def escape_codeblocks(txt):
-    return txt.replace('`', MODIFIER_GRAVE_ACCENT)
+    return txt.replace("`", MODIFIER_GRAVE_ACCENT)
 
 
 class LocalProxy(object):
@@ -68,4 +64,4 @@ class MetaException(Exception):
 def default_json(obj):
     if isinstance(obj, datetime):
         return obj.isoformat()
-    return TypeError('Type %s is not serializable' % type(obj))
+    return TypeError("Type %s is not serializable" % type(obj))

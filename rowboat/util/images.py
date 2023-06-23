@@ -11,7 +11,7 @@ def get_dominant_colors_user(user, url=None):
     from PIL import Image
     from io import BytesIO
 
-    key = 'avatar:color:{}'.format(user.avatar)
+    key = "avatar:color:{}".format(user.avatar)
     if rdb.exists(key):
         return int(rdb.get(key))
     else:
@@ -22,7 +22,10 @@ def get_dominant_colors_user(user, url=None):
             return 0
 
         rgbcolor = get_dominant_colors(Image.open(BytesIO(r.content)))[0]
-        color = int('%02x%02x%02x' % (rgbcolor[0], rgbcolor[1], rgbcolor[2]), 16) # Math is hard. https://stackoverflow.com/a/8340936
+        # https://stackoverflow.com/a/8340936
+        color = int(
+            "%02x%02x%02x" % (rgbcolor[0], rgbcolor[1], rgbcolor[2]), 16
+        )  
         rdb.set(key, color)
 
         return color
@@ -34,7 +37,7 @@ def get_dominant_colors_guild(guild, url=None):
     from PIL import Image
     from io import BytesIO
 
-    key = 'guild:color:{}'.format(guild.icon)
+    key = "guild:color:{}".format(guild.icon)
     if rdb.exists(key):
         return int(rdb.get(key))
     else:
@@ -45,7 +48,10 @@ def get_dominant_colors_guild(guild, url=None):
             return 0
 
         rgbcolor = get_dominant_colors(Image.open(BytesIO(r.content)))[0]
-        color = int('%02x%02x%02x' % (rgbcolor[0], rgbcolor[1], rgbcolor[2]), 16) # Math is hard. https://stackoverflow.com/a/8340936
+        # https://stackoverflow.com/a/8340936
+        color = int(
+            "%02x%02x%02x" % (rgbcolor[0], rgbcolor[1], rgbcolor[2]), 16
+        )
         rdb.set(key, color)
 
         return color

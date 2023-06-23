@@ -282,7 +282,7 @@ class ModLogPlugin(Plugin):
         for channel_id, chan_config in list(config._channels.items()):
             if channel_id not in guild.channels:
                 self.log.error('guild %s has outdated modlog channels (%s)', guild.id, channel_id)
-                config._channels = []
+                config._channels = list()
                 config.resolved = False
                 return
 
@@ -561,7 +561,8 @@ class ModLogPlugin(Plugin):
         archive = MessageArchive.create_from_message_ids(event.ids)
         self.log_action(Actions.MESSAGE_DELETE_BULK, event, log=archive.url, channel=channel, count=len(event.ids))
 
-    @Plugin.listen('VoiceStateUpdate', priority=Priority.SEQUENTIAL)
+    #@Plugin.listen('VoiceStateUpdate', priority=Priority.SEQUENTIAL)
+    @Plugin.listen("VoiceStateUpdate", priority=Priority.AFTER)
     def on_voice_state_update(self, event):
         old_vs = self.state.voice_states.get(event.session_id)
 
@@ -578,6 +579,7 @@ class ModLogPlugin(Plugin):
                 event,
                 channel=old_vs.channel)
 
-    @Plugin.listen('IntegrationUpdate', priority=Priority.SEQUENTIAL)
+    #@Plugin.listen('IntegrationUpdate', priority=Priority.SEQUENTIAL)
+    @Plugin.listen('IntegrationUpdate', priority=Priority.AFTER)
     def on_integration_update(self, event):
         self.log_action(Actions.INTEGRATION_UPDATE, event)

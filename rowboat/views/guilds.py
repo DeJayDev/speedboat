@@ -140,7 +140,7 @@ def guild_infractions(guild):
         on=((Infraction.actor_id == actor.user_id).alias('actor'))
     )
 
-    queries = []
+    queries = list()
     if 'filtered' in request.values:
         filters = json.loads(request.values['filtered'])
 
@@ -163,7 +163,7 @@ def guild_infractions(guild):
     else:
         q = q.where((Infraction.guild_id == guild.guild_id))
 
-    sorted_fields = []
+    sorted_fields = list()
     if 'sorted' in request.values:
         sort = json.loads(request.values['sorted'])
 
