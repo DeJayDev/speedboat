@@ -24,8 +24,8 @@ class Migrate(object):
     def __init__(self, rules, func):
         self.rules = rules
         self.func = func
-        self.actions = []
-        self.raw_actions = []
+        self.actions = list()
+        self.raw_actions = list()
         self.m = PostgresqlMigrator(database)
 
     def run(self):

@@ -1,6 +1,7 @@
 # Original Credit to EJH2
 # Source: https://gist.github.com/EJH2/c91d332237de6f8ee20fd69026e0f819/28daeb45e5ab7538129818593c32bfbfa0371466
 
+
 class FlagValue:
     def __init__(self, func):
         self.flag = func(None)
@@ -15,7 +16,7 @@ class UserFlags:
         self.value = value
 
     def __repr__(self):
-        return '<%s value=%s>' % (self.__class__.__name__, self.value)
+        return "<%s value=%s>" % (self.__class__.__name__, self.value)
 
     def __iter__(self):
         for name, value in self.__class__.__dict__.items():

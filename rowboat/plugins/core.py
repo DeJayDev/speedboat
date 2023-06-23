@@ -302,7 +302,8 @@ class CorePlugin(Plugin):
             embed.color = 0xFEE75C
             embed.add_field(name='Replayed Events', value=str(self.client.gw.replayed_events))
 
-    @Plugin.listen('Ready', priority=Priority.SEQUENTIAL)
+    #@Plugin.listen('Ready', priority=Priority.SEQUENTIAL)
+    @Plugin.listen('Ready', priority=Priority.AFTER)
     def on_ready(self, event):
         reconnects = self.client.gw.reconnects
         self.log.info('Started session {} (reconnects {})'.format(event.session_id, event.reconnects))
@@ -315,7 +316,8 @@ class CorePlugin(Plugin):
                 embed.title = 'Connected'
                 embed.color = 0x57F287
 
-    @Plugin.listen('GuildCreate', priority=Priority.SEQUENTIAL, conditional=lambda e: not e.created)
+    #@Plugin.listen('GuildCreate', priority=Priority.SEQUENTIAL, conditional=lambda e: not e.created)
+    @Plugin.listen('GuildCreate', priority=Priority.AFTER, conditional=lambda e: not e.created)
     def on_guild_create(self, event):
         try:
             guild = Guild.with_id(event.id)
@@ -522,7 +524,7 @@ class CorePlugin(Plugin):
 
     @Plugin.command('nuke', '<user:snowflake> <reason:str...>', level=-1)
     def nuke(self, event, user, reason):
-        contents = []
+        contents = list()
 
         for gid, guild in list(self.guilds.items()):
             guild = self.state.guilds[gid]
@@ -555,7 +557,7 @@ class CorePlugin(Plugin):
 
     @Plugin.command('unnuke', '<user:snowflake> <reason:str...>', level=-1)
     def unnuke(self, event, user, reason):
-        contents = []
+        contents = list()
 
         for gid, guild in list(self.guilds.items()):
             guild = self.state.guilds[gid]
@@ -760,33 +762,6 @@ class CorePlugin(Plugin):
         msg = event.msg.reply(":eyes:")
         ping = (time.time() - pre) * 1000
         msg.edit(":eyes: `BOT: {}ms` `API: {}ms`".format(int(post), int(ping)))
-
-    @Plugin.command('plsgivehelp', '[user:user|snowflake]')
-    def help(self, event, user=None):
-        if not user:
-            user = event.msg.author
-
-        cmds = ''
-        othercmds = ''
-
-        for plugin in self.bot.plugins.values():
-            plugin_cmds = []
-            ungrouped_plugin_cmds = []
-            event.level = self.get_level(event.guild, user)
-            for command in self.bot.commands:
-                if command.level and (command.level != -1) and (
-                        command.level <= event.level) and command.plugin is plugin:
-                    if command.group:
-                        plugin_cmds.append('{} {}'.format(command.group, command.name))
-                    else:
-                        ungrouped_plugin_cmds.append(command.name)
-            plugin_cmds = sorted(plugin_cmds)
-            if not plugin_cmds:
-                continue  # No commands? lets go.
-            cmds += "**{}**: {}\n".format(plugin.name.capitalize(), ', '.join(plugin_cmds))
-            othercmds += "{}".format(', '.join(ungrouped_plugin_cmds))
-
-        raise CommandSuccess('You can use:\n {}'.format(cmds + othercmds))
 
     @Plugin.command('config')
     def config_cmd(self, event):

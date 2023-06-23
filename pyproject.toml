@@ -41,6 +41,9 @@ peewee = "^3.16.2"
 datadog = "^0.45.0"
 pynacl = "^1.5.0"
 
+[tool.black]
+line-length = 256
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

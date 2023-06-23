@@ -25,7 +25,7 @@ class InternalPlugin(Plugin):
         self.events = RedisSet(rdb, 'internal:tracked-events')
         self.session_id = None
         self.lock = Semaphore()
-        self.cache = []
+        self.cache = list()
 
     @Plugin.command('errors', group='commands', level=-1)
     def on_commands_errors(self, event):
@@ -162,4 +162,4 @@ class InternalPlugin(Plugin):
                 Event.insert_many(list(filter(bool, [
                     Event.prepare(self.session_id, event) for event in self.cache
                 ]))).execute()
-                self.cache = []
+                self.cache = list()
