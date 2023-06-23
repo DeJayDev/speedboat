@@ -795,8 +795,8 @@ class CorePlugin(Plugin):
     # extract the msg selecting and confirmation bit to a function
     # allow me to purge messages from the database specifically w/o discord 
     # allow me to purge messages from the database that are only marked deleted in the db
-    @Plugin.command('gdpr', '<user:snowflake> [target:snowflake] {channel} {guild} {everywhere}', group='control', level=-1)
-    def gdpr_cmd(self, event, user, target, channel=False, guild=False, everywhere=False):
+    @Plugin.command('gdpr', '<user:snowflake> [target:snowflake] {channel} {guild} {everywhere} {discordtoo}', group='control', level=-1)
+    def gdpr_cmd(self, event, user, target, channel=False, guild=False, everywhere=False, discordtoo=False):
         if not any([channel, guild, everywhere]):
             raise CommandFail("Please flag either channel, guild, or everywhere.")
 
@@ -817,48 +817,53 @@ class CorePlugin(Plugin):
 
         bot_reply.delete()
 
-        confirm_msg = event.msg.reply(':warning: You have selected {} messages from {} in {}. Are you sure you wish to continue deleting?'.format(
-            len(messages),
-            user,
-            target if target else 'all known channels (everywhere)'
-        ))
+        if not discordtoo:
+            event.msg.reply("You've asked me not to delete Discord messages")
 
-        confirm_msg.chain(False). \
-            add_reaction(GREEN_TICK_EMOJI). \
-            add_reaction(RED_TICK_EMOJI)
+        if discordtoo:
+            confirm_msg = event.msg.reply(':warning: You have selected {} messages from {} in {}. Are you sure you wish to continue deleting?'.format(
+                len(messages),
+                user,
+                target if target else 'all known channels (everywhere)'
+            ))
 
-        try:
-            mra_event = self.wait_for_event(
-                'MessageReactionAdd',
-                message_id=confirm_msg.id,
-                conditional=lambda e: (
-                        e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
-                        e.user_id == event.author.id
-                )).get(timeout=30)
-        except gevent.Timeout:
-            return
-        finally:
-            confirm_msg.delete()
+            confirm_msg.chain(False). \
+                add_reaction(GREEN_TICK_EMOJI). \
+                add_reaction(RED_TICK_EMOJI)
 
-        if mra_event.emoji.id != GREEN_TICK_EMOJI_ID:
-            return
-        
-        event.msg.reply(':wastebasket: Ok. Please hold on, this may take a while - but I\'ll be back...')
-        deleted = 0
+            try:
+                mra_event = self.wait_for_event(
+                    'MessageReactionAdd',
+                    message_id=confirm_msg.id,
+                    conditional=lambda e: (
+                            e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
+                            e.user_id == event.author.id
+                    )).get(timeout=30)
+            except gevent.Timeout:
+                return
+            finally:
+                confirm_msg.delete()
 
-        for message in messages:
-            m: Message = message
-            if message.deleted:
+            if mra_event.emoji.id != GREEN_TICK_EMOJI_ID:
+                return
+
+            event.msg.reply(':wastebasket: Ok. Please hold on, this may take a while - but I\'ll be back...')
+            deleted = 0
+
+            for message in messages:
+                m: Message = message
+                if message.deleted:
+                    message.delete_instance()
+                    continue # moving on.
+
+                if state.channels[message.channel_id]:
+                    self.bot.client.api.channels_messages_delete(message.channel_id, message.id)
+
                 message.delete_instance()
-                continue # moving on.
+                deleted = deleted + 1
 
-            if state.channels[message.channel_id]:
-                self.bot.client.api.channels_messages_delete(message.channel_id, message.id)
-            
-            message.delete_instance()
-            deleted = deleted + 1
-
-        raise CommandSuccess("Done {} messages were deleted from Discord and the Speedboat Database.".format(
-            deleted
-        ))
+            raise CommandSuccess("Done {} messages were deleted from Speedboat Database {}".format(
+                deleted,
+                'and Discord too' if discordtoo else ''
+            ))
         
