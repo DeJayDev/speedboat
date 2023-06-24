@@ -78,7 +78,7 @@ class LevelPlugin(Plugin):
             commands = list(self.bot.get_commands_for_message(
                 config.commands.mention,
                 {},
-                config.commands.prefix,
+                config.commands.prefix if config.commands.prefix else config.commands.prefixes,
                 event.message))
         
         if commands:

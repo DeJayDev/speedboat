@@ -47,7 +47,7 @@ class TagsPlugin(Plugin):
         embed.title = "Tags for {}".format(event.guild.name)
         embed.description = "\n".join("- `{}` by {}".format(tag.name, tag.user.name) for tag in tags)
 
-        event.msg.reply(embed=embed)
+        event.msg.reply(embeds=[embed])
 
     @Plugin.command("tags", "<name:str>", aliases=["tag"], level=CommandLevels.TRUSTED)
     @Plugin.command("show", "<name:str>", group="tag", level=CommandLevels.TRUSTED)
@@ -92,7 +92,7 @@ class TagsPlugin(Plugin):
         embed.add_field(name="Author", value=str(tag.author), inline=True)
         embed.add_field(name="Times Used", value=str(tag.times_used), inline=True)
         embed.timestamp = tag.created_at.isoformat()
-        event.msg.reply(embed=embed)
+        event.msg.reply(embeds=[embed])
 
     def get_tag_by_name(tag: str):
         return Tag.select(Tag, User).join(

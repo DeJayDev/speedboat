@@ -95,7 +95,7 @@ class StarboardPlugin(Plugin):
             raise CommandFail('No starboard message with that id')
 
         content, embed, row = self.get_embed(star, source_msg, sb_config)
-        event.msg.reply(content, embed=embed, components=[row.to_dict()])
+        event.msg.reply(content, embeds=[embed], components=[row.to_dict()])
 
     @Plugin.command('stats', '[user:user]', group='stars', level=CommandLevels.MOD)
     def stars_stats(self, event, user=None):
@@ -128,7 +128,7 @@ class StarboardPlugin(Plugin):
             embed.add_field(name='Total Posts w/ Stars', value=str(recieved_stars_posts), inline=True)
             embed.add_field(name='Total Stars Recieved', value=str(recieved_stars_total), inline=True)
             # embed.add_field(name='Star Rank', value='#{}'.format(recieved_stars_rank), inline=True)
-            return event.msg.reply('', embed=embed)
+            return event.msg.reply(embeds=[embed])
 
         total_starred_posts, total_stars = list(StarboardEntry.select(
             fn.COUNT('*'),
@@ -159,7 +159,7 @@ class StarboardPlugin(Plugin):
         embed.add_field(name='Top Star Recievers', value='\n'.join(
             '{}. <@{}> ({})'.format(idx + 1, row[1], row[0]) for idx, row in enumerate(top_users)
         ))
-        event.msg.reply('', embed=embed)
+        event.msg.reply(embeds=[embed])
 
     @Plugin.command('check', '<mid:snowflake>', group='stars', level=CommandLevels.ADMIN)
     def stars_update(self, event, mid):
@@ -417,7 +417,7 @@ class StarboardPlugin(Plugin):
                 msg = self.client.api.channels_messages_create(
                     starboard_id,
                     content,
-                    embed=embed,
+                    embeds=[embed],
                     components=[row.to_dict()])
             except:
                 self.log.exception('Failed to post starboard message: ')
@@ -428,7 +428,7 @@ class StarboardPlugin(Plugin):
                     star.star_channel_id,
                     star.star_message_id,
                     content,
-                    embed=embed)
+                    embeds=[embed])
             except APIException as e:
                 # If we get a 10008, assume this message was deleted
                 if e.code == ERR_UNKNOWN_MESSAGE:

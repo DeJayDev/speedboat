@@ -289,7 +289,7 @@ class CorePlugin(Plugin):
             yield embed
             self.bot.client.api.channels_messages_create(
                 ROWBOAT_CONTROL_CHANNEL,
-                embed=embed
+                embeds=[embed]
             )
         except:
             self.log.exception('Failed to send control message:')
@@ -303,10 +303,10 @@ class CorePlugin(Plugin):
             embed.add_field(name='Replayed Events', value=str(self.client.gw.replayed_events))
 
     #@Plugin.listen('Ready', priority=Priority.SEQUENTIAL)
-    @Plugin.listen('Ready', priority=Priority.AFTER)
+    @Plugin.listen('Ready')
     def on_ready(self, event):
         reconnects = self.client.gw.reconnects
-        self.log.info('Started session {} (reconnects {})'.format(event.session_id, event.reconnects))
+        self.log.info('Started session {} (reconnects {})'.format(event.session_id, reconnects))
 
         with self.send_control_message() as embed:
             if reconnects:
@@ -317,18 +317,20 @@ class CorePlugin(Plugin):
                 embed.color = 0x57F287
 
     #@Plugin.listen('GuildCreate', priority=Priority.SEQUENTIAL, conditional=lambda e: not e.created)
-    @Plugin.listen('GuildCreate', priority=Priority.AFTER, conditional=lambda e: not e.created)
+    @Plugin.listen('GuildCreate')
     def on_guild_create(self, event):
         try:
-            guild = Guild.with_id(event.id)
+            guild = Guild.with_id(event.guild.id)
         except Guild.DoesNotExist:
             # If the guild is not awaiting setup, leave it now
-            if not rdb.sismember(GUILDS_WAITING_SETUP_KEY, str(event.id)) and event.id != ROWBOAT_GUILD_ID:
+            if not rdb.sismember(GUILDS_WAITING_SETUP_KEY, str(event.guild.id)) and event.guild.id != ROWBOAT_GUILD_ID:
                 self.log.warning(
                     'Guild %s (%s) is awaiting setup.',
-                    event.id, event.name
+                    event.guild.id, event.guild.name
                 )
             return
+        except Exception as e:
+            self.log.error("Failed to get guild {} because {}".format(event.guild.id, e))
 
         if not guild.enabled:
             return
@@ -401,17 +403,10 @@ class CorePlugin(Plugin):
 
         # If the guild has configuration, use that (otherwise use defaults)
         if config and config.commands:
-            if config.commands.prefixes:
-                commands = list(self.bot.get_commands_for_message(
+            commands = list(self.bot.get_commands_for_message(
                     config.commands.mention,
                     {},
-                    config.commands.prefixes,
-                    event.message))
-            else:
-                commands = list(self.bot.get_commands_for_message(
-                    config.commands.mention,
-                    {},
-                    config.commands.prefix,
+                    config.commands.prefix if config.commands.prefix else config.commands.prefixes,
                     event.message))
         elif guild_id:
             # Otherwise, default to requiring mentions
@@ -608,7 +603,7 @@ class CorePlugin(Plugin):
         embed.add_field(name='Version',
                         value=REV,
                         inline=True)
-        event.msg.reply(embed=embed)
+        event.msg.reply(embeds=[embed])
 
     @Plugin.command('uptime', level=-1)
     def command_uptime(self, event):

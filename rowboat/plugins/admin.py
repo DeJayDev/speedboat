@@ -393,7 +393,7 @@ class AdminPlugin(Plugin):
             embed.add_field(name='Expires', value=humanize.naturaldelta(infraction.expires_at - datetime.utcnow()))
         embed.add_field(name='Reason', value=infraction.reason or '_No Reason Given', inline=False)
         embed.timestamp = infraction.created_at.isoformat()
-        event.msg.reply('', embed=embed)
+        event.msg.reply(embeds=[embed])
 
     @Plugin.command('warnings', '<query:user|snowflake...>', level=CommandLevels.MOD)
     @Plugin.command('search', '[query:user|str...]', group='infractions', level=CommandLevels.MOD)
@@ -1219,7 +1219,7 @@ class AdminPlugin(Plugin):
 
         embed.thumbnail = MessageEmbedThumbnail(url=user.avatar_url)
         embed.color = get_dominant_colors_user(user, User.from_disco_user(user).get_avatar_url())
-        event.msg.reply('', embed=embed)
+        event.msg.reply(embeds=[embed])
 
     @Plugin.command('emojistats', '<mode:str> <sort:str>', level=CommandLevels.MOD)
     def emojistats_custom(self, event, mode, sort):

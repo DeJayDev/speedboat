@@ -125,7 +125,7 @@ class RedditPlugin(Plugin):
                     data['ups'], data['downs'], data['num_comments']
                 )))
 
-            channel.send_message('', embed=embed)
+            channel.send_message(embeds=[embed])
 
     def update_subreddit(self, sub, configs):
         # TODO: use before on this request
