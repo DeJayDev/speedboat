@@ -279,7 +279,7 @@ class UtilitiesPlugin(Plugin):
 
         if guild.icon:
             embed.color = get_dominant_colors_guild(guild)
-        event.msg.reply("", embed=embed)
+        event.msg.reply(embeds=[embed])
 
     @Plugin.command("info", "[user:user|snowflake]", aliases="whois")
     def info(self, event, user: User = None):
@@ -368,7 +368,7 @@ class UtilitiesPlugin(Plugin):
 
         embed.description = "\n".join(content)
         embed.color = get_dominant_colors_user(user, avatar)
-        event.msg.reply("", embed=embed)
+        event.msg.reply(embeds=[embed])
 
     @Plugin.command("config", global_=True)
     def config_cmd(self, event):

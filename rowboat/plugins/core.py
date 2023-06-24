@@ -289,7 +289,7 @@ class CorePlugin(Plugin):
             yield embed
             self.bot.client.api.channels_messages_create(
                 ROWBOAT_CONTROL_CHANNEL,
-                embed=embed
+                embeds=[embed]
             )
         except:
             self.log.exception('Failed to send control message:')
@@ -303,10 +303,10 @@ class CorePlugin(Plugin):
             embed.add_field(name='Replayed Events', value=str(self.client.gw.replayed_events))
 
     #@Plugin.listen('Ready', priority=Priority.SEQUENTIAL)
-    @Plugin.listen('Ready', priority=Priority.AFTER)
+    @Plugin.listen('Ready')
     def on_ready(self, event):
         reconnects = self.client.gw.reconnects
-        self.log.info('Started session {} (reconnects {})'.format(event.session_id, event.reconnects))
+        self.log.info('Started session {} (reconnects {})'.format(event.session_id, reconnects))
 
         with self.send_control_message() as embed:
             if reconnects:
@@ -317,7 +317,7 @@ class CorePlugin(Plugin):
                 embed.color = 0x57F287
 
     #@Plugin.listen('GuildCreate', priority=Priority.SEQUENTIAL, conditional=lambda e: not e.created)
-    @Plugin.listen('GuildCreate', priority=Priority.AFTER, conditional=lambda e: not e.created)
+    @Plugin.listen('GuildCreate', conditional=lambda e: not e.created)
     def on_guild_create(self, event):
         try:
             guild = Guild.with_id(event.id)
@@ -608,7 +608,7 @@ class CorePlugin(Plugin):
         embed.add_field(name='Version',
                         value=REV,
                         inline=True)
-        event.msg.reply(embed=embed)
+        event.msg.reply(embeds=[embed])
 
     @Plugin.command('uptime', level=-1)
     def command_uptime(self, event):

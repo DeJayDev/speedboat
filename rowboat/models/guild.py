@@ -9,6 +9,7 @@ from playhouse.postgres_ext import ArrayField, BinaryJSONField
 from holster.enum import Enum
 from rowboat.redis import emit
 from rowboat.sql import ModelBase
+from disco.types.guild import Guild as DiscoGuild
 
 log = logging.getLogger(__name__)
 
@@ -110,19 +111,20 @@ class Guild(ModelBase):
 
         return self._cached_config
 
-    def sync_bans(self, guild):
+    def sync_bans(self, guild: DiscoGuild):
         # Update last synced time
         Guild.update(
             last_ban_sync=datetime.utcnow()
         ).where(Guild.guild_id == self.guild_id).execute()
 
         try:
+            guild.get_permissions()
             bans = guild.get_bans()
         except:
-            log.exception('sync_bans failed for Guild %s', self.guild_id)
+            log.warning('Failed to sync_bans in {} ({})', self.guild_id, guild.name if guild.name else self.name)
             return
 
-        log.info('Syncing %s bans for guild %s', len(bans), guild.id)
+        log.info('Syncing %s bans for guild %s...', len(bans), guild.id)
 
         GuildBan.delete().where(
             (~(GuildBan.user_id << list(bans.keys()))) &

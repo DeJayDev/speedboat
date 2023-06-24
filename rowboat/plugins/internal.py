@@ -68,7 +68,7 @@ class InternalPlugin(Plugin):
         embed.add_field(name='Message', value=cmd.message.content)
         embed.add_field(name='Channel', value='{} `{}`'.format(cmd.message.channel.name, cmd.message.channel.channel_id))
         embed.add_field(name='Guild', value=str(cmd.message.guild_id))
-        event.msg.reply(embed=embed)
+        event.msg.reply(embeds=[embed])
 
     @Plugin.command('usage', group='commands', level=-1)
     def on_commands_usage(self, event):

@@ -44,7 +44,7 @@ class SQLPlugin(Plugin):
     @Plugin.listen("VoiceStateUpdate", priority=Priority.AFTER)
     def on_voice_state_update(self, event):
         pre_state = self.state.voice_states.get(event.session_id)
-        guild = self.guilds[event.guild_id]
+        guild = self.state.guilds[event.guild_id]
         if guild.afk_channel_id is not event.channel_id:
             GuildVoiceSession.create_or_update(pre_state, event.state)
 
