@@ -262,6 +262,10 @@ class CorePlugin(Plugin):
         for guild in to_update[:10]:
             guild.sync_bans(self.client.state.guilds.get(guild.guild_id))
 
+    @Plugin.listen("")
+    def on_gateway_event(self, event):
+        self.log.info("Received event with type: ".format(event.__class__.__name__))
+
     @Plugin.listen('GuildUpdate')
     def on_guild_update(self, event):
         self.log.info('Got guild update for guild %s (%s)', event.guild.name, event.guild.id)
@@ -318,17 +322,19 @@ class CorePlugin(Plugin):
 
     #@Plugin.listen('GuildCreate', priority=Priority.SEQUENTIAL, conditional=lambda e: not e.created)
     @Plugin.listen('GuildCreate', conditional=lambda e: not e.created)
-    def on_guild_create(self, event):
+    def on_guild_create(self, event):        
         try:
-            guild = Guild.with_id(event.id)
+            guild = Guild.with_id(event.guild.id)
         except Guild.DoesNotExist:
             # If the guild is not awaiting setup, leave it now
-            if not rdb.sismember(GUILDS_WAITING_SETUP_KEY, str(event.id)) and event.id != ROWBOAT_GUILD_ID:
+            if not rdb.sismember(GUILDS_WAITING_SETUP_KEY, str(event.guild.id)) and event.guild.id != ROWBOAT_GUILD_ID:
                 self.log.warning(
                     'Guild %s (%s) is awaiting setup.',
-                    event.id, event.name
+                    event.guild.id, event.guild.name
                 )
             return
+        except Exception as e:
+            self.log.error("Failed to get guild {} because {}".format(event.guild.id, e))
 
         if not guild.enabled:
             return
@@ -401,17 +407,10 @@ class CorePlugin(Plugin):
 
         # If the guild has configuration, use that (otherwise use defaults)
         if config and config.commands:
-            if config.commands.prefixes:
-                commands = list(self.bot.get_commands_for_message(
+            commands = list(self.bot.get_commands_for_message(
                     config.commands.mention,
                     {},
-                    config.commands.prefixes,
-                    event.message))
-            else:
-                commands = list(self.bot.get_commands_for_message(
-                    config.commands.mention,
-                    {},
-                    config.commands.prefix,
+                    config.commands.prefix if config.commands.prefix else config.commands.prefixes,
                     event.message))
         elif guild_id:
             # Otherwise, default to requiring mentions

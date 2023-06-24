@@ -113,13 +113,13 @@ class SQLPlugin(Plugin):
             (~(GuildEmoji.emoji_id << ids))
         ).execute()
 
-    @Plugin.listen("GuildCreate")
-    def on_guild_create(self, event):
-        for channel in list(event.channels.values()):
-            Channel.from_disco_channel(channel)
+    # @Plugin.listen("GuildCreate")
+    # def on_guild_create(self, event):
+    #     for channel in list(event.channels.values()):
+    #         Channel.from_disco_channel(channel)
 
-        for emoji in list(event.emojis.values()):
-            GuildEmoji.from_disco_guild_emoji(emoji)
+    #     for emoji in list(event.emojis.values()):
+    #         GuildEmoji.from_disco_guild_emoji(emoji)
 
     @Plugin.listen("GuildDelete")
     def on_guild_delete(self, event):
