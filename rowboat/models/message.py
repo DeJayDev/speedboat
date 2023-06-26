@@ -237,7 +237,7 @@ class MessageArchive(ModelBase):
 
     @staticmethod
     def encode_message_text(msg):
-        return '{m.timestamp} ({m.channel_id} / {m.id} / {m.author.id}) {m.author}: {m.content} ({attach})'.format(
+        return '{m.timestamp} ({m.channel_id} / {m.id}) {m.author}: {m.content} ({attach})'.format(
             m=msg, attach=', '.join(map(str, msg.attachments or [])))
 
     @staticmethod

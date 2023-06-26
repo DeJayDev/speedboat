@@ -118,10 +118,9 @@ class Guild(ModelBase):
         ).where(Guild.guild_id == self.guild_id).execute()
 
         try:
-            guild.get_permissions()
             bans = guild.get_bans()
         except:
-            log.warning('Failed to sync_bans in {} ({})', self.guild_id, guild.name if guild.name else self.name)
+            log.warning('Failed to sync_bans in {} ({})', str(self.guild_id), guild.name if guild.name else self.name)
             return
 
         log.info('Syncing %s bans for guild %s...', len(bans), guild.id)
