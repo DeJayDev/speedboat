@@ -13,10 +13,10 @@ documentation = "https://docs.speedboat.rocks"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-betterdisco-py = {git = "ssh://git@github.com/elderlabs/betterdisco", extras=["performance"], rev = "bd380df97c65c3127cfc211203bc9dc6852983be"}
-holster = {git = "ssh://git@github.com/elderlabs/holster"}
-dominantcolors = {git = "ssh://git@github.com/wenmin-wu/dominant-colors-py"}
-pygal = {git = "ssh://git@github.com/rafalkucharczyk/pygal", rev = "02c10a2919457bad4c83913a90c3aa0dd0ccb83a"}
+betterdisco-py = {git = "https://github.com/elderlabs/betterdisco", extras=["performance"], rev = "bd380df97c65c3127cfc211203bc9dc6852983be"}
+holster = {git = "https://github.com/elderlabs/holster"}
+dominantcolors = {git = "https://github.com/wenmin-wu/dominant-colors-py"}
+pygal = {git = "https://github.com/rafalkucharczyk/pygal", rev = "02c10a2919457bad4c83913a90c3aa0dd0ccb83a"}
 click = "^8.1.3"
 faust-cchardet = "^2.1.18"
 dill = "^0.3.6"

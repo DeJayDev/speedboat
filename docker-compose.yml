@@ -2,20 +2,18 @@ version: '3.8'
 services:
   db:
     build: ./docker/
+    hostname: db
     volumes:
-      - ~/.speedboatdata:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+      - speedboat_psql_data:/var/lib/postgresql/data
     environment:
       - ENV=production
     stop_grace_period: 1m
   redis:
     image: redis:7-alpine
+    hostname: redis
     command: redis-server --appendonly yes
-    ports:
-      - "6379:6379"
     volumes:
-      - ~/.speedboatdata:/data
+      - speedboat_redis_data:/data
   web:
     build: .
     command: python manage.py serve -r
@@ -28,6 +26,7 @@ services:
       - redis
   bot:
     build: .
+    hostname: bot
     command: python manage.py bot -e docker
     volumes:
       - .:/opt/rowboat
@@ -42,3 +41,7 @@ services:
       - .:/opt/rowboat
     depends_on:
       - web
+
+volumes:
+  speedboat_psql_data:
+  speedboat_redis_data:
