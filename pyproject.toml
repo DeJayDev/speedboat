@@ -13,7 +13,7 @@ documentation = "https://docs.speedboat.rocks"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-betterdisco-py = {git = "https://github.com/elderlabs/betterdisco", extras=["performance"], rev = "bd380df97c65c3127cfc211203bc9dc6852983be"}
+betterdisco-py = {git = "https://github.com/elderlabs/betterdisco", extras=["performance"], rev = "30dbecb9998ad32af9a18928896473c043f6377a"}
 holster = {git = "https://github.com/elderlabs/holster"}
 dominantcolors = {git = "https://github.com/wenmin-wu/dominant-colors-py"}
 pygal = {git = "https://github.com/rafalkucharczyk/pygal", rev = "02c10a2919457bad4c83913a90c3aa0dd0ccb83a"}
