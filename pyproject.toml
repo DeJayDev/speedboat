@@ -18,7 +18,7 @@ holster = {git = "https://github.com/elderlabs/holster"}
 dominantcolors = {git = "https://github.com/wenmin-wu/dominant-colors-py"}
 pygal = {git = "https://github.com/rafalkucharczyk/pygal", rev = "02c10a2919457bad4c83913a90c3aa0dd0ccb83a"}
 click = "^8.1.3"
-faust-cchardet = "^2.1.18"
+faust-cchardet = "^2.1.19"
 dill = "^0.3.6"
 emoji = "^2.5.1"
 Flask = "^2.3.2"
