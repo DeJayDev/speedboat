@@ -13,32 +13,45 @@ documentation = "https://docs.speedboat.rocks"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-betterdisco-py = {git = "https://github.com/elderlabs/betterdisco", extras=["performance"], rev = "bd380df97c65c3127cfc211203bc9dc6852983be"}
-holster = {git = "https://github.com/elderlabs/holster"}
 dominantcolors = {git = "https://github.com/wenmin-wu/dominant-colors-py"}
+holster = {git = "https://github.com/elderlabs/holster"}
 pygal = {git = "https://github.com/rafalkucharczyk/pygal", rev = "02c10a2919457bad4c83913a90c3aa0dd0ccb83a"}
+Flask = "^2.3.3"
+Pillow = "^10.1.0"
+cairosvg = "^2.7.1"
 click = "^8.1.7"
-faust-cchardet = "^2.1.19"
+datadog = "^0.47.0"
 dill = "^0.3.7"
 emoji = "^2.8.0"
-Flask = "^2.3.3"
+faust-cchardet = "^2.1.19"
 humanize = "^4.8.0"
 markovify = "^0.9.4"
 oauthlib = "^3.2.2"
-Pillow = "^10.0.1"
+peewee = "^3.17.0"
 psycogreen = "^1.0.2"
-psycopg2-binary = "^2.9.7"
+psycopg2-binary = "^2.9.9"
+pynacl = "^1.5.0"
 pytz = "^2023.3.post1"
 pyyaml = "^6.0.1"
-sentry-sdk = "^1.31.0"
-redis = "^5.0.0"
+rapidfuzz = "^3.5.2"
+redis = "^5.0.1"
 requests-oauthlib = "^1.3.1"
-urllib3 = "^2.0.4"
+sentry-sdk = "^1.35.0"
+urllib3 = "^2.1.0"
 wheel = "^0.41.2"
-rapidfuzz = "^3.3.0"
-peewee = "^3.16.3"
-datadog = "^0.47.0"
-pynacl = "^1.5.0"
+# i have no idea why im the person who has to require these even though redis is the one that needs them
+aiohttp = "^3.9.0"
+async-timeout = "^4.0.3"
+
+[tool.poetry.dependencies.betterdisco-py]
+rev = "dec8605ab8ebdcceda2893d663d14a533c8cfe20"
+git = "https://github.com/elderlabs/betterdisco"
+extras = ["performance"]
+
+[tool.poe.tasks.bot]
+help = "Start the Speedbot bot"
+args = [{ name = "env", required = false }]
+script = "manage:bot()"
 
 [tool.black]
 line-length = 256

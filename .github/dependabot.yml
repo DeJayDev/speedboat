@@ -7,7 +7,7 @@ updates:
     groups:
       bot-dependencies:
         patterns:
-        - "*"
+          - "*"
 
   - package-ecosystem: "npm"
     directory: "/frontend" 
@@ -16,4 +16,4 @@ updates:
     groups:
       frontend-dependencies:
         patterns:
-        - "*"
+          - "*"

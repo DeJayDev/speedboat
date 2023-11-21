@@ -1,8 +1,11 @@
+name: speedboat
 version: '3.8'
+
 services:
   db:
     build: ./docker/
     hostname: db
+    container_name: db
     volumes:
       - speedboat_psql_data:/var/lib/postgresql/data
     environment:
@@ -11,6 +14,7 @@ services:
   redis:
     image: redis:7-alpine
     hostname: redis
+    container_name: redis
     command: redis-server --appendonly yes
     volumes:
       - speedboat_redis_data:/data
@@ -27,13 +31,16 @@ services:
   bot:
     build: .
     hostname: bot
-    command: python manage.py bot -e docker
+    container_name: bot
+    command: /opt/poetry/bin/poetry poe bot --env docker
     volumes:
       - .:/opt/rowboat
     ports:
       - "7171:7171"
     depends_on:
       - web
+    links:
+      - 'db:db'
   workers:
     build: .
     command: python manage.py workers
