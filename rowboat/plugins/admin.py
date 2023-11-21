@@ -149,7 +149,10 @@ class AdminPlugin(Plugin):
                     user_id=item.user_id,
                 )
 
-                guild.delete_ban(item.user_id)
+                try: 
+                    guild.delete_ban(item.user_id)
+                except:
+                    pass # no need, we can keep going :)
 
                 self.call(
                     'ModLogPlugin.log_action_ext',
@@ -964,30 +967,46 @@ class AdminPlugin(Plugin):
         raise CommandSuccess('Ok, the running clean was cancelled')
 
     @Plugin.command('all', '[size:int]', level=CommandLevels.MOD, group='clean')
-    @Plugin.command('user', '<user:user> [size:int]', level=CommandLevels.MOD, group='clean', context={'mode': 'user'})
-    def clean(self, event, user=None, size=25, mode='all'):
+    @Plugin.command('user', '<user:user|snowflake> [size:int]', level=CommandLevels.MOD, group='clean', context={'mode': 'user'})
+    @Plugin.command('user', '<user:user|snowflake> [size:int] [days:int] {daddy}', level=CommandLevels.MOD, group='clean', context={'mode': 'user'})
+    def clean(self, event, user=None, size=25, days=30, daddy=False, mode='all'):
         """
         Removes messages
         """
-        if size < 1 or size > 10000:
+        if not daddy and (size < 1 or size > 10000):
             raise CommandFail('Too many messages. Must be between 1-10000')
 
         if event.channel.id in self.cleans:
             raise CommandFail('A clean is already running on this channel')
 
-        query = Message.select(Message.id).where(
-            (Message.deleted >> False) &
-            (Message.channel_id == event.channel.id) &
-            (Message.timestamp > (datetime.utcnow() - timedelta(days=13)))
-        ).join(User).order_by(Message.timestamp.desc()).limit(size)
+        if daddy:
+            event.channel.send_message("Query will take a lot longer. o7")
+            query = Message.select(Message.id).where(
+                (Message.deleted >> False) &
+                (Message.channel_id == event.channel.id) &
+                (Message.timestamp < (datetime.utcnow() - timedelta(days=days)))
+            ).join(User).order_by(Message.timestamp.desc()).limit(size)
+        else:
+            query = Message.select(Message.id).where(
+                (Message.deleted >> False) &
+                (Message.channel_id == event.channel.id) &
+                (Message.timestamp > (datetime.utcnow() - timedelta(days=13)))
+            ).join(User).order_by(Message.timestamp.desc()).limit(size)
 
         if mode == 'user':
-            query = query.where((User.user_id == user.id))
+            if isinstance(user, int):
+                query = query.where((User.user_id == user))
+            else:
+                query = query.where((User.user_id == user.id))
 
         messages = [i[0] for i in query.tuples()]
 
+        if daddy:
+            event.channel.send_message("Messages selected by the query {} o7".format(len(messages)))
+
         if len(messages) > 100:
-            msg = event.msg.reply('Woah there, that will delete a total of {} messages, please confirm.'.format(
+            msg = event.msg.reply(':warning: Heads up, that will {} a total of {} messages, please confirm.'.format(
+                'bulk delete' if not daddy else '**spam delete**',
                 len(messages)
             ))
 
@@ -1011,17 +1030,22 @@ class AdminPlugin(Plugin):
             if mra_event.emoji.id != GREEN_TICK_EMOJI_ID:
                 return
 
-            event.msg.reply(':wastebasket: Ok please hold on while I delete those messages...').after(5).delete()
+            event.msg.reply(':wastebasket: Please hold on while I delete those messages...').after(5).delete()
 
-        def run_clean():
-            for chunk in chunks(messages, 100):
-                self.client.api.channels_messages_delete_bulk(event.channel.id, chunk)
+        if daddy:
+            def run_clean():
+                for message in messages:
+                    self.client.api.channels_messages_delete(message.channel_id, message.id)
+        else:
+            def run_clean():
+                for chunk in chunks(messages, 100):
+                    self.client.api.channels_messages_delete_bulk(event.channel.id, chunk)
 
         self.cleans[event.channel.id] = gevent.spawn(run_clean)
         self.cleans[event.channel.id].join()
         del self.cleans[event.channel.id]
 
-        raise CommandSuccess('Deleted {} messages'.format(size))
+        raise CommandSuccess('Deleted {} messages'.format(len(messages)))
 
     @Plugin.command(
         'addbypass',

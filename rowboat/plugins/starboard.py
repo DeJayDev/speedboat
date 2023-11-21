@@ -290,24 +290,27 @@ class StarboardPlugin(Plugin):
         info_msg = event.msg.reply('Updating starboard...')
 
         for star in stars:
-            msg = self.client.api.channels_messages_get(
-                star.message.channel_id,
-                star.message_id)
+            try:
+                msg = self.client.api.channels_messages_get(
+                    star.message.channel_id,
+                    star.message_id)
 
-            users = [i.id for i in msg.get_reactors(STAR_EMOJI)]
+                users = [i.id for i in msg.get_reactors(STAR_EMOJI)]
 
-            if set(users) != set(star.stars):
-                self.log.warning('star %s had outdated reactors list (%s vs %s)',
-                                 star.message_id,
-                                 len(users),
-                                 len(star.stars))
+                if set(users) != set(star.stars):
+                    self.log.warning('star %s had outdated reactors list (%s vs %s)',
+                                     star.message_id,
+                                     len(users),
+                                     len(star.stars))
 
-                StarboardEntry.update(
-                    stars=users,
-                    dirty=True,
-                ).where(
-                    (StarboardEntry.message_id == star.message_id)
-                ).execute()
+                    StarboardEntry.update(
+                        stars=users,
+                        dirty=True,
+                    ).where(
+                        (StarboardEntry.message_id == star.message_id)
+                    ).execute()
+            except:
+                continue
 
         self.queue_update(event.guild.id, event.config)
         info_msg.delete()
