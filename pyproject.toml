@@ -16,7 +16,7 @@ python = "^3.10"
 dominantcolors = {git = "https://github.com/wenmin-wu/dominant-colors-py"}
 holster = {git = "https://github.com/elderlabs/holster"}
 pygal = {git = "https://github.com/rafalkucharczyk/pygal", rev = "02c10a2919457bad4c83913a90c3aa0dd0ccb83a"}
-Flask = "^2.3.3"
+Flask = "^3.0.0"
 Pillow = "^10.1.0"
 cairosvg = "^2.7.1"
 click = "^8.1.7"
