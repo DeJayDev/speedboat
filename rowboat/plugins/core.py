@@ -598,7 +598,7 @@ class CorePlugin(Plugin):
                         value=str(len(self.state.guilds)), 
                         inline=True)
         embed.add_field(name='Last Started', 
-                        value='<t:{}:R>'.format((now - (now - self.startup)).timestamp()), 
+                        value='<t:{}:R>'.format(self.startup.timestamp()), 
                         inline=True)
         embed.add_field(name='Version',
                         value=REV,
