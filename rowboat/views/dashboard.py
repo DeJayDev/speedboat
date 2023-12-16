@@ -1,6 +1,6 @@
 import json
 import subprocess
-from datetime import datetime
+from datetime import datetime, timezone
 
 from flask import Blueprint, g, make_response
 
@@ -12,11 +12,7 @@ dashboard = Blueprint('dash', __name__)
 
 
 def pretty_number(i):
-    if i > 1000000:
-        return '%.2fm' % (i / 1000000.0)
-    elif i > 10000:
-        return '%.2fk' % (i / 1000.0)
-    return str(i)
+    return str(f"{i:,}")
 
 
 class ServerSentEvent(object):
@@ -42,7 +38,7 @@ def archive(aid, fmt):
     try:
         archive = MessageArchive.select().where(
             (MessageArchive.archive_id == aid) &
-            (MessageArchive.expires_at > datetime.utcnow())
+            (MessageArchive.expires_at > datetime.now(timezone.utc))
         ).get()
     except MessageArchive.DoesNotExist:
         return 'Invalid or Expired Archive ID', 404

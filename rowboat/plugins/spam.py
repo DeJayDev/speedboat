@@ -2,13 +2,13 @@ import operator
 import re
 import time
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+from enum import Enum
 from functools import reduce
 
 from disco.util.emitter import Priority
 from gevent.lock import Semaphore
 
-from holster.enum import Enum
 from rowboat.models.message import EMOJI_RE, Message
 from rowboat.models.user import Infraction
 from rowboat.plugins import RowboatPlugin as Plugin
@@ -22,15 +22,13 @@ from rowboat.util.stats import timed
 
 UPPER_RE = re.compile('[A-Z]')
 
-
-PunishmentType = Enum(
-    'NONE',
-    'MUTE',
-    'KICK',
-    'TEMPBAN',
-    'BAN',
-    'TEMPMUTE'
-)
+class PunishmentType(Enum): # TODO: Why don't we use InfractionTypes?
+    NONE = 0
+    MUTE = 1
+    KICK = 2
+    TEMPBAN = 3
+    BAN = 4
+    TEMPMUTE = 5
 
 
 class CheckConfig(SlottedModel):
@@ -154,7 +152,7 @@ class SpamPlugin(Plugin):
                     violation.event,
                     violation.member,
                     'Spam Detected',
-                    datetime.utcnow() + timedelta(seconds=punishment_duration))
+                    datetime.now(timezone.utc) + timedelta(seconds=punishment_duration))
             elif punishment == PunishmentType.KICK:
                 Infraction.kick(
                     self,
@@ -167,7 +165,7 @@ class SpamPlugin(Plugin):
                     violation.event,
                     violation.member,
                     'Spam Detected',
-                    datetime.utcnow() + timedelta(seconds=punishment_duration))
+                    datetime.now(timezone.utc) + timedelta(seconds=punishment_duration))
             elif punishment == PunishmentType.BAN:
                 Infraction.ban(
                     self,
@@ -184,7 +182,7 @@ class SpamPlugin(Plugin):
                 ).where(
                     (Message.guild_id == violation.event.guild.id) &
                     (Message.author_id == violation.member.id) &
-                    (Message.timestamp > (datetime.utcnow() - timedelta(seconds=violation.rule.clean_duration)))
+                    (Message.timestamp > (datetime.now(timezone.utc) - timedelta(seconds=violation.rule.clean_duration)))
                 ).limit(violation.rule.clean_count).tuples()
 
                 channels = defaultdict(list)
@@ -201,7 +199,7 @@ class SpamPlugin(Plugin):
     def check_duplicate_messages(self, event, member, rule):
         q = [
             (Message.guild_id == event.guild.id),
-            (Message.timestamp > (datetime.utcnow() - timedelta(seconds=rule.max_duplicates.interval)))
+            (Message.timestamp > (datetime.now(timezone.utc) - timedelta(seconds=rule.max_duplicates.interval)))
         ]
 
         # If we're not checking globally, include the member id

@@ -5,24 +5,20 @@ import json
 import os
 import pprint
 import signal
-import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from disco.api.http import APIException
-from disco.api.client import APIClient
 from disco.bot import Bot
 from disco.bot.command import CommandEvent
 from disco.gateway.events import MessageCreate
 from disco.types.message import MessageEmbed
 from disco.types.permissions import Permissions
-from disco.util.emitter import Emitter, Priority
+from disco.util.emitter import Emitter
 from disco.util.sanitize import S
 from disco.util.snowflake import to_datetime
 
 from rowboat import ENV, REV
-from rowboat.constants import (GREEN_TICK_EMOJI, RED_TICK_EMOJI, GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID,
-                               ROWBOAT_CONTROL_CHANNEL, ROWBOAT_GUILD_ID,
-                               ROWBOAT_USER_ROLE_ID, WEB_URL)
+from rowboat.constants import GREEN_TICK_EMOJI, GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI, RED_TICK_EMOJI_ID, ROWBOAT_CONTROL_CHANNEL, ROWBOAT_GUILD_ID, ROWBOAT_USER_ROLE_ID, WEB_URL
 from rowboat.models.guild import Guild, GuildBan
 from rowboat.models.message import Command, Message
 from rowboat.models.user import Infraction
@@ -32,6 +28,7 @@ from rowboat.plugins.modlog import Actions
 from rowboat.redis import rdb
 from rowboat.sql import init_db
 from rowboat.util import LocalProxy
+from rowboat.util.formatting import DiscordFormatting, as_discord
 from rowboat.util.stats import timed
 
 PY_CODE_BLOCK = '```py\n{}\n```'
@@ -47,7 +44,7 @@ class CorePlugin(Plugin):
     def load(self, ctx):
         init_db(ENV)
 
-        self.startup = ctx.get('startup', datetime.utcnow())
+        self.startup = ctx.get('startup', datetime.now(timezone.utc))
         self.guilds = ctx.get('guilds', {})
 
         self.emitter = Emitter()
@@ -77,7 +74,6 @@ class CorePlugin(Plugin):
 
     # def wait_for_plugin_changes(self):
     #     import gevent_inotifyx as inotify
-    #
     #     fd = inotify.init()
     #     inotify.add_watch(fd, 'rowboat/plugins/', inotify.IN_MODIFY)
     #     inotify.add_watch(fd, 'rowboat/plugins/modlog', inotify.IN_MODIFY)
@@ -87,7 +83,6 @@ class CorePlugin(Plugin):
     #             # Can't reload core.py
     #             if event.name.startswith('core.py'):
     #                 continue
-    #
     #             plugin_name = '{}Plugin'.format(event.name.split('.', 1)[0].title())
     #             plugin = next((v for k, v in list(self.bot.plugins.items()) if k.lower() == plugin_name.lower()), None)
     #             if plugin:
@@ -253,7 +248,7 @@ class CorePlugin(Plugin):
     def update_guild_bans(self):
         to_update = [
             guild for guild in Guild.select().where(
-                (Guild.last_ban_sync < (datetime.utcnow() - timedelta(days=1))) |
+                (Guild.last_ban_sync < (datetime.now(timezone.utc) - timedelta(days=1))) |
                 (Guild.last_ban_sync >> None)
             )
             if guild.guild_id in self.client.state.guilds]
@@ -283,7 +278,7 @@ class CorePlugin(Plugin):
         embed.set_footer(text='Speedboat {}'.format(
             'Production' if ENV == 'prod' else 'Testing'
         ))
-        embed.timestamp = datetime.utcnow().isoformat()
+        embed.timestamp = datetime.now(timezone.utc).isoformat()
         embed.color = 0x5865F2
         try:
             yield embed
@@ -401,22 +396,22 @@ class CorePlugin(Plugin):
         guild = self.guilds.get(event.guild.id) if guild_id else None
         config = guild and guild.get_config()
 
-        # If the guild has configuration, use that (otherwise use defaults)
         if config and config.commands:
+            # If the guild has configuration, use that (otherwise use defaults)
             commands = list(self.bot.get_commands_for_message(
                     config.commands.mention,
                     {},
                     config.commands.prefix if config.commands.prefix else config.commands.prefixes,
                     event.message))
+        elif ENV != 'prod':
+            if event.message.content.startswith(ENV + '!'):
+                commands = list(self.bot.get_commands_for_message(False, {}, [ENV + '!'], event.message))
+            else:
+                return # fast fail, commands isn't set so we won't make it to the if not len commands check.
         elif guild_id:
             # Otherwise, default to requiring mentions
             commands = list(self.bot.get_commands_for_message(True, {}, '', event.message))
         else:
-            if ENV != 'prod':
-                if not event.message.content.startswith(ENV + '!'):
-                    return
-                event.message.content = event.message.content[len(ENV) + 1:]
-
             # DM's just use the commands (no prefix/mention)
             commands = list(self.bot.get_commands_for_message(False, {}, '', event.message))
 
@@ -588,9 +583,7 @@ class CorePlugin(Plugin):
         event.msg.reply('Result:\n' + '\n'.join(contents))
 
     @Plugin.command('about')
-    def command_about(self, event):
-        now = datetime.utcnow()
-    
+    def command_about(self, event):    
         embed = MessageEmbed()
         embed.set_author(name='Speedboat', icon_url=self.client.state.me.avatar_url, url=WEB_URL)
         embed.description = BOT_INFO
@@ -598,7 +591,7 @@ class CorePlugin(Plugin):
                         value=str(len(self.state.guilds)), 
                         inline=True)
         embed.add_field(name='Last Started', 
-                        value='<t:{}:R>'.format(int(self.startup.timestamp())), 
+                        value='{}'.format(as_discord(self.startup, DiscordFormatting.RELATIVE)), 
                         inline=True)
         embed.add_field(name='Version',
                         value=REV,
@@ -607,9 +600,7 @@ class CorePlugin(Plugin):
 
     @Plugin.command('uptime', level=-1)
     def command_uptime(self, event):
-        event.msg.reply('Speedboat was started <t:{}:R>'.format(
-            int(self.startup.timestamp())
-        ))
+        event.msg.reply('Speedboat was started {}'.format(as_discord(self.startup)))
 
     @Plugin.command('source', '<command>', level=-1)
     def command_source(self, event, command=None):

@@ -1,10 +1,9 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import peewee
 from disco.api.http import APIException
 from disco.bot import CommandLevels
-from disco.types.message import (ActionRow, ButtonStyles, ComponentTypes,
-                                 MessageEmbed)
+from disco.types.message import ActionRow, ButtonStyles, ComponentTypes, MessageEmbed
 from peewee import JOIN, fn
 
 from rowboat.constants import ERR_UNKNOWN_MESSAGE, STAR_EMOJI
@@ -12,8 +11,7 @@ from rowboat.models.message import Message, StarboardEntry
 from rowboat.models.user import StarboardBlock, User
 from rowboat.plugins import CommandFail, CommandSuccess
 from rowboat.plugins import RowboatPlugin as Plugin
-from rowboat.types import (ChannelField, DictField, Field, ListField,
-                           SlottedModel)
+from rowboat.types import ChannelField, DictField, Field, ListField, SlottedModel
 from rowboat.types.plugin import PluginConfig
 from rowboat.util.timing import Debounce
 
@@ -348,7 +346,7 @@ class StarboardPlugin(Plugin):
         stars = StarboardEntry.select().join(Message).where(
             (StarboardEntry.dirty == 1) &
             (Message.guild_id == guild_id) &
-            (Message.timestamp > (datetime.utcnow() - timedelta(hours=32)))
+            (Message.timestamp > (datetime.now(timezone.utc) - timedelta(hours=32)))
         )
 
         for star in stars:

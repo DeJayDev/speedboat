@@ -3,23 +3,22 @@ import re
 import string
 import time
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timezone
 from functools import reduce
 
 import humanize
 import pytz
+from aenum import Enum, extend_enum
 from disco.bot import CommandLevels
 from disco.types.base import cached_property
 from disco.util.emitter import Priority
 from disco.util.sanitize import S
 from disco.util.snowflake import to_datetime, to_unix
 
-from holster.enum import Enum
 from rowboat.models.guild import Guild
 from rowboat.plugins import CommandFail, CommandSuccess
 from rowboat.plugins import RowboatPlugin as Plugin
-from rowboat.types import (ChannelField, DictField, Field, ListField,
-                           SlottedModel, snowflake)
+from rowboat.types import ChannelField, DictField, Field, ListField, SlottedModel, snowflake
 from rowboat.types.plugin import PluginConfig
 from rowboat.util import MetaException, ordered_load
 
@@ -230,7 +229,7 @@ class ModLogPlugin(Plugin):
         config.resolved = True
 
     def register_action(self, name, simple):
-        action = Actions.add(name)
+        action = extend_enum(Actions, name, len(Actions) + 1)
         self.action_simple[action] = simple
 
     def log_action_ext(self, action, guild_id, **details):
@@ -271,7 +270,7 @@ class ModLogPlugin(Plugin):
             msg = ':{}: {}'.format(info['emoji'], contents)
 
             if chan_config.timestamps:
-                ts = pytz.utc.localize(datetime.utcnow()).astimezone(chan_config.tz)
+                ts = datetime.now(chan_config.tz)
                 msg = '`[{}]` '.format(ts.strftime('%H:%M:%S')) + msg
 
             if len(msg) > 2000:
@@ -345,10 +344,10 @@ class ModLogPlugin(Plugin):
 
     @Plugin.listen('GuildMemberAdd')
     def on_guild_member_add(self, event):
-        created = humanize.naturaltime(datetime.utcnow() - to_datetime(event.user.id))
+        created = humanize.naturaltime(datetime.now(timezone.utc) - to_datetime(event.user.id))
         new = (
-                event.config.new_member_threshold and
-                (time.time() - to_unix(event.user.id)) < event.config.new_member_threshold
+            event.config.new_member_threshold and
+            (time.time() - to_unix(event.user.id)) < event.config.new_member_threshold
         )
 
         self.log_action(Actions.GUILD_MEMBER_ADD, event, new=' :new:' if new else '', created=created)

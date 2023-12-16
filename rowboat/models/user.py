@@ -1,12 +1,11 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
+from aenum import IntEnum
 from disco.api.http import APIException
 from disco.types.guild import GuildMember
-from peewee import (BigIntegerField, BooleanField, DateTimeField, IntegerField,
-                    TextField)
+from peewee import BigIntegerField, BooleanField, DateTimeField, IntegerField, TextField
 from playhouse.postgres_ext import BinaryJSONField
 
-from holster.enum import Enum
 from rowboat.plugins.modlog.core import Actions
 from rowboat.sql import ModelBase
 from rowboat.util.input import human_time
@@ -19,7 +18,7 @@ class User(ModelBase):
     avatar = TextField(null=True)
     bot = BooleanField()
 
-    created_at = DateTimeField(default=datetime.utcnow)
+    created_at = DateTimeField(default=datetime.now(timezone.utc))
 
     admin = BooleanField(default=False)
 
@@ -107,18 +106,16 @@ class User(ModelBase):
 
 @ModelBase.register
 class Infraction(ModelBase):
-    Types = Enum(
-        'MUTE',
-        'KICK',
-        'TEMPBAN',
-        'SOFTBAN',
-        'BAN',
-        'TEMPMUTE',
-        'UNBAN',
-        'TEMPROLE',
-        'WARNING',
-        bitmask=False,
-    )
+    class InfractionTypes(IntEnum):
+        MUTE = 0
+        KICK = 1
+        TEMPBAN = 2
+        SOFTBAN = 3
+        BAN = 4
+        TEMPMUTE = 5
+        UNBAN = 6
+        TEMPROLE = 7
+        WARNING = 8
 
     guild_id = BigIntegerField()
     user_id = BigIntegerField()
@@ -129,7 +126,7 @@ class Infraction(ModelBase):
     metadata = BinaryJSONField(default={})
 
     expires_at = DateTimeField(null=True)
-    created_at = DateTimeField(default=datetime.utcnow)
+    created_at = DateTimeField(default=datetime.now(timezone.utc))
     active = BooleanField(default=True)
 
     messaged = BooleanField(default=False, null=True)
@@ -485,7 +482,7 @@ class Infraction(ModelBase):
 
         if expires_at is not None:
             expires = '\n\n:timer: This action will expire in {}'.format(
-                human_time(expires_at - datetime.utcnow()))
+                human_time(expires_at - datetime.now(timezone.utc)))
         
         try:
             user.open_dm().send_message(':{}: You were **{}** from {} {} {}'.format(

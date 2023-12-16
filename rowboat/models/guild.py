@@ -1,25 +1,22 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 
 import yaml
-from peewee import (BigIntegerField, BlobField, BooleanField, CharField,
-                    CompositeKey, DateTimeField, TextField)
+from aenum import IntFlag
+from disco.types.guild import Guild as DiscoGuild
+from peewee import BigIntegerField, BlobField, BooleanField, CharField, CompositeKey, DateTimeField, TextField
 from playhouse.postgres_ext import ArrayField, BinaryJSONField
 
-from holster.enum import Enum
 from rowboat.redis import emit
 from rowboat.sql import ModelBase
-from disco.types.guild import Guild as DiscoGuild
 
 log = logging.getLogger(__name__)
 
 
 @ModelBase.register
 class Guild(ModelBase):
-    WhitelistFlags = Enum(
-        'MODLOG_CUSTOM_FORMAT',
-        bitmask=False
-    )
+    class WhitelistFlags(IntFlag):
+        MODLOG_CUSTOM_FORMAT = 1
 
     guild_id = BigIntegerField(primary_key=True)
     owner_id = BigIntegerField(null=True)
@@ -37,7 +34,7 @@ class Guild(ModelBase):
     enabled = BooleanField(default=True)
     whitelist = BinaryJSONField(default=[])
 
-    added_at = DateTimeField(default=datetime.utcnow)
+    added_at = DateTimeField(default=datetime.now(timezone.utc))
 
     # SQL = '''
     #     CREATE OR REPLACE FUNCTION shard (int, bigint)
@@ -114,7 +111,7 @@ class Guild(ModelBase):
     def sync_bans(self, guild: DiscoGuild):
         # Update last synced time
         Guild.update(
-            last_ban_sync=datetime.utcnow()
+            last_ban_sync=datetime.now(timezone.utc)
         ).where(Guild.guild_id == self.guild_id).execute()
 
         try:
@@ -212,7 +209,7 @@ class GuildConfigChange(ModelBase):
     before_raw = BlobField(null=True)
     after_raw = BlobField()
 
-    created_at = DateTimeField(default=datetime.utcnow)
+    created_at = DateTimeField(default=datetime.now(timezone.utc))
 
     class Meta:
         table_name = 'guild_config_changes'
@@ -305,7 +302,7 @@ class GuildVoiceSession(ModelBase):
         # If we have a previous voice state, we need to close it out
         if before and before.channel_id:
             GuildVoiceSession.update(
-                ended_at=datetime.utcnow()
+                ended_at=datetime.now(timezone.utc)
             ).where(
                 (GuildVoiceSession.user_id == after.user_id) &
                 (GuildVoiceSession.session_id == after.session_id) &
@@ -320,7 +317,7 @@ class GuildVoiceSession(ModelBase):
                 guild_id=after.guild_id,
                 channel_id=after.channel_id,
                 user_id=after.user_id,
-                started_at=datetime.utcnow(),
+                started_at=datetime.now(timezone.utc),
             ).returning(GuildVoiceSession.session_id).on_conflict_ignore().execute()
 
 

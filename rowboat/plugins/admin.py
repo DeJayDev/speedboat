@@ -1,18 +1,17 @@
 import csv
 import operator
 import re
-import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from functools import reduce
 from io import StringIO
+from time import time
 
 import gevent
 import humanize
 from disco.api.http import APIException
 from disco.bot import CommandLevels
 from disco.types.guild import GuildMember
-from disco.types.message import (MessageEmbed, MessageEmbedField,
-                                 MessageEmbedThumbnail, MessageTable)
+from disco.types.message import MessageEmbed, MessageEmbedField, MessageEmbedThumbnail, MessageTable
 from disco.types.permissions import Permissions
 from disco.types.user import User as DiscoUser
 from disco.util.emitter import Priority
@@ -21,10 +20,8 @@ from disco.util.sanitize import S
 from peewee import fn
 from rapidfuzz import fuzz
 
-from rowboat.constants import (GREEN_TICK_EMOJI, GREEN_TICK_EMOJI_ID,
-                               RED_TICK_EMOJI, RED_TICK_EMOJI_ID)
-from rowboat.models.guild import (GuildBan, GuildEmoji, GuildMemberBackup,
-                                  GuildVoiceSession)
+from rowboat.constants import GREEN_TICK_EMOJI, GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI, RED_TICK_EMOJI_ID
+from rowboat.models.guild import GuildBan, GuildEmoji, GuildMemberBackup, GuildVoiceSession
 from rowboat.models.message import Message, MessageArchive, Reaction
 from rowboat.models.user import Infraction, User
 from rowboat.plugins import CommandFail, CommandSuccess
@@ -128,7 +125,7 @@ class AdminPlugin(Plugin):
     def clear_infractions(self):
         expired = list(Infraction.select().where(
             (Infraction.active == 1) &
-            (Infraction.expires_at < datetime.utcnow())
+            (Infraction.expires_at < datetime.now(timezone.utc))
         ))
 
         self.log.info('[INF] Trying to clear %s expired infractions', len(expired))
@@ -281,11 +278,11 @@ class AdminPlugin(Plugin):
         if event.role.id not in event.config.locked_roles:
             return
 
-        if event.role.id in self.unlocked_roles and self.unlocked_roles[event.role.id] > time.time():
+        if event.role.id in self.unlocked_roles and self.unlocked_roles[event.role.id] > time():
             return
 
         if event.role.id in self.role_debounces:
-            if self.role_debounces.pop(event.role.id) > time.time():
+            if self.role_debounces.pop(event.role.id) > time():
                 return
 
         role_before = event.guild.roles.get(event.role.id)
@@ -299,7 +296,7 @@ class AdminPlugin(Plugin):
 
         if to_update:
             self.log.warning('Rolling back update to roll %s (in %s), roll is locked', event.role.id, event.guild_id)
-            self.role_debounces[event.role.id] = time.time() + 60
+            self.role_debounces[event.role.id] = time() + 60
             event.role.update(**to_update)
 
     @Plugin.command('unban', '<user:snowflake> [reason:str...]', level=CommandLevels.MOD)
@@ -393,7 +390,7 @@ class AdminPlugin(Plugin):
         embed.add_field(name='Moderator', value=str(infraction.actor), inline=True)
         embed.add_field(name='Active', value='yes' if infraction.active else 'no', inline=False)
         if infraction.active and infraction.expires_at:
-            embed.add_field(name='Expires', value=humanize.naturaldelta(infraction.expires_at - datetime.utcnow()))
+            embed.add_field(name='Expires', value=humanize.naturaldelta(infraction.expires_at - datetime.now(timezone.utc)))
         embed.add_field(name='Reason', value=infraction.reason or '_No Reason Given', inline=False)
         embed.timestamp = infraction.created_at.isoformat()
         event.msg.reply(embeds=[embed])
@@ -440,7 +437,7 @@ class AdminPlugin(Plugin):
             if inf.active:
                 active = 'yes'
                 if inf.expires_at:
-                    active += ' (expires in {})'.format(humanize.naturaldelta(inf.expires_at - datetime.utcnow()))
+                    active += ' (expires in {})'.format(humanize.naturaldelta(inf.expires_at - datetime.now(timezone.utc)))
             else:
                 active = 'no'
 
@@ -521,8 +518,9 @@ class AdminPlugin(Plugin):
 
     @Plugin.command('import', '<url:str>', group='infractions', level=-1)
     def infraction_import(self, event, url):
-        import requests
         import json
+
+        import requests
         r = requests.get(url)
         try:
             infs = json.load(r.content)
@@ -630,7 +628,7 @@ class AdminPlugin(Plugin):
                         ':ok_hand: {u} is now muted for {t} (`{o}`)',
                         ':ok_hand: {u} is now muted for {t}',
                         u=member.user,
-                        t=humanize.naturaldelta(duration - datetime.utcnow()),
+                        t=humanize.naturaldelta(duration - datetime.now(timezone.utc)),
                     ))
             else:
                 existed = False
@@ -681,7 +679,7 @@ class AdminPlugin(Plugin):
                 ':ok_hand: {u} is now in the {r} role for {t}',
                 r=event.guild.roles[role_id].name,
                 u=member.user,
-                t=humanize.naturaldelta(expire_dt - datetime.utcnow()),
+                t=humanize.naturaldelta(expire_dt - datetime.now(timezone.utc)),
             ))
 
     @Plugin.command('unmute', '<user:user|snowflake>', aliases=['umute'], level=CommandLevels.MOD)
@@ -883,7 +881,7 @@ class AdminPlugin(Plugin):
                     ':ok_hand: temp-banned {u} for {t} (`{o}`)',
                     ':ok_hand: temp-banned {u} for {t}',
                     u=member.user,
-                    t=humanize.naturaldelta(expires_dt - datetime.utcnow()),
+                    t=humanize.naturaldelta(expires_dt - datetime.now(timezone.utc)),
                 ))
         else:
             raise CommandFail('Invalid user')
@@ -984,13 +982,13 @@ class AdminPlugin(Plugin):
             query = Message.select(Message.id).where(
                 (Message.deleted >> False) &
                 (Message.channel_id == event.channel.id) &
-                (Message.timestamp < (datetime.utcnow() - timedelta(days=days)))
+                (Message.timestamp < (datetime.now(timezone.utc) - timedelta(days=days)))
             ).join(User).order_by(Message.timestamp.desc()).limit(size)
         else:
             query = Message.select(Message.id).where(
                 (Message.deleted >> False) &
                 (Message.channel_id == event.channel.id) &
-                (Message.timestamp > (datetime.utcnow() - timedelta(days=13)))
+                (Message.timestamp > (datetime.now(timezone.utc) - timedelta(days=13)))
             ).join(User).order_by(Message.timestamp.desc()).limit(size)
 
         if mode == 'user':
@@ -1273,7 +1271,7 @@ class AdminPlugin(Plugin):
     def invites_prune(self, event, uses=1):
         invites = [
             i for i in event.guild.get_invites()
-            if i.uses <= uses and i.created_at < (datetime.utcnow() - timedelta(hours=1))
+            if i.uses <= uses and i.created_at < (datetime.now(timezone.utc) - timedelta(hours=1))
         ]
 
         if not invites:
@@ -1407,7 +1405,7 @@ class AdminPlugin(Plugin):
                 str(self.state.channels.get(session.channel_id) or 'UNKNOWN'),
                 '{} ({} ago)'.format(
                     session.started_at.isoformat(),
-                    humanize.naturaldelta(datetime.utcnow() - session.started_at)),
+                    humanize.naturaldelta(datetime.now(timezone.utc) - session.started_at)),
                 humanize.naturaldelta(session.ended_at - session.started_at) if session.ended_at else 'Active')
 
         event.msg.reply(tbl.compile())
@@ -1487,8 +1485,8 @@ class AdminPlugin(Plugin):
         if role_id not in event.config.locked_roles:
             raise CommandFail('Role %s is not locked' % role_id)
 
-        if role_id in self.unlocked_roles and self.unlocked_roles[role_id] > time.time():
+        if role_id in self.unlocked_roles and self.unlocked_roles[role_id] > time():
             raise CommandFail('Role %s is already unlocked' % role_id)
 
-        self.unlocked_roles[role_id] = time.time() + 300
+        self.unlocked_roles[role_id] = time() + 300
         raise CommandSuccess('Role is unlocked for 5 minutes')

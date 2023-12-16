@@ -1,5 +1,5 @@
 import math
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from disco.bot.command import CommandError
 
@@ -41,7 +41,7 @@ def parse_duration(raw, source=None, negative=False, safe=False):
     if value > 999999999:  # Fixes SPEEDBOAT-60 on Sentry
         raise CommandError("Invalid duration")
 
-    return (source or datetime.utcnow()) + timedelta(seconds=value + 1)
+    return (source or datetime.now(timezone.utc)) + timedelta(seconds=value + 1)
 
 
 def human_time(time):

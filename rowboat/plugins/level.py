@@ -6,8 +6,7 @@ from disco.bot import CommandLevels
 from disco.types.message import MessageTable
 from disco.util.sanitize import S
 
-from rowboat.constants import (GREEN_TICK_EMOJI, GREEN_TICK_EMOJI_ID,
-                               RED_TICK_EMOJI, RED_TICK_EMOJI_ID)
+from rowboat.constants import GREEN_TICK_EMOJI, GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI, RED_TICK_EMOJI_ID
 from rowboat.models.guild import GuildMemberLevel
 from rowboat.models.message import Message
 from rowboat.models.user import User, XPBlock

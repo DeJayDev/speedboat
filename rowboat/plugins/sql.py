@@ -1,5 +1,4 @@
-import time
-from datetime import datetime
+from datetime import datetime, timezone
 
 import cairosvg
 import gevent
@@ -401,7 +400,7 @@ class Recovery(object):
         self.log = log
         self.channel = channel
         self.start_dt = start_dt
-        self.end_dt = end_dt or datetime.utcnow()
+        self.end_dt = end_dt or datetime.now(timezone.utc)
         self._recovered = 0
 
     def run(self):

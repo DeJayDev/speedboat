@@ -1,7 +1,6 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
-from peewee import (BigIntegerField, CompositeKey, DateTimeField, IntegerField,
-                    TextField)
+from peewee import BigIntegerField, CompositeKey, DateTimeField, IntegerField, TextField
 
 from rowboat.sql import ModelBase
 
@@ -15,7 +14,7 @@ class Tag(ModelBase):
     content = TextField()
     times_used = IntegerField(default=0)
 
-    created_at = DateTimeField(default=datetime.utcnow)
+    created_at = DateTimeField(default=datetime.now(timezone.utc))
 
     class Meta:
         table_name = 'tags'

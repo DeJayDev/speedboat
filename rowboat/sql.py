@@ -40,7 +40,7 @@ def init_db(env):
                 port=int(os.getenv("PG_PORT", 5432)),
             )
         )
-    elif env =='dev':
+    elif env == "dev":
         database.initialize(
             PostgresqlExtDatabase(
                 "rowboat",
@@ -50,11 +50,7 @@ def init_db(env):
             )
         )
     else:
-        database.initialize(
-            PostgresqlExtDatabase(
-                "rowboat", user="rowboat", port=int(os.getenv("PG_PORT", 5432))
-            )
-        )
+        database.initialize(PostgresqlExtDatabase("rowboat", user="rowboat", port=int(os.getenv("PG_PORT", 5432))))
 
     for model in REGISTERED_MODELS:
         model.create_table(True)

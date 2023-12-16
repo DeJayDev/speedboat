@@ -1,10 +1,10 @@
-import re
 from collections import OrderedDict
 from datetime import datetime
-from rowboat.constants import INVITE_LINK_RE
 
 import yaml
 from gevent.local import local
+
+from rowboat.constants import INVITE_LINK_RE
 
 # Invisible space that can be used to escape mentions
 ZERO_WIDTH_SPACE = "\u200B"

@@ -1,11 +1,10 @@
 import operator
 import random
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from functools import reduce
 from io import BytesIO
 
 import gevent
-import pytz
 import requests
 from disco.api.http import APIException
 from disco.types.guild import Guild
@@ -25,6 +24,7 @@ from rowboat.plugins import CommandFail, CommandSuccess
 from rowboat.plugins import RowboatPlugin as Plugin
 from rowboat.types.plugin import PluginConfig
 from rowboat.util.badges import UserFlags
+from rowboat.util.formatting import DiscordFormatting, as_discord, as_unix
 from rowboat.util.images import get_dominant_colors_guild, get_dominant_colors_user
 from rowboat.util.input import parse_duration
 from rowboat.util.timing import Eventual
@@ -208,7 +208,7 @@ class UtilitiesPlugin(Plugin):
         except DoesNotExist:
             raise CommandFail("I've never seen {}".format(user))
 
-        raise CommandSuccess("I last saw {} <t:{}:R>".format(user, int(msg.timestamp.timestamp())))
+        raise CommandSuccess("I last saw {} {}".format(user, as_discord(msg.timestamp, DiscordFormatting.RELATIVE)))
 
     @Plugin.command("search", "<query:str...>", global_=True)
     def search(self, event, query: str):
@@ -247,7 +247,7 @@ class UtilitiesPlugin(Plugin):
         # General Abouts
         about_field = MessageEmbedField()
         about_field.name = "**\u276F About**"
-        about_text = "Created by {} ({}) — <t:{}:R>".format(guild.owner, guild.owner.id, int(to_datetime(guild.id).replace(tzinfo=pytz.UTC).timestamp()))
+        about_text = "Created by {} ({}) — {}".format(guild.owner, guild.owner.id, as_discord(to_datetime(guild.id, DiscordFormatting.RELATIVE)))
         about_text += "\nMembers: {:,}/{:,}".format(guild.approximate_presence_count, guild.member_count)
         about_text += "\nRegion: {}".format(guild.region)
         about_field.value = about_text
@@ -306,7 +306,7 @@ class UtilitiesPlugin(Plugin):
         content.append("Profile: <@{}>".format(user.id))
 
         created_dt = to_datetime(user.id)
-        content.append("Created: <t:{0}:R> (<t:{0}:f>)".format(int(created_dt.replace(tzinfo=pytz.UTC).timestamp())))
+        content.append("Created: <t:{0}:R> (<t:{0}:f>)".format(as_unix(created_dt)))
 
         member = event.guild.get_member(user.id) if event.guild else None
 
@@ -324,7 +324,7 @@ class UtilitiesPlugin(Plugin):
             if member.nick:
                 content.append("Nickname: {}".format(member.nick))
 
-            content.append("Joined: <t:{0}:R> (<t:{0}:f>)".format(int(member.joined_at.replace(tzinfo=pytz.UTC).timestamp())))
+            content.append("Joined: <t:{0}:R> (<t:{0}:f>)".format(as_unix(member.joined_at)))
 
             content.append("Messages: {}".format(int(Message.select(fn.Count(Message.id)).where((Message.author_id == user.id) & (Message.guild_id == event.guild.id)).tuples()[0][0])))
 
@@ -338,11 +338,7 @@ class UtilitiesPlugin(Plugin):
 
         if newest_msg:
             content.append("\n **\u276F Activity**")
-            content.append("Last Message: <t:{0}:R> (<t:{0}:f>)".format(int((to_datetime(newest_msg).replace(tzinfo=pytz.UTC)).timestamp())))
-            # content.append('First Message: {} ({})'.format(
-            #    humanize.naturaltime(datetime.utcnow() - to_datetime(oldest_msg)),
-            #    to_datetime(oldest_msg).strftime("%b %d %Y %H:%M:%S"),
-            # ))
+            content.append("Last Message: <t:{0}:R> (<t:{0}:f>)".format(as_unix(to_datetime(newest_msg))))
 
         if len(infractions) > 0:
             content.append("\n**\u276F Infractions**")
@@ -375,7 +371,7 @@ class UtilitiesPlugin(Plugin):
         raise CommandSuccess("{}/guilds/{}/config".format(WEB_URL, event.guild.id))
 
     def trigger_reminders(self):
-        reminders = Reminder.with_message_join().where((Reminder.remind_at < (datetime.utcnow() + timedelta(seconds=1))))
+        reminders = Reminder.with_message_join().where((Reminder.remind_at < (datetime.now(timezone.utc) + timedelta(seconds=1))))
 
         waitables = list()
         for reminder in reminders:
@@ -398,7 +394,7 @@ class UtilitiesPlugin(Plugin):
             "<@{}> you asked me on <t:{reminder_time}:f> (<t:{reminder_time}:R>) to remind you about: {}".format(
                 message.author_id,
                 S(reminder.content),
-                reminder_time=int(reminder.created_at.replace(tzinfo=pytz.UTC).timestamp()),
+                reminder_time=as_unix(reminder.created_at)
             ),
             allowed_mentions={"users": [str(message.author_id)]},
         )
@@ -420,7 +416,7 @@ class UtilitiesPlugin(Plugin):
                 pass
 
         if mra_event.emoji.name == SNOOZE_EMOJI:
-            reminder.remind_at = datetime.utcnow() + timedelta(minutes=20)
+            reminder.remind_at = datetime.now(timezone.utc) + timedelta(minutes=20)
             reminder.save()
             msg.edit("Ok, I've snoozed that reminder. You'll get another notification in 20 minutes.")
             return
@@ -439,7 +435,7 @@ class UtilitiesPlugin(Plugin):
             raise CommandFail("You can only have 15 reminders going at once!")
 
         remind_at = parse_duration(duration)
-        if remind_at > (datetime.utcnow() + timedelta(seconds=5 * YEAR_IN_SEC)):
+        if remind_at > (datetime.now(timezone.utc) + timedelta(seconds=5 * YEAR_IN_SEC)):
             raise CommandFail("That's too far in the future!")
 
         if event.msg.message_reference:
@@ -450,4 +446,4 @@ class UtilitiesPlugin(Plugin):
 
         r = Reminder.create(message_id=event.msg.id, remind_at=remind_at, content=content)
         self.reminder_task.set_next_schedule(r.remind_at)
-        raise CommandSuccess("I'll remind you at <t:{0}:f> (<t:{0}:R>)".format(int(r.remind_at.replace(tzinfo=pytz.UTC).timestamp())))
+        raise CommandSuccess("I'll remind you at <t:{0}:f> (<t:{0}:R>)".format(as_unix(r.remind_at)))

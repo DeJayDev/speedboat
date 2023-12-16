@@ -1,5 +1,5 @@
-import time
-from datetime import datetime
+from datetime import datetime, timezone
+from time import time
 
 import gevent
 from gevent.lock import Semaphore
@@ -17,7 +17,7 @@ class Eventual(object):
 
     def wait(self, nxt):
         def f():
-            wait_time = self._next - datetime.utcnow()
+            wait_time = self._next - datetime.now(timezone.utc)
             gevent.sleep(wait_time.seconds + (wait_time.microseconds / 1000000.0))
             self._next = None
             gevent.spawn(self.func)
@@ -35,7 +35,7 @@ class Eventual(object):
         gevent.spawn(self.func)
 
     def set_next_schedule(self, date):
-        if date < datetime.utcnow():
+        if date < datetime.now(timezone.utc):
             return gevent.spawn(self.trigger)
 
         if not self._next or date < self._next:
@@ -49,7 +49,7 @@ class Debounce(object):
         self.hardlimit = hardlimit
         self.kwargs = kwargs
 
-        self._start = time.time()
+        self._start = time()
         self._lock = Semaphore()
         self._t = gevent.spawn(self.wait)
 

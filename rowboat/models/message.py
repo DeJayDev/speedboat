@@ -2,10 +2,9 @@ import json
 import re
 import traceback
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
-from peewee import (BigIntegerField, BooleanField, DateTimeField,
-                    ForeignKeyField, TextField, UUIDField)
+from peewee import BigIntegerField, BooleanField, DateTimeField, ForeignKeyField, TextField, UUIDField
 from playhouse.postgres_ext import ArrayField, BinaryJSONField
 
 from rowboat import REV
@@ -185,8 +184,8 @@ class MessageArchive(ModelBase):
 
     message_ids = BinaryJSONField()
 
-    created_at = DateTimeField(default=datetime.utcnow)
-    expires_at = DateTimeField(default=lambda: datetime.utcnow() + timedelta(days=7))
+    created_at = DateTimeField(default=datetime.now(timezone.utc))
+    expires_at = DateTimeField(default=lambda: datetime.now(timezone.utc) + timedelta(days=7))
 
     class Meta:
         table_name = 'message_archives'
@@ -367,7 +366,7 @@ class StarboardEntry(ModelBase):
 class Reminder(ModelBase):
     message_id = BigIntegerField(primary_key=True)
 
-    created_at = DateTimeField(default=datetime.utcnow)
+    created_at = DateTimeField(default=datetime.now(timezone.utc))
     remind_at = DateTimeField()
     content = TextField()
 

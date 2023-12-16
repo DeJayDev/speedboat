@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from peewee import BigIntegerField, CharField, CompositeKey, DateTimeField
 from playhouse.postgres_ext import BinaryJSONField
@@ -11,7 +11,7 @@ class Event(ModelBase):
     session = CharField()
     seq = BigIntegerField()
 
-    timestamp = DateTimeField(default=datetime.utcnow)
+    timestamp = DateTimeField(default=datetime.now(timezone.utc))
     event = CharField()
     data = BinaryJSONField()
 
@@ -26,7 +26,7 @@ class Event(ModelBase):
     @classmethod
     def truncate(cls, hours=12):
         return cls.delete().where(
-            (cls.timestamp < (datetime.utcnow() - timedelta(hours=hours)))
+            (cls.timestamp < (datetime.now(timezone.utc) - timedelta(hours=hours)))
         ).execute()
 
     @classmethod
@@ -34,7 +34,7 @@ class Event(ModelBase):
         return {
             'session': session,
             'seq': event['s'],
-            'timestamp': datetime.utcnow(),
+            'timestamp': datetime.now(timezone.utc),
             'event': event['t'],
             'data': event['d'],
         }

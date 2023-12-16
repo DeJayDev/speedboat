@@ -12,8 +12,7 @@ from rowboat.models.message import Message
 from rowboat.plugins import RowboatPlugin as Plugin
 from rowboat.plugins.modlog import Actions
 from rowboat.redis import rdb
-from rowboat.types import (ChannelField, DictField, Field, ListField,
-                           SlottedModel, lower, snowflake)
+from rowboat.types import ChannelField, DictField, Field, ListField, SlottedModel, lower, snowflake
 from rowboat.types.plugin import PluginConfig
 from rowboat.util.stats import timed
 from rowboat.util.zalgo import ZALGO_RE

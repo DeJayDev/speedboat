@@ -1,5 +1,4 @@
-from peewee import (BigIntegerField, BooleanField, CharField,
-                    SmallIntegerField, TextField)
+from peewee import BigIntegerField, BooleanField, CharField, SmallIntegerField, TextField
 
 from rowboat.models.message import Message
 from rowboat.sql import ModelBase

@@ -14,20 +14,21 @@ documentation = "https://docs.speedboat.rocks"
 [tool.poetry.dependencies]
 python = "^3.10"
 dominantcolors = {git = "https://github.com/wenmin-wu/dominant-colors-py"}
-holster = {git = "https://github.com/elderlabs/holster"}
 pygal = {git = "https://github.com/rafalkucharczyk/pygal", rev = "02c10a2919457bad4c83913a90c3aa0dd0ccb83a"}
-Flask = "^2.3.3"
-Pillow = "^10.1.0"
+aenum = "^3.1.15"
 cairosvg = "^2.7.1"
 click = "^8.1.7"
 datadog = "^0.47.0"
 dill = "^0.3.7"
 emoji = "^2.9.0"
 faust-cchardet = "^2.1.19"
+Flask = "^2.3.3"
+gevent-inotifyx = "^0.2"
 humanize = "^4.9.0"
 markovify = "^0.9.4"
 oauthlib = "^3.2.2"
 peewee = "^3.17.0"
+Pillow = "^10.1.0"
 psycogreen = "^1.0.2"
 psycopg2 = "^2.9.9"
 pynacl = "^1.5.0"
@@ -54,8 +55,8 @@ help = "Start the Speedbot bot"
 args = [{ name = "env", required = false }]
 script = "manage:bot()"
 
-[tool.black]
-line-length = 256
+[tool.ruff]
+line-length = 4096
 
 [build-system]
 requires = ["poetry-core"]

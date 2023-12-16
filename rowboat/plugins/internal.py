@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import gevent
 from disco.gateway.packets import RECV, OPCode
@@ -135,7 +135,7 @@ class InternalPlugin(Plugin):
     def prune_old_events(self):
         # Keep 24 hours of all events
         Event.delete().where(
-            (Event.timestamp > datetime.utcnow() - timedelta(hours=24))
+            (Event.timestamp > datetime.now(timezone.utc) - timedelta(hours=24))
         ).execute()
 
     @Plugin.listen('Ready')
