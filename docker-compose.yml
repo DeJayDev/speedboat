@@ -11,6 +11,8 @@ services:
     environment:
       - ENV=production
     stop_grace_period: 1m
+    ports:
+      - "5432:5432"
   redis:
     image: redis:7-alpine
     hostname: redis
@@ -18,6 +20,8 @@ services:
     command: redis-server --appendonly yes
     volumes:
       - speedboat_redis_data:/data
+    ports:
+      - "6379:6379"
   web:
     build: .
     command: python manage.py serve -r

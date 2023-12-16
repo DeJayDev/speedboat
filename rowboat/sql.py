@@ -40,6 +40,15 @@ def init_db(env):
                 port=int(os.getenv("PG_PORT", 5432)),
             )
         )
+    elif env =='dev':
+        database.initialize(
+            PostgresqlExtDatabase(
+                "rowboat",
+                host="localhost",
+                user="rowboat",
+                port=int(os.getenv("PG_PORT", 5432)),
+            )
+        )
     else:
         database.initialize(
             PostgresqlExtDatabase(
