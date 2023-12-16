@@ -25,7 +25,8 @@ from rowboat.util import MetaException, ordered_load
 from .pump import ModLogPump
 
 # Dynamically updated by the plugin
-Actions = Enum()
+class Actions(Enum):
+    pass
 
 URL_REGEX = re.compile(r'(https?://[^\s]+)')
 

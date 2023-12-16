@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from aenum import IntEnum
+from holster.enum import Enum
 from disco.api.http import APIException
 from disco.types.guild import GuildMember
 from peewee import BigIntegerField, BooleanField, DateTimeField, IntegerField, TextField
@@ -106,16 +106,18 @@ class User(ModelBase):
 
 @ModelBase.register
 class Infraction(ModelBase):
-    class InfractionTypes(IntEnum):
-        MUTE = 0
-        KICK = 1
-        TEMPBAN = 2
-        SOFTBAN = 3
-        BAN = 4
-        TEMPMUTE = 5
-        UNBAN = 6
-        TEMPROLE = 7
-        WARNING = 8
+    Types = Enum(
+        'MUTE',
+        'KICK',
+        'TEMPBAN',
+        'SOFTBAN',
+        'BAN',
+        'TEMPMUTE',
+        'UNBAN',
+        'TEMPROLE',
+        'WARNING',
+        bitmask=False,
+    )
 
     guild_id = BigIntegerField()
     user_id = BigIntegerField()

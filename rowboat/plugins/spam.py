@@ -3,7 +3,7 @@ import re
 import time
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
-from enum import Enum
+from holster.enum import Enum
 from functools import reduce
 
 from disco.util.emitter import Priority
@@ -22,13 +22,14 @@ from rowboat.util.stats import timed
 
 UPPER_RE = re.compile('[A-Z]')
 
-class PunishmentType(Enum): # TODO: Why don't we use InfractionTypes?
-    NONE = 0
-    MUTE = 1
-    KICK = 2
-    TEMPBAN = 3
-    BAN = 4
-    TEMPMUTE = 5
+PunishmentType = Enum( # Why isn't this InfractionTypes?
+    'NONE',
+    'MUTE',
+    'KICK',
+    'TEMPBAN',
+    'BAN',
+    'TEMPMUTE'
+)
 
 
 class CheckConfig(SlottedModel):
