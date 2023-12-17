@@ -892,6 +892,24 @@ docs = ["Sphinx"]
 test = ["objgraph", "psutil"]
 
 [[package]]
+name = "holster"
+version = "2.0.0"
+description = "a set of Python utilities"
+optional = false
+python-versions = "*"
+files = []
+develop = false
+
+[package.dependencies]
+six = "*"
+
+[package.source]
+type = "git"
+url = "https://github.com/elderlabs/holster"
+reference = "HEAD"
+resolved_reference = "e553bf70c6a07874c4b71cce6bf750650344d9eb"
+
+[[package]]
 name = "humanize"
 version = "4.9.0"
 description = "Python humanize utilities"
@@ -2164,4 +2182,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "baf502f463f0cc4d7c1bf406586d27f637cf73b032b7550bf282ec6c04944599"
+content-hash = "2a824ca9ff73ea8829bb3e423659e7af749637cb9d9e229eb985a7163d151ed2"

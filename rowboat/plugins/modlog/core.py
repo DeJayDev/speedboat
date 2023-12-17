@@ -8,13 +8,13 @@ from functools import reduce
 
 import humanize
 import pytz
-from aenum import Enum, extend_enum
 from disco.bot import CommandLevels
 from disco.types.base import cached_property
 from disco.util.emitter import Priority
 from disco.util.sanitize import S
 from disco.util.snowflake import to_datetime, to_unix
 
+from holster.enum import Enum
 from rowboat.models.guild import Guild
 from rowboat.plugins import CommandFail, CommandSuccess
 from rowboat.plugins import RowboatPlugin as Plugin
@@ -25,8 +25,7 @@ from rowboat.util import MetaException, ordered_load
 from .pump import ModLogPump
 
 # Dynamically updated by the plugin
-class Actions(Enum):
-    pass
+Actions = Enum()
 
 URL_REGEX = re.compile(r'(https?://[^\s]+)')
 
@@ -53,7 +52,7 @@ class ChannelConfig(SlottedModel):
 
     @cached_property
     def subscribed(self):
-        include = set(self.include if self.include else Actions.attrs)
+        include = set(self.include if self.include else [])
         exclude = set(self.exclude if self.exclude else [])
         return include - exclude
 
@@ -146,16 +145,13 @@ class ModLogPlugin(Plugin):
     fmt = Formatter()
 
     def load(self, ctx):
-        if not Actions.attrs:
-            self.action_simple = {}
+        self.action_simple = {}
 
-            with open('data/actions_simple.yaml') as f:
-                simple = ordered_load(f.read())
+        with open('data/actions_simple.yaml') as f:
+            simple = ordered_load(f.read())
 
-            for k, v in list(simple.items()):
-                self.register_action(k, v)
-        else:
-            self.action_simple = ctx['action_simple']
+        for k, v in list(simple.items()):
+            self.register_action(k, v)
 
         self.debounces = ctx.get('debounces') or DebouncesCollection()
 
@@ -230,7 +226,7 @@ class ModLogPlugin(Plugin):
         config.resolved = True
 
     def register_action(self, name, simple):
-        action = extend_enum(Actions, name, len(Actions) + 1)
+        action = Actions.add(name)
         self.action_simple[action] = simple
 
     def log_action_ext(self, action, guild_id, **details):
