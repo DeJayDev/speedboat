@@ -5,7 +5,7 @@ import GuildConfig from './components/GuildConfig'
 import GuildOverview from './components/GuildOverview'
 import GuildStats from './components/GuildStats'
 import Login from './components/Login'
-import useStore from './State'
+import useStore from './state'
 import User from './types/user'
 import API from './util'
 

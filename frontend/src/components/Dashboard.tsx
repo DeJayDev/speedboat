@@ -1,4 +1,4 @@
-import useStore from "../State";
+import useStore from "../state";
 import GuildsTable from "./Guilds";
 
 function Dashboard() {

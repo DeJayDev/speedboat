@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://direct.speedboat.rocks:8686',
+        target: 'http://api.speedboat.rocks:8686',
         changeOrigin: false
       }
     }

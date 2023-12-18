@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import useStore from "../State";
+import useStore from "../state";
 import Guild from "../types/guild";
 
 import { FaBan, FaEdit, FaInfo } from 'react-icons/fa';

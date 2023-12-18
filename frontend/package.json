@@ -14,6 +14,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tremor/react": "^3.12.1",
     "ace-builds": "^1.32.2",
     "axios": "^1.6.2",
     "react": "^18.2.0",
