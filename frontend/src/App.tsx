@@ -8,6 +8,7 @@ import Login from './components/Login'
 import useStore from './state'
 import User from './types/user'
 import API from './util'
+import './assets/index.css'
 
 function App() {
 
@@ -37,4 +38,5 @@ function App() {
     <Route path='/guilds/:gid/config' component={GuildConfig} />
   </Switch>
 }
+
 export default App

@@ -1,3 +1,4 @@
+import { Title } from "@tremor/react";
 import useStore from "../state";
 import GuildsTable from "./Guilds";
 
@@ -5,16 +6,18 @@ function Dashboard() {
 
   const user = useStore((state) => state.user) // This varible is unused, only to trigger a re-render
 
-  return (
-    <div className='card'>
-      <div className='card-header'>
-        Guilds
+  return (<>
+    <div className="flex items-center gap-3 m-2">
+      <div className="avatar">
+        <div className="w-12 rounded-full">
+          <img src={user?.avatarURL} />
+        </div>
       </div>
-      <div className='card-body'>
-        <GuildsTable />
-      </div>
+      <Title>Hi {user?.username}!</Title>
     </div>
-  )
+    
+    <GuildsTable/>
+  </>)
 }
 
 

@@ -3,6 +3,7 @@ import useStore from "../state";
 import Guild from "../types/guild";
 
 import { FaBan, FaEdit, FaInfo } from 'react-icons/fa';
+import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from "@tremor/react";
 
 function GuildsTable() {
   const user = useStore((state) => state.user)
@@ -13,34 +14,30 @@ function GuildsTable() {
   }
 
   return (
-    <div className='table-responsive'>
-      <table className='table table-sriped table-bordered'>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {
-            guilds.map((guild: Guild) => {
-              return <GuildTableRow guild={guild} key={guild.id} />
-            })
-          }
-        </tbody>
-      </table>
-    </div>
+    <Table>
+      <TableHead>
+        <TableRow>
+          <TableHeaderCell>ID</TableHeaderCell>
+          <TableHeaderCell>Name</TableHeaderCell>
+          <TableHeaderCell>Actions</TableHeaderCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {guilds.map((guild: Guild) => {
+            return <GuildTableRow guild={guild}/>
+        })}
+      </TableBody>
+    </Table>
   );
 }
 
 function GuildTableRow(props: { guild: Guild }) {
 
   return (
-    <tr>
-      <td>{props.guild.id}</td>
-      <td>{props.guild.name}</td>
-      <td>
+    <TableRow key={props.guild.id}>
+      <TableCell>{props.guild.id}</TableCell>
+      <TableCell>{props.guild.name}</TableCell>
+      <TableCell>
         <div>
           <Link to={`/guilds/${props.guild.id}`}>
             <button type='button' className='btn btn-success btn-circle'>
@@ -58,8 +55,8 @@ function GuildTableRow(props: { guild: Guild }) {
             </button>
           </Link>
         </div>
-      </td>
-    </tr>
+      </TableCell>
+    </TableRow>
   );
 }
 

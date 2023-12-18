@@ -1,60 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRoute } from 'wouter';
 import Guild from '../types/guild';
-
-function GuildWidget() {
-  const [match, params] = useRoute("/guilds/:gid");
-
-  const source = `https://discord.com/api/guilds/${params?.gid}/widget.png?style=banner2`;
-  return (<img src={source} alt='(Guild must have widget enabled)' />);
-}
-
-function GuildIcon(props: {guild: Guild}) {
-  const [match, params] = useRoute("/guilds/:gid");
-
-  return <img src={props.guild.iconURL} />;
-}
-
-function GuildSplash(props: {guild: Guild}) {
-  const [match, params] = useRoute("/guilds/:gid");
-
-  if (props.guild.splash) {
-    return <img src={props.guild.splashURL} alt='No Splash' />;
-  } else {
-    return <i>No Splash</i>;
-  }
-}
-
-function GuildInfoTable(props: {guild: Guild}) {
-
-  return (
-    <table className='table table-striped table-bordered'>
-      <thead></thead>
-      <tbody>
-        <tr>
-          <td>ID</td>
-          <td>{props.guild.id}</td>
-        </tr>
-        <tr>
-          <td>Owner</td>
-          <td>{props.guild.owner}</td>
-        </tr>
-        <tr>
-          <td>Region</td>
-          <td>{props.guild.region}</td>
-        </tr>
-        <tr>
-          <td>Icon</td>
-          <td><GuildIcon guild={props.guild}/></td>
-        </tr>
-        <tr>
-          <td>Splash</td>
-          <td><GuildSplash guild={props.guild} /></td>
-        </tr>
-      </tbody>
-    </table>
-  );
-}
+import { Card, Grid, Italic, Table, TableBody, TableCell, TableRow, Text, Title } from '@tremor/react';
 
 export default function GuildOverview() {
   const [match, params] = useRoute("/guilds/:gid");
@@ -75,25 +22,53 @@ export default function GuildOverview() {
     return <h3>Loading...</h3>;
   }
 
-  return (<div>
-    <div className='row'>
-      <div className='col-lg-12'>
-        <div className='card'>
-          <div className='card-header'>Guild Banner</div>
-          <div className='card-body'>
-            <GuildWidget/>
-          </div>
-        </div>
-        <div className='card'>
-          <div className='card-header'>Guild Info</div>
-          <div className='card-body'>
-            <div className='table-responsive'>
-              <GuildInfoTable guild={guild} />
-            </div>
-          </div>
-        </div>
-      </div>
+  return (
+    <div>
+      <Grid className="gap-6 mt-6">
+        <Title>Info for {guild.name}</Title>
+        <Card>
+          <Text>Guild Banner</Text>
+          <img src={`https://discord.com/api/guilds/${guild.id}/widget.png?style=banner2`}/>
+        </Card>
+        <Card>
+          <Text>Guild Info</Text>
+          <GuildInfoTable guild={guild} />
+        </Card>
+      </Grid>
     </div>
-  </div>);
+  );
+
+function GuildInfoTable(props: {guild: Guild}) {
+  return (
+    <Table>
+      <TableBody>
+        <TableRow>
+          <TableCell>ID</TableCell>
+          <TableCell>{props.guild.id}</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Owner</TableCell>
+          <TableCell>{props.guild.owner}</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Region</TableCell>
+          <TableCell>{props.guild.region}</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Icon</TableCell>
+          <TableCell>
+            <img src={props.guild.iconURL} alt=''/>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Splash</TableCell>
+          <TableCell>
+            {props.guild.splash ? <img src={props.guild.splashURL} alt=''/> : <Italic>No Splash</Italic>}
+          </TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  );
+}
 
 }

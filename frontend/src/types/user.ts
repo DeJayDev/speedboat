@@ -27,6 +27,14 @@ export default class User {
     } as User
   }
 
+  get avatarURL() {
+    let fmt = 'png'
+    if (this.avatar.startsWith("a_")) {
+      fmt = 'gif'
+    }
+    return `https://cdn.discordapp.com/avatars/${this.id}/${this.avatar}.${fmt}`
+  }
+
   async create() {
     const res = await API.get<Guild[]>('/users/@me/guilds');
     this.guilds = res.data.map((guild: Guild) => new Guild(guild));
