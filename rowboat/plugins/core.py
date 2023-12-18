@@ -5,6 +5,8 @@ import json
 import os
 import pprint
 import signal
+import time
+import gevent
 from datetime import datetime, timedelta, timezone
 
 from disco.api.http import APIException
@@ -28,7 +30,7 @@ from rowboat.plugins.modlog import Actions
 from rowboat.redis import rdb
 from rowboat.sql import init_db
 from rowboat.util import LocalProxy
-from rowboat.util.formatting import DiscordFormatting, as_discord
+from rowboat.util.formatting import DiscordFormatting, as_discord, to_datetime_aware
 from rowboat.util.stats import timed
 
 PY_CODE_BLOCK = '```py\n{}\n```'
@@ -208,7 +210,7 @@ class CorePlugin(Plugin):
             return
 
         if hasattr(plugin, 'WHITELIST_FLAG'):
-            if not int(plugin.WHITELIST_FLAG) in self.guilds[guild_id].whitelist:
+            if int(plugin.WHITELIST_FLAG) not in self.guilds[guild_id].whitelist:
                 return
 
         event.base_config = self.guilds[guild_id].get_config()
@@ -744,7 +746,7 @@ class CorePlugin(Plugin):
     @Plugin.command('ping', level=-1)
     def ping(self, event):
         pre = time.time()
-        post = (time.mktime(to_datetime(event.msg.id).timetuple()) - pre) / 1000
+        post = (time.mktime(to_datetime_aware(to_datetime(event.msg.id)).timetuple()) - pre) / 1000
         msg = event.msg.reply(":eyes:")
         ping = (time.time() - pre) * 1000
         msg.edit(":eyes: `BOT: {}ms` `API: {}ms`".format(int(post), int(ping)))

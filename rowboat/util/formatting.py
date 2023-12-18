@@ -14,6 +14,10 @@ class DiscordFormatting(Enum):
     @classmethod
     def __missing__(cls, value):
         return cls.SHORT_DATE_TIME
+
+    
+def to_datetime_aware(dt: datetime) -> datetime:
+    return dt.replace(tzinfo=timezone.utc) if dt.tzinfo is None else dt
     
 def as_unix(dt: datetime) -> int:
     return int(dt.timestamp(timezone.utc))

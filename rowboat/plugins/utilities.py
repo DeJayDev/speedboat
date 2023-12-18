@@ -12,7 +12,7 @@ from disco.types.message import MessageEmbed, MessageEmbedAuthor, MessageEmbedFi
 from disco.types.user import ActivityTypes, Status
 from disco.types.user import User as DiscoUser
 from disco.util.sanitize import S
-from disco.util.snowflake import to_datetime
+from disco.util.snowflake import to_datetime, to_unix
 from gevent.pool import Pool
 from peewee import DoesNotExist, fn
 from PIL import Image
@@ -305,8 +305,7 @@ class UtilitiesPlugin(Plugin):
         content.append("**\u276F User Information**")
         content.append("Profile: <@{}>".format(user.id))
 
-        created_dt = to_datetime(user.id)
-        content.append("Created: <t:{0}:R> (<t:{0}:f>)".format(as_unix(created_dt)))
+        content.append("Created: <t:{0}:R> (<t:{0}:f>)".format(as_unix(user.id)))
 
         member = event.guild.get_member(user.id) if event.guild else None
 

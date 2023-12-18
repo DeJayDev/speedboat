@@ -59,16 +59,3 @@ class JoinPlugin(Plugin):
         if verification_level is VerificationLevel.EXTREME:
             gevent.spawn_later(event.config.advanced.highest, event.member.add_role, event.config.join_role)
 
-    @Plugin.command('debugdelay', '[length:int]', group='join', level=-1)
-    def trigger_delay(self, event, length: int = None):
-        length = length if length else 10
-
-        msg = event.channel.send_message("Sending later...")
-
-        def calc_timediff():
-            return "Scheduled for {} after trigger, took {}".format(length, (datetime.now() - to_datetime(msg.id)))
-
-        gevent.spawn_later(length,
-                           lambda: event.channel.send_message("Scheduled for {} after trigger, took {}"
-                                                              .format(length, (
-                                       datetime.now() - to_datetime(msg.id)) / timedelta(seconds=1))))
