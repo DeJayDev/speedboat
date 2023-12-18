@@ -1,9 +1,7 @@
-from datetime import datetime, timedelta
 
 import gevent
 from disco.types.base import SlottedModel
 from disco.types.guild import VerificationLevel
-from disco.util.snowflake import to_datetime
 
 from rowboat.plugins import RowboatPlugin as Plugin
 from rowboat.types import Field, snowflake

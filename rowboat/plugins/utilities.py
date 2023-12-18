@@ -337,7 +337,7 @@ class UtilitiesPlugin(Plugin):
 
         if newest_msg:
             content.append("\n **\u276F Activity**")
-            content.append("Last Message: <t:{0}:R> (<t:{0}:f>)".format(as_unix(to_datetime(newest_msg))))
+            content.append("Last Message: <t:{0}:R> (<t:{0}:f>)".format(to_unix(newest_msg)))
 
         if len(infractions) > 0:
             content.append("\n**\u276F Infractions**")
