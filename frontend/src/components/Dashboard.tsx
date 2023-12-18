@@ -4,7 +4,7 @@ import GuildsTable from "./Guilds";
 
 function Dashboard() {
 
-  const user = useStore((state) => state.user) // This varible is unused, only to trigger a re-render
+  const user = useStore((state) => state.user)
 
   return (<>
     <div className="flex items-center gap-3 m-2">
