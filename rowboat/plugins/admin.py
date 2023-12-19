@@ -32,6 +32,7 @@ from rowboat.types import DictField, Field, ListField, SlottedModel, snowflake
 from rowboat.types.plugin import PluginConfig
 from rowboat.util.images import get_dominant_colors_user
 from rowboat.util.input import parse_duration
+from rowboat.util.time import timestamp_now
 from rowboat.util.timing import Eventual
 
 EMOJI_RE = re.compile(r'<:[a-zA-Z0-9_]+:([0-9]+)>')
@@ -390,7 +391,7 @@ class AdminPlugin(Plugin):
         embed.add_field(name='Moderator', value=str(infraction.actor), inline=True)
         embed.add_field(name='Active', value='yes' if infraction.active else 'no', inline=False)
         if infraction.active and infraction.expires_at:
-            embed.add_field(name='Expires', value=humanize.naturaldelta(infraction.expires_at - datetime.now(timezone.utc)))
+            embed.add_field(name='Expires', value=humanize.naturaldelta(infraction.expires_at - timestamp_now()))
         embed.add_field(name='Reason', value=infraction.reason or '_No Reason Given', inline=False)
         embed.timestamp = infraction.created_at.isoformat()
         event.msg.reply(embeds=[embed])
@@ -437,7 +438,7 @@ class AdminPlugin(Plugin):
             if inf.active:
                 active = 'yes'
                 if inf.expires_at:
-                    active += ' (expires in {})'.format(humanize.naturaldelta(inf.expires_at - datetime.now(timezone.utc)))
+                    active += ' (expires in {})'.format(humanize.naturaldelta(inf.expires_at - timestamp_now()))
             else:
                 active = 'no'
 
@@ -628,7 +629,7 @@ class AdminPlugin(Plugin):
                         ':ok_hand: {u} is now muted for {t} (`{o}`)',
                         ':ok_hand: {u} is now muted for {t}',
                         u=member.user,
-                        t=humanize.naturaldelta(duration - datetime.now(timezone.utc)),
+                        t=humanize.naturaldelta(duration - timestamp_now()),
                     ))
             else:
                 existed = False
@@ -679,7 +680,7 @@ class AdminPlugin(Plugin):
                 ':ok_hand: {u} is now in the {r} role for {t}',
                 r=event.guild.roles[role_id].name,
                 u=member.user,
-                t=humanize.naturaldelta(expire_dt - datetime.now(timezone.utc)),
+                t=humanize.naturaldelta(expire_dt - timestamp_now()),
             ))
 
     @Plugin.command('unmute', '<user:user|snowflake>', aliases=['umute'], level=CommandLevels.MOD)
@@ -881,7 +882,7 @@ class AdminPlugin(Plugin):
                     ':ok_hand: temp-banned {u} for {t} (`{o}`)',
                     ':ok_hand: temp-banned {u} for {t}',
                     u=member.user,
-                    t=humanize.naturaldelta(expires_dt - datetime.now(timezone.utc)),
+                    t=humanize.naturaldelta(expires_dt - timestamp_now()),
                 ))
         else:
             raise CommandFail('Invalid user')
@@ -1405,7 +1406,7 @@ class AdminPlugin(Plugin):
                 str(self.state.channels.get(session.channel_id) or 'UNKNOWN'),
                 '{} ({} ago)'.format(
                     session.started_at.isoformat(),
-                    humanize.naturaldelta(datetime.now(timezone.utc) - session.started_at)),
+                    humanize.naturaldelta(timestamp_now() - session.started_at)),
                 humanize.naturaldelta(session.ended_at - session.started_at) if session.ended_at else 'Active')
 
         event.msg.reply(tbl.compile())

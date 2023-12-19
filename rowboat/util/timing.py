@@ -1,8 +1,9 @@
-from datetime import datetime, timezone
 from time import time
 
 import gevent
 from gevent.lock import Semaphore
+
+from rowboat.util.time import timestamp_now, as_unix
 
 
 class Eventual(object):
@@ -17,8 +18,8 @@ class Eventual(object):
 
     def wait(self, nxt):
         def f():
-            wait_time = self._next - datetime.now(timezone.utc)
-            gevent.sleep(wait_time.seconds + (wait_time.microseconds / 1000000.0))
+            wait_time = self._next - timestamp_now()
+            gevent.sleep(wait_time)
             self._next = None
             gevent.spawn(self.func)
 
@@ -35,7 +36,8 @@ class Eventual(object):
         gevent.spawn(self.func)
 
     def set_next_schedule(self, date):
-        if date < datetime.now(timezone.utc):
+        date = as_unix(date)
+        if date < timestamp_now():
             return gevent.spawn(self.trigger)
 
         if not self._next or date < self._next:
@@ -70,9 +72,9 @@ class Debounce(object):
                     self._t.kill()
                     self._t = None
         else:
-            self._start = time.time()
+            self._start = time()
 
-        if time.time() - self._start > self.hardlimit:
+        if time() - self._start > self.hardlimit:
             gevent.spawn(self.func, **self.kwargs)
             return
 

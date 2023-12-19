@@ -3,7 +3,7 @@ import re
 import string
 import time
 from collections import defaultdict
-from datetime import datetime, timezone
+from datetime import datetime
 from functools import reduce
 
 import humanize
@@ -13,14 +13,15 @@ from disco.types.base import cached_property
 from disco.util.emitter import Priority
 from disco.util.sanitize import S
 from disco.util.snowflake import to_unix
-
 from holster.enum import Enum
+
 from rowboat.models.guild import Guild
 from rowboat.plugins import CommandFail, CommandSuccess
 from rowboat.plugins import RowboatPlugin as Plugin
 from rowboat.types import ChannelField, DictField, Field, ListField, SlottedModel, snowflake
 from rowboat.types.plugin import PluginConfig
 from rowboat.util import MetaException, ordered_load
+from rowboat.util.time import timestamp_now
 
 from .pump import ModLogPump
 
@@ -341,7 +342,7 @@ class ModLogPlugin(Plugin):
 
     @Plugin.listen('GuildMemberAdd')
     def on_guild_member_add(self, event):
-        created = humanize.naturaltime(datetime.now(timezone.utc) - to_unix(event.user.id))
+        created = humanize.naturaltime(timestamp_now() - to_unix(event.user.id))
         new = (
             event.config.new_member_threshold and
             (time.time() - to_unix(event.user.id)) < event.config.new_member_threshold

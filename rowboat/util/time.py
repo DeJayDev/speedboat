@@ -20,7 +20,10 @@ def to_datetime_aware(dt: datetime) -> datetime:
     return dt.replace(tzinfo=timezone.utc) if dt.tzinfo is None else dt
     
 def as_unix(dt: datetime) -> int:
-    return int(dt.timestamp(timezone.utc))
+    return int(to_datetime_aware(dt).timestamp())
 
 def as_discord(dt: datetime, type: DiscordFormatting = DiscordFormatting.SHORT_DATE_TIME) -> str:
     return '<t:{}:{}>'.format(as_unix(dt), type.value)
+
+def timestamp_now() -> int:
+    return as_unix(datetime.now(timezone.utc))

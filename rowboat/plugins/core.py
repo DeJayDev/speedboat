@@ -6,9 +6,9 @@ import os
 import pprint
 import signal
 import time
-import gevent
 from datetime import datetime, timedelta, timezone
 
+import gevent
 from disco.api.http import APIException
 from disco.bot import Bot
 from disco.bot.command import CommandEvent
@@ -30,7 +30,7 @@ from rowboat.plugins.modlog import Actions
 from rowboat.redis import rdb
 from rowboat.sql import init_db
 from rowboat.util import LocalProxy
-from rowboat.util.formatting import DiscordFormatting, as_discord, to_datetime_aware
+from rowboat.util.time import DiscordFormatting, as_discord, to_datetime_aware
 from rowboat.util.stats import timed
 
 PY_CODE_BLOCK = '```py\n{}\n```'

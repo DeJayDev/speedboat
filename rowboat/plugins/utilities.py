@@ -24,9 +24,9 @@ from rowboat.plugins import CommandFail, CommandSuccess
 from rowboat.plugins import RowboatPlugin as Plugin
 from rowboat.types.plugin import PluginConfig
 from rowboat.util.badges import UserFlags
-from rowboat.util.formatting import DiscordFormatting, as_discord, as_unix
 from rowboat.util.images import get_dominant_colors_guild, get_dominant_colors_user
 from rowboat.util.input import parse_duration
+from rowboat.util.time import DiscordFormatting, as_discord, as_unix
 from rowboat.util.timing import Eventual
 
 
