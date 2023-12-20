@@ -53,7 +53,7 @@ class ChannelConfig(SlottedModel):
 
     @cached_property
     def subscribed(self):
-        include = set(self.include if self.include else [])
+        include = set(self.include if self.include else Actions.attrs)
         exclude = set(self.exclude if self.exclude else [])
         return include - exclude
 
