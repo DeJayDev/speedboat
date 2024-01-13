@@ -93,7 +93,6 @@ class StarboardPlugin(Plugin):
             raise CommandFail('No starboard message with that id')
 
         content, embed, row = self.get_embed(star, source_msg, sb_config)
-        print(row.to_dict())
         event.msg.reply(content, embeds=[embed], components=[row.to_dict()])
 
     @Plugin.command('stats', '[user:user]', group='stars', level=CommandLevels.MOD)
@@ -416,7 +415,6 @@ class StarboardPlugin(Plugin):
 
         if not star.star_message_id:
             try:
-                print(row.to_dict())
                 msg = self.client.api.channels_messages_create(
                     starboard_id,
                     content,
@@ -597,13 +595,13 @@ class StarboardPlugin(Plugin):
         embed.color = config.get_color(len(star.stars))
 
         row = ActionRow()
-        row.add_component(label='Jump to Message', type=ComponentTypes.BUTTON, style=ButtonStyles.LINK,
-                          url='https://discord.com/channels/{}/{}/{}'.format(
-                              msg.guild.id,
-                              msg.channel_id,
-                              msg.id
-                          ))
-
-        print(row.to_dict())
+        row.add_component({'label': 'Jump to Message', 
+                            'type': 2, 
+                            'style': 5,
+                            'url': 'https://discord.com/channels/{}/{}/{}'.format(
+                                msg.guild.id,
+                                msg.channel_id,
+                                msg.id
+                            )})
 
         return content, embed, row

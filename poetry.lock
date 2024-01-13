@@ -99,7 +99,6 @@ files = [
 
 [package.dependencies]
 aiosignal = ">=1.1.2"
-async-timeout = {version = ">=4.0,<5.0", markers = "python_version < \"3.11\""}
 attrs = ">=17.3.0"
 frozenlist = ">=1.1.1"
 multidict = ">=4.5,<7.0"
@@ -790,10 +789,7 @@ files = [
 
 [package.dependencies]
 cffi = {version = ">=1.12.2", markers = "platform_python_implementation == \"CPython\" and sys_platform == \"win32\""}
-greenlet = [
-    {version = ">=2.0.0", markers = "platform_python_implementation == \"CPython\" and python_version < \"3.11\""},
-    {version = ">=3.0rc3", markers = "platform_python_implementation == \"CPython\" and python_version >= \"3.11\""},
-]
+greenlet = {version = ">=3.0rc3", markers = "platform_python_implementation == \"CPython\" and python_version >= \"3.11\""}
 "zope.event" = "*"
 "zope.interface" = "*"
 
@@ -2183,5 +2179,5 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 
 [metadata]
 lock-version = "2.0"
-python-versions = "^3.10"
-content-hash = "9c3adcb48da3943eb308b7e9abd6cbb58333a794e36455f8610f74cb176a1ed4"
+python-versions = "^3.11"
+content-hash = "e01c9d18c90a12e47eab6ab47052341dcfb3b2e45f7204bc10538636fdcb1d6c"
