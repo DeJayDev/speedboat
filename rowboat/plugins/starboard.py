@@ -93,6 +93,7 @@ class StarboardPlugin(Plugin):
             raise CommandFail('No starboard message with that id')
 
         content, embed, row = self.get_embed(star, source_msg, sb_config)
+        print(row.to_dict())
         event.msg.reply(content, embeds=[embed], components=[row.to_dict()])
 
     @Plugin.command('stats', '[user:user]', group='stars', level=CommandLevels.MOD)
@@ -415,6 +416,7 @@ class StarboardPlugin(Plugin):
 
         if not star.star_message_id:
             try:
+                print(row.to_dict())
                 msg = self.client.api.channels_messages_create(
                     starboard_id,
                     content,
@@ -601,5 +603,7 @@ class StarboardPlugin(Plugin):
                               msg.channel_id,
                               msg.id
                           ))
+
+        print(row.to_dict())
 
         return content, embed, row

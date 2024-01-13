@@ -3,9 +3,9 @@ import re
 import time
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
-from holster.enum import Enum
 from functools import reduce
 
+from disco.util.enum import Enum
 from disco.util.emitter import Priority
 from gevent.lock import Semaphore
 

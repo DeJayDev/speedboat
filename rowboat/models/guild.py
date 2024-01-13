@@ -23,7 +23,6 @@ class Guild(ModelBase):
     name = TextField(null=True)
     icon = TextField(null=True)
     splash = TextField(null=True)
-    region = TextField(null=True)
 
     last_ban_sync = DateTimeField(null=True)
 
@@ -58,7 +57,6 @@ class Guild(ModelBase):
             name=guild.name,
             icon=guild.icon,
             splash=guild.splash,
-            region=guild.region,
             config={'web': {guild.owner_id: 'admin'}},
             config_raw='')
 
@@ -86,7 +84,7 @@ class Guild(ModelBase):
     def sync(self, guild):
         updates = {}
 
-        for key in ['owner_id', 'name', 'icon', 'splash', 'region']:
+        for key in ['owner_id', 'name', 'icon', 'splash']:
             if getattr(guild, key) != getattr(self, key):
                 updates[key] = getattr(guild, key)
 
@@ -137,7 +135,6 @@ class Guild(ModelBase):
             'name': self.name,
             'icon': self.icon,
             'splash': self.splash,
-            'region': self.region,
             'enabled': self.enabled,
             'whitelist': self.whitelist
         }

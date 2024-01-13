@@ -14,7 +14,6 @@ documentation = "https://docs.speedboat.rocks"
 [tool.poetry.dependencies]
 python = "^3.10"
 dominantcolors = {git = "https://github.com/wenmin-wu/dominant-colors-py"}
-holster = {git = "https://github.com/elderlabs/holster"}
 pygal = {git = "https://github.com/rafalkucharczyk/pygal", rev = "02c10a2919457bad4c83913a90c3aa0dd0ccb83a"}
 aenum = "^3.1.15"
 cairosvg = "^2.7.1"
@@ -29,7 +28,7 @@ humanize = "^4.9.0"
 markovify = "^0.9.4"
 oauthlib = "^3.2.2"
 peewee = "^3.17.0"
-Pillow = "^10.1.0"
+Pillow = "^10.2.0"
 psycogreen = "^1.0.2"
 psycopg2 = "^2.9.9"
 pynacl = "^1.5.0"
@@ -47,7 +46,7 @@ async-timeout = "^4.0.3"
 
 # https://github.com/elderlabs/BetterDisco/tree/staging/dooley
 [tool.poetry.dependencies.betterdisco-py]
-rev = "c21796c477c1fdb94c1cd0c1f3a8edbeeda7fda3"
+rev = "7b97d7c6f234b17b5355c9dde503fc8e226906af"
 git = "https://github.com/elderlabs/betterdisco"
 extras = ["performance"]
 

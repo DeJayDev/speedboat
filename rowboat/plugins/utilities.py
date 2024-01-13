@@ -249,7 +249,6 @@ class UtilitiesPlugin(Plugin):
         about_field.name = "**\u276F About**"
         about_text = "Created by {} ({}) — {}".format(guild.owner, guild.owner.id, as_discord(to_datetime(guild.id, DiscordFormatting.RELATIVE)))
         about_text += "\nMembers: {:,}/{:,}".format(guild.approximate_presence_count, guild.member_count)
-        about_text += "\nRegion: {}".format(guild.region)
         about_field.value = about_text
         embed.add_field(about_field)
 

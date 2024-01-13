@@ -12,7 +12,7 @@ class JoinPluginConfigAdvanced(SlottedModel):
     low = Field(int, default=0)
     medium = Field(int, default=5)
     high = Field(int, default=10)
-    highest = Field(int, default=30, alias='extreme')  # Disco calls it extreme, the client calls it Highest.
+    highest = Field(int, default=30) # This is "VERY_HIGH" in Disco.
 
 
 class JoinPluginConfig(PluginConfig):
@@ -28,7 +28,7 @@ class JoinPlugin(Plugin):
     @Plugin.listen('GuildMemberAdd')
     def on_guild_member_add(self, event):
         if event.member.user.bot:
-            return  # I simply do not care
+            return
 
         verification_level = event.guild.verification_level
 
@@ -54,6 +54,6 @@ class JoinPlugin(Plugin):
         if verification_level is VerificationLevel.HIGH:
             gevent.spawn_later(event.config.advanced.high, event.member.add_role, event.config.join_role)
 
-        if verification_level is VerificationLevel.EXTREME:
+        if verification_level is VerificationLevel.VERY_HIGH:
             gevent.spawn_later(event.config.advanced.highest, event.member.add_role, event.config.join_role)
 

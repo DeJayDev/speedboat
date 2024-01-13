@@ -40,10 +40,6 @@ function GuildInfoTable(props: {guild: Guild}) {
           <td>{props.guild.owner}</td>
         </tr>
         <tr>
-          <td>Region</td>
-          <td>{props.guild.region}</td>
-        </tr>
-        <tr>
           <td>Icon</td>
           <td><GuildIcon guild={props.guild}/></td>
         </tr>

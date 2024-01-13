@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from holster.enum import Enum
+from disco.util.enum import Enum
 from disco.api.http import APIException
 from disco.types.guild import GuildMember
 from peewee import BigIntegerField, BooleanField, DateTimeField, IntegerField, TextField

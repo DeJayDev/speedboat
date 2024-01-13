@@ -13,7 +13,7 @@ from disco.types.base import cached_property
 from disco.util.emitter import Priority
 from disco.util.sanitize import S
 from disco.util.snowflake import to_unix
-from holster.enum import Enum
+from disco.util.enum import Enum
 
 from rowboat.models.guild import Guild
 from rowboat.plugins import CommandFail, CommandSuccess

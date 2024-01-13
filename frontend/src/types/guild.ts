@@ -6,17 +6,15 @@ class Guild {
   name: string;
   icon: string;
   splash: string;
-  region: string;
   enabled: boolean;
   role: 'admin' | 'editor' | 'viewer';
 
-  constructor({ id, owner_id, name, icon, splash, region, enabled, role }: Guild) {
+  constructor({ id, owner_id, name, icon, splash, enabled, role }: Guild) {
     this.id = id;
     this.owner_id = owner_id;
     this.name = name;
     this.icon = icon;
     this.splash = splash;
-    this.region = region;
     this.enabled = enabled;
     this.role = role;
   }
@@ -28,7 +26,6 @@ class Guild {
       name: this.name,
       icon: this.icon,
       splash: this.splash,
-      region: this.region,
       enabled: this.enabled,
       role: this.role,
     } as Guild;
