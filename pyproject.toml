@@ -41,7 +41,7 @@ sentry-sdk = "^1.39.1"
 urllib3 = "^2.1.0"
 wheel = "^0.42.0"
 # i have no idea why im the person who has to require these even though redis is the one that needs them
-aiohttp = "^3.9.1"
+aiohttp = "^3.9.2"
 async-timeout = "^4.0.3"
 
 # https://github.com/elderlabs/BetterDisco/tree/staging/dooley
