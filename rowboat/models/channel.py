@@ -10,6 +10,7 @@ class Channel(ModelBase):
     guild_id = BigIntegerField(null=True)
     name = CharField(null=True, index=True)
     topic = TextField(null=True)
+    channel_type = TextField(null=True)
     type_ = SmallIntegerField(null=True)
 
     # First message sent in the channel
@@ -36,10 +37,10 @@ class Channel(ModelBase):
             guild_id=channel.guild.id if channel.guild else None,
             name=channel.name or None,
             topic=channel.topic or None,
-            type_=channel.type,
+            channel_type=channel.type,
         ).on_conflict(
             conflict_target=cls.channel_id,
-            preserve=(cls.channel_id, cls.guild_id, cls.type_),
+            preserve=(cls.channel_id, cls.guild_id, cls.channel_type),
             update={cls.name: channel.name, cls.topic: channel.topic}
         ).returning(cls.first_message_id).execute())[0]
 

@@ -1,5 +1,4 @@
-from disco.types.channel import ChannelType, MessageIterator
-from disco.types.permissions import Permissions
+from disco.types.channel import MessageIterator
 
 from rowboat.models.message import Message
 
@@ -30,16 +29,10 @@ def backfill_channel(task, channel_id):
     for chunk in msgs_iter:
         if not chunk:
             break
-
         for msg in chunk:
             if msg.author.bot:
                 break
-
-            if msg.channel.type is not ChannelType.DM:
-                if not msg.channel.get_permissions(351776065477279745).can(Permissions.SEND_MESSAGES, Permissions.VIEW_CHANNEL):
-                    break
-
         scanned += len(chunk)
         inserted += len(Message.from_disco_message_many(chunk, safe=True))
-
+    
     task.log.info('Completed backfill on channel %s, %s scanned and %s inserted', channel_id, scanned, inserted)

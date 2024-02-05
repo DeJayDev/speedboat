@@ -67,7 +67,7 @@ class StatsPlugin(Plugin):
         if event.author.bot:
             return
 
-        if event.channel.type is ChannelType.DM:
+        if event.channel.type == "DM":
             return
 
         tags = {
@@ -95,7 +95,7 @@ class StatsPlugin(Plugin):
         if event.message.author.bot:
             return
 
-        if event.channel.type is ChannelType.DM:
+        if event.channel.type == "DM":
             return
 
         tags = {

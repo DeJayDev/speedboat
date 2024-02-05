@@ -5,8 +5,9 @@ import gevent
 import markovify
 import psycopg2
 import pygal
+from time import time
 from disco.types.channel import Channel as DiscoChannel
-from disco.types.channel import ChannelType, MessageIterator
+from disco.types.channel import MessageIterator
 from disco.types.guild import Guild as DiscoGuild
 from disco.types.message import MessageTable
 from disco.types.permissions import Permissions
@@ -147,9 +148,9 @@ class SQLPlugin(Plugin):
             tbl = MessageTable(codeblock=False)
 
             with conn.cursor() as cur:
-                start = time.time()
+                start = time()
                 cur.execute(event.codeblock.format(e=event))
-                dur = time.time() - start
+                dur = time() - start
                 if not cur.description:
                     raise CommandSuccess("execution complete (had no return)")
                 else:
@@ -222,7 +223,7 @@ class SQLPlugin(Plugin):
     def command_backfill_message(self, event, channel, message):
         channel = self.state.channels.get(channel)
         Message.from_disco_message(channel.get_message(message))
-        raise CommandSuccess("Backfill Complete")
+        raise CommandSuccess("Backfilled message")
 
     @Plugin.command("reactions", "<message:snowflake>", level=-1, group="backfill", global_=True)
     def command_sql_reactions(self, event, message):
@@ -233,21 +234,21 @@ class SQLPlugin(Plugin):
 
         message = self.state.channels.get(message.channel_id).get_message(message.id)
         for reaction in message.reactions:
-            for users in message.get_reactors(reaction.emoji, bulk=True):
-                Reaction.from_disco_reactors(message.id, reaction, (i.id for i in users))
+            for users in message.get_reactors(reaction, bulk=True):
+                Reaction.from_disco_reactors(message.id, reaction.emoji, (i.id for i in users))
 
     @Plugin.command("global", "<duration:str> [pool:int]", level=-1, global_=True, context={"mode": "global"}, group="recover")
     @Plugin.command("here", "<duration:str> [pool:int]", level=-1, global_=True, context={"mode": "here"}, group="recover")
     def command_recover(self, event, duration, pool=4, mode=None):
         channels = list()
         if mode == "global":
-            chlist = list(self.state.channels.values())
+            possible_channels = list(self.state.channels.values())
         else:
-            chlist = list(event.guild.channels.values())
-        for gch in chlist:
-            if self.state.channels[gch.id].type is ChannelType.GUILD_TEXT:
-                if self.state.channels[gch.id].get_permissions(self.state.me.id).can(Permissions.VIEW_CHANNEL, Permissions.READ_MESSAGE_HISTORY):
-                    channels.append(self.state.channels[gch.id])
+            possible_channels = list(event.guild.channels.values())
+
+        for channel in possible_channels:
+            if channel.type == "GUILD_TEXT" and channel.get_permissions(self.state.me.id).can(Permissions.VIEW_CHANNEL, Permissions.READ_MESSAGE_HISTORY):
+                channels.append(channel)
 
         start_at = parse_duration(duration, negative=True)
         pool = Pool(pool)
@@ -318,7 +319,7 @@ class SQLPlugin(Plugin):
 
         msg = event.msg.reply(":alarm_clock: One moment pls...")
 
-        start = time.time()
+        start = time()
         tuples = list(Message.raw(
             sql,
             "{} {}".format(amount, unit),
@@ -329,9 +330,9 @@ class SQLPlugin(Plugin):
             "{}".format(word),
             unit
         ).tuples())
-        sql_duration = time.time() - start
+        sql_duration = time() - start
 
-        start = time.time()
+        start = time()
         chart = pygal.Line(style=DiscordStyle)
         chart.title = 'Usage of "{}" over {} {}'.format(
             word, amount, unit,
@@ -350,7 +351,7 @@ class SQLPlugin(Plugin):
         pngdata = cairosvg.svg2png(
             bytestring=chart.render(),
             dpi=72)
-        chart_duration = time.time() - start
+        chart_duration = time() - start
 
         event.msg.reply(
             "_SQL: {}ms_ - _Chart: {}ms_".format(
@@ -425,30 +426,3 @@ class Recovery(object):
             if to_datetime(chunk[-1].id) > self.end_dt:
                 break
 
-
-class Backfill(object):
-    def __init__(self, plugin, channel):
-        self.log = plugin.log
-        self.channel = channel
-
-        self._scanned = 0
-        self._inserted = 0
-
-    def run(self):
-        self.log.info("Starting backfill on channel %s", self.channel)
-
-        msgs_iter = self.channel.messages_iter(bulk=True, after=1, direction=MessageIterator.Direction.DOWN)
-        for chunk in msgs_iter:
-            if not chunk:
-                break
-
-            for msg in chunk:
-                if msg.author.bot:
-                    break
-
-                if not msg.channel.type == ChannelType.DM:
-                    if not msg.channel.get_permissions(351776065477279745).can(Permissions.SEND_MESSAGES, Permissions.VIEW_CHANNEL):
-                        break
-
-            self._scanned += len(chunk)
-            self._inserted = len(Message.from_disco_message_many(chunk, safe=True))

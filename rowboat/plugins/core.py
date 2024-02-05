@@ -474,7 +474,7 @@ class CorePlugin(Plugin):
                         ), inline=True)
                         embed.description = '```{}```'.format('\n'.join(tracked.traceback.split('\n')[-8:]))
 
-                    return event.reply('<:{}> something went wrong, perhaps try again later'.format(RED_TICK_EMOJI))
+                    return event.reply('<:{}> Something went wrong... try again later?'.format(RED_TICK_EMOJI))
 
             Command.track(event, command)
 
