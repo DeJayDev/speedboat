@@ -234,7 +234,7 @@ class SQLPlugin(Plugin):
 
         message = self.state.channels.get(message.channel_id).get_message(message.id)
         for reaction in message.reactions:
-            for users in message.get_reactors(reaction, bulk=True):
+            for users in message.get_reactors(reaction.emoji.name, bulk=True):
                 Reaction.from_disco_reactors(message.id, reaction.emoji, (i.id for i in users))
 
     @Plugin.command("global", "<duration:str> [pool:int]", level=-1, global_=True, context={"mode": "global"}, group="recover")
