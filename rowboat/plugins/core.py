@@ -635,8 +635,8 @@ class CorePlugin(Plugin):
             'message': event.msg,
             'guild': event.msg.guild,
             'channel': event.msg.channel,
-            'member': event.msg.member,
-            'author': event.msg.author,
+            'member': event.member, 
+            'author': event.author,
             'crab': '🦀'
         }
 
