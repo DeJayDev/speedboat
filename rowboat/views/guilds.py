@@ -65,7 +65,7 @@ def guild_get(guild):
 def guild_config(guild):
     encoding = chardet.detect(guild.config_raw.tobytes())['encoding']
     return jsonify({
-        'contents': guild.config_raw.tobytes().decode(encoding) if guild.config_raw else yaml.dump(guild.config, allow_unicode=True, dumper=CDumper),
+        'contents': guild.config_raw.tobytes().decode(encoding) if guild.config_raw else yaml.dump(guild.config, allow_unicode=True),
     })
 
 
