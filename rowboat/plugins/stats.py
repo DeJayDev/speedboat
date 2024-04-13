@@ -19,7 +19,7 @@ class StatsPlugin(Plugin):
         if ENV == "docker":
             initialize(statsd_host="dd-agent", statsd_port=8125, hostname_from_config=False)
         else:
-            initialize(statsd_host="127.0.0.1", statsd_port=8125, hostname_from_config=False)
+            initialize(statsd_host="172.17.0.1", statsd_port=8125, hostname_from_config=False)
 
         self.nonce = 0
         self.nonces = {}
@@ -67,7 +67,7 @@ class StatsPlugin(Plugin):
         if event.author.bot:
             return
 
-        if event.channel.type == "DM":
+        if event.channel.type is ChannelType.DM:
             return
 
         tags = {
@@ -95,7 +95,7 @@ class StatsPlugin(Plugin):
         if event.message.author.bot:
             return
 
-        if event.channel.type == "DM":
+        if event.channel.type is ChannelType.DM:
             return
 
         tags = {

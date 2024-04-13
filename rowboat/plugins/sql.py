@@ -7,7 +7,7 @@ import psycopg2
 import pygal
 from time import time
 from disco.types.channel import Channel as DiscoChannel
-from disco.types.channel import MessageIterator
+from disco.types.channel import ChannelType, MessageIterator
 from disco.types.guild import Guild as DiscoGuild
 from disco.types.message import MessageTable
 from disco.types.permissions import Permissions
@@ -247,7 +247,7 @@ class SQLPlugin(Plugin):
             possible_channels = list(event.guild.channels.values())
 
         for channel in possible_channels:
-            if channel.type == "GUILD_TEXT" and channel.get_permissions(self.state.me.id).can(Permissions.VIEW_CHANNEL, Permissions.READ_MESSAGE_HISTORY):
+            if channel.type is ChannelType.GUILD_DM and channel.get_permissions(self.state.me.id).can(Permissions.VIEW_CHANNEL, Permissions.READ_MESSAGE_HISTORY):
                 channels.append(channel)
 
         start_at = parse_duration(duration, negative=True)

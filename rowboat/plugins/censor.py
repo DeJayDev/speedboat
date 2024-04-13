@@ -4,6 +4,7 @@ import urllib.parse
 from urllib.parse import unquote
 
 from disco.types.base import cached_property
+from disco.types.channel import ChannelType
 from disco.util.sanitize import S
 
 from rowboat.constants import INVITE_LINK_RE, URL_RE
@@ -144,7 +145,7 @@ class CensorPlugin(Plugin):
         if author.id == self.state.me.id:
             return
 
-        if event.message.author.bot or event.channel.type == "DM":
+        if event.message.author.bot or event.channel.type is ChannelType.DM:
             return
 
         if event.webhook_id:
