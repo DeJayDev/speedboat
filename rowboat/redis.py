@@ -5,7 +5,7 @@ import redis
 from rowboat import ENV
 
 if ENV == "docker":
-    rdb = redis.Redis(db=0, host="redis")
+    rdb = redis.Redis(db=0, host="keydb")
 else:
     rdb = redis.Redis(db=0)
 

@@ -4,7 +4,7 @@ WORKDIR /opt/rowboat
 
 RUN git config --global safe.directory *
 
-COPY pyproject.toml poetry.lock .git/ ./
+COPY pyproject.toml poetry.lock manage.py .git/ ./
 
 ENV POETRY_HOME=/opt/poetry
 RUN python3 -m venv $POETRY_HOME

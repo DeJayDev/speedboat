@@ -1,5 +1,4 @@
 name: speedboat
-version: '3.8'
 
 services:
   db:
@@ -14,10 +13,10 @@ services:
     ports:
       - "5432:5432"
   redis:
-    image: redis:7-alpine
-    hostname: redis
-    container_name: redis
-    command: redis-server --appendonly yes
+    image: eqalpha/keydb:latest
+    hostname: keydb
+    container_name: keydb
+    command: keydb-server --appendonly yes
     volumes:
       - speedboat_redis_data:/data
     ports:
@@ -39,12 +38,8 @@ services:
     command: /opt/poetry/bin/poetry poe bot --env docker
     volumes:
       - .:/opt/rowboat
-    ports:
-      - "7171:7171"
     depends_on:
       - web
-    links:
-      - 'db:db'
   workers:
     build: .
     command: python manage.py workers

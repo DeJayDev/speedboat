@@ -1,0 +1,27 @@
+name: speedboat
+
+services:
+  web:
+    build: .
+    network_mode: bridge
+    command: python manage.py serve -r
+    volumes:
+      - .:/opt/rowboat
+    ports:
+      - "8686:8686"
+  bot:
+    build: .
+    network_mode: bridge
+    command: /opt/poetry/bin/poetry poe bot --env prod
+    volumes:
+      - .:/opt/rowboat
+    depends_on:
+      - web
+  workers:
+    build: .
+    network_mode: bridge
+    command: python manage.py workers
+    volumes:
+      - .:/opt/rowboat
+    depends_on:
+      - web
