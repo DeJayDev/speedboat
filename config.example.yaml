@@ -3,23 +3,26 @@ token: ''
 intents: 6087 # https://ziad87.net/intents/
 max_reconnects: 0
 
-manhole_enable: true
+manhole_enable: false
 manhole_bind: 0.0.0.0:7171
+
+encoder: 'etf'
 
 DSN: ''
 
 web:
-    CLIENT_SECRET: ''
-    SECRET_KEY: ''
-    DISCORD_CLIENT_ID: ''
-    DISCORD_CLIENT_SECRET: ''
-    DISCORD_API_BASE_URL: 'https://discord.com/api' #Leave this
-    DISCORD_TOKEN_URL: 'https://discord.com/api/oauth2/token' #Leave this
-    DISCORD_AUTH_URL: 'https://discord.com/oauth2/authorize' #Leave this
-    DISCORD_REDIRECT_URI: ''
+  CLIENT_SECRET: ''
+  SECRET_KEY: ''
+  DISCORD_CLIENT_ID: ''
+  DISCORD_CLIENT_SECRET: ''
+  DISCORD_API_BASE_URL: 'https://discord.com/api' #Leave this
+  DISCORD_TOKEN_URL: 'https://discord.com/api/oauth2/token' #Leave this
+  DISCORD_AUTH_URL: 'https://discord.com/oauth2/authorize' #Leave this
+  DISCORD_REDIRECT_URI: ''
 
 state:
   sync_guild_members: true
+  sync_guild_members_on_startup: false
 
 ENV: 'docker' # Set to 'prod' when prod
 

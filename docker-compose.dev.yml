@@ -3,19 +3,13 @@ name: speedboat
 services:
   db:
     build: ./docker/
-    hostname: db
-    container_name: db
     volumes:
       - speedboat_psql_data:/var/lib/postgresql/data
-    environment:
-      - ENV=production
     stop_grace_period: 1m
     ports:
       - "5432:5432"
-  redis:
+  keydb:
     image: eqalpha/keydb:latest
-    hostname: keydb
-    container_name: keydb
     command: keydb-server --appendonly yes
     volumes:
       - speedboat_redis_data:/data
@@ -26,15 +20,13 @@ services:
     command: python manage.py serve -r
     volumes:
       - .:/opt/rowboat
-    ports:
-      - "8686:8686"
     depends_on:
       - db
-      - redis
+      - keydb
+    ports:
+      - "8686:8686"
   bot:
     build: .
-    hostname: bot
-    container_name: bot
     command: /opt/poetry/bin/poetry poe bot --env docker
     volumes:
       - .:/opt/rowboat
