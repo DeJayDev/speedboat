@@ -19,15 +19,15 @@
     "react": "^18.2.0",
     "react-ace": "^11.0.1",
     "react-dom": "^18.2.0",
-    "react-icons": "^5.0.1",
+    "react-icons": "^5.1.0",
     "wouter": "^3.1.2",
     "zustand": "^4.5.2"
   },
   "devDependencies": {
-    "@types/react": "^18.2.78",
+    "@types/react": "^18.2.79",
     "@types/react-dom": "^18.2.25",
     "@vitejs/plugin-react": "^4.2.1",
     "typescript": "^5.4.5",
-    "vite": "^5.2.8"
+    "vite": "^5.2.10"
   }
 }
