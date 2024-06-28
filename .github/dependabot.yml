@@ -3,7 +3,7 @@ updates:
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     groups:
       bot-dependencies:
         patterns:
@@ -12,7 +12,7 @@ updates:
   - package-ecosystem: "npm"
     directory: "/frontend" 
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     groups:
       frontend-dependencies:
         patterns:
