@@ -25,7 +25,7 @@ function GuildConfig() {
 
   useEffect(() => {
     if(!match) return;
-    Guild.fromID(params?.gid!!).then(async g => {
+    Guild.fromID(params?.gid).then(async g => {
       setGuild(g)
       const config = await g.getConfig();
       setInitialConfig(config);
@@ -36,7 +36,7 @@ function GuildConfig() {
   function onEditorChange(newValue: string) {
     setNewConfig(newValue);
     setHasUnsavedChanges(false);
-    if (initialConfig != newValue) {
+    if (initialConfig !== newValue) {
       setHasUnsavedChanges(true)
     }
   }
@@ -46,7 +46,7 @@ function GuildConfig() {
       setInitialConfig(newConfig);
       setHasUnsavedChanges(false);
       renderMessage('success', 'Saved Configuration!');
-    }).catch((err: any) => {
+    }).catch((err) => {
       renderMessage('danger', `Failed to save configuration: ${err}`);
     });
   }
@@ -83,7 +83,7 @@ function GuildConfig() {
         </div>
         <div className='card-footer'>
           {
-            guild && guild.role != 'viewer' &&
+            guild && guild.role !== 'viewer' &&
             <button onClick={() => onSave()} type='button' className='btn btn-success btn-circle btn-lg'>
               <FaCheck/>
             </button>

@@ -1,7 +1,7 @@
-import { SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRoute } from "wouter";
 import Guild from "../types/guild";
-import Infraction from "../types/infractions";
+import type Infraction from "../types/infractions";
 
 function InfractionTable(props: {infraction: Infraction}) {
   const inf = props.infraction;

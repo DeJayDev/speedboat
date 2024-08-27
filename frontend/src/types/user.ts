@@ -28,14 +28,14 @@ export default class User {
   }
 
   async create() {
-    const res = await API.get<Guild[]>('/users/@me/guilds');
-    this.guilds = res.data.map((guild: Guild) => new Guild(guild));
+    const guild = await API.get<Guild[]>('/users/@me/guilds');
+    this.guilds = guild.map((guild: Guild) => new Guild(guild));
     return this;
   }
 
   static async fromID(id: string | number) {
-    const res = await API.get<User>(`/users/${id}`);
-    return new User(res.data);
+    const user = await API.get<User>(`/users/${id}`);
+    return new User(user);
   }
 
 

@@ -18,7 +18,7 @@ function App() {
   useEffect(() => {
     API.get<User>('/users/@me')
       .then(res => {
-        let apiUser = new User(res.data as User);
+        const apiUser = new User(res as User);
         setUser(apiUser)
       })
       .catch(err => {

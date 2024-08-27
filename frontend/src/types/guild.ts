@@ -33,7 +33,6 @@ class Guild {
 
   get owner() {
     // TODO: Can we make this return a String? IE:
-    // DeJay#1337 (ID)
     return this.owner_id;
   }
 
@@ -48,19 +47,19 @@ class Guild {
   }
 
   async getConfig() {
-    const res = await API.get(`guilds/${this.id}/config`);
-    return res.data.contents;
+    const res = await API.get(`/guilds/${this.id}/config`);
+    return res.contents;
   }
 
   async setConfig(config: any) {
-    API.post(`guilds/${this.id}/config`, {config: config}).catch((err) => {
-      console.log("Error while getting guild: " + err)
+    API.post(`/guilds/${this.id}/config`, {config: config}).catch((err) => {
+      console.log(`Error while getting guild: ${err}`)
     });
   }
 
   static async fromID(id: string | number) {
-    const res = await API.get<Guild>(`/guilds/${id}`);
-    return new Guild(res.data);
+    const guild = await API.get<Guild>(`/guilds/${id}`);
+    return new Guild(guild);
   }
 
 }

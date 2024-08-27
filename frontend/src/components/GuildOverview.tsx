@@ -20,16 +20,15 @@ function GuildSplash(props: {guild: Guild}) {
 
   if (props.guild.splash) {
     return <img src={props.guild.splashURL} alt='No Splash' />;
-  } else {
-    return <i>No Splash</i>;
   }
+    return <i>No Splash</i>;
 }
 
 function GuildInfoTable(props: {guild: Guild}) {
 
   return (
     <table className='table table-striped table-bordered'>
-      <thead></thead>
+      <thead/>
       <tbody>
         <tr>
           <td>ID</td>
@@ -57,7 +56,7 @@ export default function GuildOverview() {
   const [guild, setGuild] = useState<Guild>();
 
   function ensureGuild() {
-    Guild.fromID(params?.gid!!).then(g => setGuild(g));
+    Guild.fromID(params?.gid).then(g => setGuild(g));
   }
 
   useEffect(() => {

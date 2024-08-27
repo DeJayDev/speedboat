@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import useStore from "../State";
-import Guild from "../types/guild";
+import type Guild from "../types/guild";
 
 import { FaBan, FaEdit, FaInfo } from 'react-icons/fa';
 
