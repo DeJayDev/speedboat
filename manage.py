@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# ruff: noqa: E402, E702
 from gevent import monkey; monkey.patch_all()
 
 import copy
@@ -15,8 +16,6 @@ from werkzeug._reloader import run_with_reloader
 from yaml import safe_load
 
 from rowboat import ENV
-from rowboat.sql import init_db
-from rowboat.web import rowboat
 
 
 class BotSupervisor(object):
@@ -63,6 +62,7 @@ def cli():
 @cli.command()
 @click.option('--reloader/--no-reloader', '-r', default=False)
 def serve(reloader):
+    from rowboat.web import rowboat
     def run():
         wsgi.WSGIServer(('0.0.0.0', 8686), rowboat).serve_forever()
 
@@ -88,6 +88,7 @@ def bot(env):
 @cli.command()
 @click.option('--worker-id', '-w', default=0)
 def workers(worker_id):
+    from rowboat.sql import init_db
     from rowboat.tasks import TaskWorker
 
     # Log things to file
@@ -108,7 +109,10 @@ def workers(worker_id):
 def add_global_admin(user_id):
     from rowboat.models.user import User
     from rowboat.redis import rdb
+    from rowboat.sql import init_db
+
     init_db(ENV)
+
     rdb.sadd('global_admins', user_id)
     user = User.get_id(user_id)
     user.update(admin=True)
@@ -120,6 +124,8 @@ def add_global_admin(user_id):
 @click.argument('flag')
 def add_whitelist(guild_id, flag):
     from rowboat.models.guild import Guild
+    from rowboat.sql import init_db
+    
     init_db(ENV)
 
     flag = Guild.WhitelistFlags.get(flag)
@@ -143,7 +149,9 @@ def add_whitelist(guild_id, flag):
 @click.argument('guild-id')
 @click.argument('flag')
 def rmv_whitelist(guild_id, flag):
+    from rowboat.sql import init_db
     from rowboat.models.guild import Guild
+
     init_db(ENV)
 
     flag = Guild.WhitelistFlags.get(flag)

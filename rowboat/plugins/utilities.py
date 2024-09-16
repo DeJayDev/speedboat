@@ -119,18 +119,6 @@ class UtilitiesPlugin(Plugin):
         except:
             return event.msg.reply("{} Cat not found :(".format(cat.status_code))
 
-    @Plugin.command("otter", global_=True)
-    def otter(self, event):
-        try:
-            URL = "https://otter.bruhmomentlol.repl.co/random"
-            otter = requests.get(URL)
-            otter.raise_for_status()
-
-            fext = otter.headers["x-file-ext"]
-            event.msg.reply("", attachments=[("otter.{}".format(fext), otter.content)])
-        except:
-            return event.msg.reply("{} Otter not found :(".format(otter.status_code))
-
     @Plugin.command("dog", global_=True)
     def dog(self, event):
         try:
@@ -142,7 +130,7 @@ class UtilitiesPlugin(Plugin):
             fname = data[0]["id"]
             fext = dog.headers["content-type"].split("/")[-1].split(";")[0]
             event.msg.reply("", attachments=[("dog-{}.{}".format(fname, fext), dog.content)])
-        except Exception as e:
+        except:
             return event.msg.reply("{} Dog not found :(".format(dog.status_code))
 
     @Plugin.command("emoji", "<emoji:str>", global_=True)

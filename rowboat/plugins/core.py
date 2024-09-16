@@ -814,12 +814,11 @@ class CorePlugin(Plugin):
             deleted = 0
 
             for message in messages:
-                m: Message = message
                 if message.deleted:
                     message.delete_instance()
                     continue # moving on.
 
-                if state.channels[message.channel_id]:
+                if self.state.channels[message.channel_id]:
                     self.bot.client.api.channels_messages_delete(message.channel_id, message.id)
 
                 message.delete_instance()

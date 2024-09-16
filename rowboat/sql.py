@@ -1,12 +1,9 @@
 import os
 
-import psycogreen.gevent
 from peewee import OP, Expression, Model, Proxy
-from playhouse.postgres_ext import PostgresqlExtDatabase
 
 from rowboat import ENV
-
-psycogreen.gevent.patch_psycopg()
+from rowboat.util.psycopgext import Psycopg3ExtDatabase
 
 REGISTERED_MODELS = list()
 
@@ -33,29 +30,33 @@ class ModelBase(Model):
 def init_db(env):
     if env == "docker":
         database.initialize(
-            PostgresqlExtDatabase(
+            Psycopg3ExtDatabase(
                 "rowboat",
                 host="db",
                 user="rowboat",
                 port=int(os.getenv("PG_PORT", 5432)),
+                register_hstore=True
             )
         )
     elif env == "dev":
         database.initialize(
-            PostgresqlExtDatabase(
+            Psycopg3ExtDatabase(
                 "rowboat",
                 host="localhost",
-                user="rowboat",
+                user="postgres",
+                password="mysecretpassword",
                 port=int(os.getenv("PG_PORT", 5432)),
+                register_hstore=True
             )
         )
     else:
         database.initialize(
-            PostgresqlExtDatabase(
+            Psycopg3ExtDatabase(
                 "rowboat", 
                 host="172.17.0.1",
                 user="rowboat", 
-                port=int(os.getenv("PG_PORT", 5432))
+                port=int(os.getenv("PG_PORT", 5432)),
+                register_hstore=True
             )
         )
 

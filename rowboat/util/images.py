@@ -1,8 +1,8 @@
-from dominantcolors import get_dominant_colors_for
+from modern_colorthief import get_color
 
 
 def get_dominant_colors(img):
-    return get_dominant_colors_for(img, 1)
+    return get_color(img, 1)
 
 
 def get_dominant_colors_user(user, url=None):

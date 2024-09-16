@@ -33,7 +33,7 @@ def C(txt, codeblocks=False):
     if codeblocks:
         txt = escape_codeblocks(txt)
 
-    return INVITE_LINK_RE.sub("\g<0>" + ZERO_WIDTH_SPACE, txt)
+    return INVITE_LINK_RE.sub("?P=0" + ZERO_WIDTH_SPACE, txt)
 
 
 def escape_codeblocks(txt):
